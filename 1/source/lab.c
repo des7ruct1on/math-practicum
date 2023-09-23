@@ -29,7 +29,7 @@ status_code is_prime_num(int num, bool* result) {
     }
 
     int count_digits = 0;
-    for (int i = 0; i < sqrt(num) + 1; i++) {
+    for (int i = 1; i < sqrt(num) + 1; i++) {
         if (num % i == 0) {
             count_digits++;
             if (num / i == i) {
