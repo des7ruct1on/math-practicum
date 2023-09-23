@@ -1,5 +1,5 @@
 # Описание
 
-###Запуск программы###
+Запуск программы
 >- gcc ../source/lab.c main.c
->- ./a.out <FLAG> <NUM>
+>- ./a.out (FLAG) (NUM>)
