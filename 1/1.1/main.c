@@ -8,7 +8,7 @@
 
 int main(int argc, const char *argv[]) {
     if (argc != 3) {
-        printf("Your programm must start with: %s FLAG= NUMBER=\n", argv[0]);
+        printf("Your programm must start with: %s <FLAG> <NUMBER>\n", argv[0]);
         exit(1);
     }
     int num = atoi(argv[2]);
