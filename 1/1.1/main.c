@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <math.h>
-#include "../headers/lab.h"
+#include "headers/lab.h"
 
 int main(int argc, const char *argv[]) {
     if (argc != 3) {
@@ -40,6 +40,7 @@ int main(int argc, const char *argv[]) {
         switch(partition_number(num, &result, length)) {
             case code_succes:
                 printf("String of a number %d: %s\n", num, result);
+                free(result);
                 break;
             default:
                 printf("Something went wrong\n");
