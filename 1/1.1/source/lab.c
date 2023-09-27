@@ -62,11 +62,13 @@ status_code partition_number(int num, char** result, int len_number) {
         strcpy(*result, "0");
         return code_succes;
     }
-
     while (num % 10 == 0) {
         num /= 10;
     }
-    int res_size = 2 * len_number - 1;
+    int res_size = res_size = 2 * len_number - 1;
+    if (num < 0) {
+        num *= -1;
+    }
     char res[res_size];
     res[res_size - 1] = '\0';
     for (int i = res_size - 1; i >= 0; i -= 2) { // Начинаем с конца массива и устанавливаем первый символ

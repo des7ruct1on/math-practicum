@@ -17,12 +17,17 @@ int main(int argc, const char *argv[]) {
         exit(1);
     }
     char flag = argv[1][1];
+    bool result;
+    int length;
+    char* result_str = NULL;
+    int number_to_pow;
+    int result_progression;
+    long result_fact;
     switch (flag) {
         case 'h':
             print_natural_number(num);
             break;
         case 'p':
-            bool result;
             switch(is_prime_num(num, &result)) {
                 case code_succes:
                     if (result == true) {
@@ -40,8 +45,7 @@ int main(int argc, const char *argv[]) {
             }
             break;
         case 's':
-            int length = get_length(num);
-            char* result_str = NULL;
+            length = get_length(num);
             switch(partition_number(num, &result_str, length)) {
                 case code_succes:
                     printf("String of a number %d: %s\n", num, result_str);
@@ -53,7 +57,6 @@ int main(int argc, const char *argv[]) {
             }
             break;
         case 'e':
-            int number_to_pow;
             printf("Enter the number to raise to the power %d\n", num);
             scanf("%d", &number_to_pow);
             switch (print_pow(number_to_pow, num)) {
@@ -69,7 +72,6 @@ int main(int argc, const char *argv[]) {
             }
             break;
         case 'a':
-            int result_progression;
             switch (ariphm_progression(num, &result_progression)) {
                 case code_succes:
                     printf("Result: %d\n", result_progression);
@@ -83,7 +85,6 @@ int main(int argc, const char *argv[]) {
             }
             break;
         case 'f':
-            long result_fact;
             switch (factorial(num, &result_fact)) {
                 case code_succes:
                     printf("Result: %ld\n", result_fact);
