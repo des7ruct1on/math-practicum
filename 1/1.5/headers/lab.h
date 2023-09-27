@@ -16,7 +16,7 @@ typedef enum status_code {
     code_diverge
 } status_code;
 
-bool compare_double_less(double a, double b, double epsilon)
+bool compare_double_less(double a, double b, double epsilon);
 bool compare_double_bigger(double a, double b, double epsilon);
 bool compare_double_equal(double a, double b, double epsilon);
 status_code factorial(int num, double* res, double epsilon);
