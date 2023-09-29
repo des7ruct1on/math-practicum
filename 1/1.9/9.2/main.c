@@ -18,7 +18,7 @@ int main() {
             break;
         case code_malloc_error:
             printf("Error memory allocation detected!!!\n");
-            return 1;
+            exit(1);
     }
 
     switch (generate_array(&arr_b, size_b, -1000, 1000)) {
@@ -27,7 +27,7 @@ int main() {
         case code_malloc_error:
             printf("Error memory allocation detected!!!\n");
             free(arr_a);
-            return 1;
+            exit(1);
     }
 
     // print arrays A and B
@@ -48,6 +48,7 @@ int main() {
         printf("Error memory allocation detected!!!\n");
         free(arr_a);
         free(arr_b);
+        exit(1);
     }
     // print array C
     printf("Array C: ");
