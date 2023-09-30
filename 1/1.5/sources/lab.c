@@ -14,7 +14,7 @@ bool compare_double_equal(double a, double b, double epsilon) {
 
 status_code factorial(int num, double* res, double epsilon) {
     if (num < 0) {
-        *res = NULL; 
+        res = NULL; 
         return code_invalid_parameter;
     }
     if (num == 0 || num == 1) {
@@ -35,7 +35,7 @@ status_code factorial(int num, double* res, double epsilon) {
 
 status_code double_factorial(int num, double* res, double epsilon) {
     if (num < 0) {
-        *res = NULL; 
+        res = NULL; 
         return code_invalid_parameter;
     }
     if (num == 0 || num == 1) {
@@ -98,7 +98,7 @@ status_code summary_a(double epsilon, double x, double* result) {
                 return code_invalid_parameter;
             case code_overflow:
                 return code_overflow;
-            case code_succes:
+            default:
                 break;
         }
         switch (binary_power(x, n, &pow_res)) {
@@ -106,7 +106,7 @@ status_code summary_a(double epsilon, double x, double* result) {
                 return code_invalid_parameter;
             case code_overflow:
                 return code_overflow;
-            case code_succes:
+            default:
                 break;
         }
         if (n == 0) {
@@ -141,7 +141,7 @@ status_code summary_b(double epsilon, double x, double* result) {
                 return code_invalid_parameter;
             case code_overflow:
                 return code_overflow;
-            case code_succes:
+            default:
                 break;
         }
         switch (binary_power(-1, n, &first_pow_res)) {
@@ -149,7 +149,7 @@ status_code summary_b(double epsilon, double x, double* result) {
                 return code_invalid_parameter;
             case code_overflow:
                 return code_overflow;
-            case code_succes:
+            default:
                 break;
         }
         switch (binary_power(x, 2 * n, &second_pow_res)) {
@@ -157,7 +157,7 @@ status_code summary_b(double epsilon, double x, double* result) {
                 return code_invalid_parameter;
             case code_overflow:
                 return code_overflow;
-            case code_succes:
+            default:
                 break;
         }
         if (n == 0) {
@@ -192,7 +192,7 @@ status_code summary_c(double epsilon, double x, double* result) {
                 return code_invalid_parameter;
             case code_overflow:
                 return code_overflow;
-            case code_succes:
+            default:
                 break;
         }
         switch (factorial(n, &second_pow_res, epsilon)) {
@@ -200,7 +200,7 @@ status_code summary_c(double epsilon, double x, double* result) {
                 return code_invalid_parameter;
             case code_overflow:
                 return code_overflow;
-            case code_succes:
+            default:
                 break;
         }
         switch (binary_power(3, 3 * n, &first_pow_res)) {
@@ -208,7 +208,7 @@ status_code summary_c(double epsilon, double x, double* result) {
                 return code_invalid_parameter;
             case code_overflow:
                 return code_overflow;
-            case code_succes:
+            default:
                 break;
         }
         switch (binary_power(second_pow_res, 3, &second_pow_res)) {
@@ -216,7 +216,7 @@ status_code summary_c(double epsilon, double x, double* result) {
                 return code_invalid_parameter;
             case code_overflow:
                 return code_overflow;
-            case code_succes:
+            default:
                 break;
         }
         switch (binary_power(x, 2 * n, &third_pow_res)) {
@@ -224,7 +224,7 @@ status_code summary_c(double epsilon, double x, double* result) {
                 return code_invalid_parameter;
             case code_overflow:
                 return code_overflow;
-            case code_succes:
+            default:
                 break;
         }
         if (n == 0) {
@@ -259,7 +259,7 @@ status_code summary_d(double epsilon, double x, double* result) {
                 return code_invalid_parameter;
             case code_overflow:
                 return code_overflow;
-            case code_succes:
+            default:
                 break;
         }
         switch (double_factorial(2 * n - 1, &second_pow_res, epsilon)) {
@@ -267,7 +267,7 @@ status_code summary_d(double epsilon, double x, double* result) {
                 return code_invalid_parameter;
             case code_overflow:
                 return code_overflow;
-            case code_succes:
+            default:
                 break;
         }
         switch (binary_power(-1, n, &first_pow_res)) {
@@ -275,7 +275,7 @@ status_code summary_d(double epsilon, double x, double* result) {
                 return code_invalid_parameter;
             case code_overflow:
                 return code_overflow;
-            case code_succes:
+            default:
                 break;
         }
         switch (binary_power(x, 2 * n, &third_pow_res)) {
@@ -283,7 +283,7 @@ status_code summary_d(double epsilon, double x, double* result) {
                 return code_invalid_parameter;
             case code_overflow:
                 return code_overflow;
-            case code_succes:
+            default:
                 break;
         }
         if (n == 1) {

@@ -12,12 +12,11 @@ int main(int argc, const char *argv[]) {
         printf("Your programm must start with: %s <FLAG> <INPUT_FILE>\n", argv[0]);
         exit(1);
     }
-    int num = atoi(argv[2]);
     if (argv[1][0] != '/' && argv[1][0] != '-') {
         printf("Your flag must start with '-' or '/' symbol!\n");
         exit(1);
     }
-    char* input_name = argv[2];
+    const char* input_name = argv[2];
     char* output_name = NULL;
     char flag;
     if (argv[1][1] == 'n') {
@@ -54,10 +53,9 @@ int main(int argc, const char *argv[]) {
             case 'd':
                 for (int i = 0; line[i] != '\0'; i++) {
                     if (!isdigit(line[i])) {
-                        fprintf(output_file, " ");
+                        fprintf(output_file, "%c", line[i]);
                     }
                 } 
-                fputc('\n', output_file);
                 break;
             case 'i':
                 count_latin_letters(line, &counter);
@@ -86,7 +84,7 @@ int main(int argc, const char *argv[]) {
     }
     fclose(input_file);
     fclose(output_file);
-    if (argc == 4) {
+    if (argc == 3) {
         free(output_name);
     }
     return 0;

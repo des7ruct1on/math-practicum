@@ -25,6 +25,7 @@ typedef enum status_code {
 bool compare_double_less(double a, double b, double epsilon);
 bool compare_double_bigger(double a, double b, double epsilon);
 bool compare_double_equal(double a, double b, double epsilon);
+void bubble_sort_descending(double* arr, int size, double epsilon);
 void swap(double *arr, int i, int j);
 void reverse(double *arr, int begin, int end);
 bool next_permutation(double *arr, int n);

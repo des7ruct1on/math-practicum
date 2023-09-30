@@ -11,32 +11,28 @@ void print_natural_number(int num) {
 }
 
 status_code is_prime_num(int num, bool* result) {
-    if (num == 0) {
-        *result = true;
-        return code_succes;
-    }
-    if (num < 0) {
+    if (num == 0 || num == 1 || num < 0) {
         *result = false;
         return code_invalid_parameter;
     }
-
-    int count_digits = 0;
-    for (int i = 1; i < sqrt(num) + 1; i++) {
+    int count_digits = 2; 
+    for (int i = 2; i * i <= num; ++i) { 
         if (num % i == 0) {
             count_digits++;
-            if (num / i == i) {
+            if (i != num / i) {
                 count_digits++;
             }
         }
     }
     if (count_digits == 2) {
         *result = true;
-        return code_succes;
+        return code_succes; 
     } else {
         *result = false;
-        return code_succes;
+        return code_succes; 
     }
 }
+
 
 int get_length(int num) {
     if (num == 0) {
@@ -55,7 +51,7 @@ int get_length(int num) {
 
 status_code partition_number(int num, char** result, int len_number) {
     if (num == 0) {
-        *result = (char*)malloc(2);
+        *result = (char*)malloc(sizeof(char));
         if (*result == NULL) {
             return code_overflow; 
         }
@@ -94,7 +90,7 @@ status_code print_pow(int num_pow, int num) {
     }
     int check_res = 1;
     int tmp_res;
-    for (int i = 0; i < num; i++) {
+    for (int i = 0; i <= num; i++) {
         if (i > 0) {
             check_res = tmp_res;
         }
@@ -131,7 +127,7 @@ status_code ariphm_progression(int num, int* result) {
 
 status_code factorial(int num, long* res) {
     if (num < 0) {
-        *res = NULL; 
+        res = NULL; 
         return code_invalid_parameter;
     }
     if (num == 0 || num == 1) {

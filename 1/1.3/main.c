@@ -6,7 +6,6 @@
 #include <math.h>
 #include "headers/lab.h"
 
-
 int main(int argc, const char *argv[]) {
     if (argc < 2) {
         printf("Your programm must start with: %s <FLAG> <PARAMETRES>\n", argv[0]);
@@ -31,20 +30,22 @@ int main(int argc, const char *argv[]) {
             double coef2 = atof(argv[4]);
             double coef3 = atof(argv[5]);
             double coefs[3] = {coef1, coef2, coef3};
+            bubble_sort_descending(coefs, 3, epsilon_q);
             double root1, root2;
             do {
+                printf("Equation: %.3f.*x^2 + (%.3f*x) + (%.3f)\n", coefs[0], coefs[1], coefs[2]);
                 switch(solve_sqr_equation(coefs, epsilon_q, &root1, &root2)) {
                     case status_invalid_parametr:
                         printf("Invalid parametr detected!!!\n");
                         break;
                     case status_two_roots:
-                        printf("Solution: x_1 = %f, x_2 = %f\n", root1, root2);
+                        printf("\t\tSolution: x_1 = %f, x_2 = %f\n", root1, root2);
                         break;
                     case status_one_root:
-                        printf("Solution: x = %f\n", root1);
+                        printf("\t\tSolution: x = %f\n", root1);
                         break;
                     case status_no_roots:
-                        printf("This equation does not have solutin in Real numbers\n");
+                        printf("\t\tThis equation does not have solutin in Real numbers\n");
                         break;
                 }
             } while(next_permutation(coefs, 3));
@@ -78,16 +79,16 @@ int main(int argc, const char *argv[]) {
             double side1 = atof(argv[3]);
             double side2 = atof(argv[4]);
             double side3 = atof(argv[5]);
-            printf("%f %f %f\n", side1, side2, side3);
             double sides[3] = {side1, side2, side3};
+            bubble_sort_descending(sides, 3, epsilon_q);
             do {
                 switch(is_triangle(sides, epsilon_q, &result)) {
                     case code_succes:
                         if (result) {
-                            printf("Yes\n");
+                            printf("Yes, if c = %f, a = %f, b = %f\n", sides[0], sides[1], sides[2]);
                             need_stop = true;
                         } else {
-                            printf("No\n");
+                            printf("No, if c = %f, a = %f, b = %f\n", sides[0], sides[1], sides[2]);
                         }
                         break;
                     case code_invalid_parameter:

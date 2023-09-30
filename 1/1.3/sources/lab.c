@@ -13,7 +13,7 @@ bool compare_double_equal(double a, double b, double epsilon) {
 }
 
 void swap(double *arr, int i, int j) {
-    int temp = arr[i];
+    double temp = arr[i];
     arr[i] = arr[j];
     arr[j] = temp;
 }
@@ -23,6 +23,16 @@ void reverse(double *arr, int begin, int end) {
         swap(arr, begin, end);
         begin++;
         end--;
+    }
+}
+
+void bubble_sort_descending(double* arr, int size, double epsilon) {
+    for (int i = 0; i < size; i++) {
+        for (int j = size - 1; j > i; j--) {
+            if (compare_double_bigger(arr[i], arr[j], epsilon)) {
+                swap(arr, i, j);
+            }
+        }
     }
 }
 
@@ -63,9 +73,18 @@ sqr_equation_status_code solve_sqr_equation(double* coefs, double epsilon, doubl
     if (discriminant > 0) {
         *root1 = ((-1) * coefs[1] + sqrt(discriminant)) / (2 * coefs[0]);
         *root2 = ((-1) * coefs[1] - sqrt(discriminant)) / (2 * coefs[0]);
+        if (*root1 == -0) {
+            *root1 = 0;
+        }
+        if (*root2 == -0) {
+            *root2 = 0;
+        }
         return status_two_roots;
     } else if (discriminant == 0) {
         *root1 = ((-1) * coefs[1]) / (2 * coefs[0]);
+        if (*root1 == -0) {
+            *root1 = 0;
+        }
         return status_one_root;
     } else {
         return status_no_roots;
