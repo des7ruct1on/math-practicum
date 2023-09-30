@@ -14,7 +14,7 @@ bool compare_double_equal(double a, double b, double epsilon) {
 
 status_code factorial(int num, double* res, double epsilon) {
     if (num < 0) {
-        res = NULL; 
+        *res = NULL; 
         return code_invalid_parameter;
     }
     if (num == 0 || num == 1) {
@@ -35,7 +35,7 @@ status_code factorial(int num, double* res, double epsilon) {
 
 status_code double_factorial(int num, double* res, double epsilon) {
     if (num < 0) {
-        res = NULL; 
+        *res = NULL; 
         return code_invalid_parameter;
     }
     if (num == 0 || num == 1) {

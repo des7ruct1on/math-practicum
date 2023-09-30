@@ -131,7 +131,7 @@ status_code ariphm_progression(int num, int* result) {
 
 status_code factorial(int num, long* res) {
     if (num < 0) {
-        res = NULL; 
+        *res = NULL; 
         return code_invalid_parameter;
     }
     if (num == 0 || num == 1) {
