@@ -51,6 +51,33 @@ void generate_lexems(FILE* input_file, FILE* output_file) {
     }
 }
 
+void rewrite_by_two_files(FILE* input_file1, FILE* input_file2, FILE* output_file) {
+    char line_1[STR_SIZE];
+    char line_2[STR_SIZE];
+    bool file_1_ended = false;
+    bool file_2_ended = false;
+    while (true) {
+        if (file_1_ended && file_2_ended) {
+            break;
+        }
+        if (!file_1_ended) {
+            fscanf(input_file1, "%s", line_1);
+            fprintf(output_file, "%s ", line_1);
+            if (feof(input_file1)) {
+                file_1_ended = true;
+            }
+        }
+
+        if (!file_2_ended) {
+            fscanf(input_file2, "%s", line_2);
+            fprintf(output_file, "%s ", line_2);
+            if (feof(input_file2)) {  
+                file_2_ended = true;
+            }
+        }
+    }
+}
+
 int main(int argc, const char *argv[]) {
     if (argv[1][0] != '/' && argv[1][0] != '-') {
         printf("Your flag must start with '-' or '/' symbol!\n");
@@ -101,51 +128,11 @@ int main(int argc, const char *argv[]) {
 
     char line_1[STR_SIZE];
     char line_2[STR_SIZE];
-    bool token_1_end = false;
-    bool token_2_end = false;
+    bool file_1_ended = false;
+    bool file_2_ended = false;
     switch (flag) {
         case 'r':
-            while (true) {         
-                char *saveptr1;
-                char *saveptr2;
-                char* token_1;
-                char* token_2;
-                if (fgets(line_1, sizeof(line_1), input_file1) != NULL) {
-                    token_1 = strtok_r(line_1, " \t\n", &saveptr1);
-                }
-                if (fgets(line_2, sizeof(line_2), input_file2) != NULL) {
-                    token_2 = strtok_r(line_2, " \t\n", &saveptr2);
-                }
-                if (token_1 == NULL && token_2 == NULL) {
-                    break;
-                }
-                while (true) {
-                    if (!token_1_end && token_1 != NULL) {
-                        fprintf(output_file, "%s", token_1);
-                        token_1 = strtok_r(NULL, " \t\n", &saveptr1);
-                    } 
-                    if (token_1 == NULL) {
-                        token_1_end = true;
-                    } else {
-                        fprintf(output_file, " ");
-                    }
-                    if (!token_2_end && token_2 != NULL) {
-                        fprintf(output_file, "%s", token_2);
-                        token_2 = strtok_r(NULL, " \t\n", &saveptr2);
-                    } 
-
-                    if (token_2 == NULL) {
-                        token_2_end = true;
-                    } else {
-                        fprintf(output_file, " ");
-                    }
-                    if (token_2 == NULL && token_1 == NULL) {
-                        token_1_end = false;
-                        token_2_end = false;
-                        break;
-                    }
-                }
-            }
+            rewrite_by_two_files(input_file1, input_file2, output_file);
             fclose(input_file2);
             break;
         case 'a':
