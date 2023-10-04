@@ -33,57 +33,6 @@ status_code is_prime_num(int num, bool* result) {
     }
 }
 
-
-int get_length(int num) {
-    if (num == 0) {
-        return 1;
-    }
-    while (num % 10 == 0) {
-        num /= 10;
-    }
-    int count = 0;
-    while(num) {
-        count++;
-        num /= 10;
-    }
-    return count;
-}
-
-status_code partition_number(int num, char** result, int len_number) {
-    if (num == 0) {
-        *result = (char*)malloc(sizeof(char));
-        if (*result == NULL) {
-            return code_overflow; 
-        }
-        strcpy(*result, "0");
-        return code_succes;
-    }
-    while (num % 10 == 0) {
-        num /= 10;
-    }
-    int res_size = res_size = 2 * len_number - 1;
-    if (num < 0) {
-        num *= -1;
-    }
-    char res[res_size];
-    res[res_size - 1] = '\0';
-    for (int i = res_size - 1; i >= 0; i -= 2) { // Начинаем с конца массива и устанавливаем первый символ
-        int digit = num % 10;
-        res[i] = digit + '0';
-        if (i != 0) {
-            res[i - 1] = ' ';
-        }
-        num /= 10;
-    }
-
-    *result = (char*)malloc(res_size + 1);
-    strcpy(*result, res);
-
-    return code_succes;
-}
-
-
-
 status_code print_pow(int num_pow, int num) {
     if (num_pow > 10) {
         return code_invalid_parameter;
@@ -146,3 +95,22 @@ status_code factorial(int num, long* res) {
     return code_succes;
 }
 
+void partition_number(const char* num) {
+    int length = strlen(num);
+    if (length == 1) {
+        printf("%s\n", num);
+        return;
+    }
+    int last_index = length - 1;
+    while (last_index >= 0 && num[last_index] == '0') {
+        last_index--;
+    }
+    for (int i = 0; i <= last_index; i++) {
+        printf("%c", num[i]);
+        if (i != last_index) {
+            printf(" ");
+        }
+    }
+
+    printf("\n");
+}

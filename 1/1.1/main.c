@@ -6,6 +6,26 @@
 #include <math.h>
 #include "headers/lab.h"
 
+void partition_number(const char* num) {
+    int length = strlen(num);
+    if (length == 1) {
+        printf("%s\n", num);
+        return;
+    }
+    int last_index = length - 1;
+    while (last_index >= 0 && num[last_index] == '0') {
+        last_index--;
+    }
+    for (int i = 0; i <= last_index; i++) {
+        printf("%c", num[i]);
+        if (i != last_index) {
+            printf(" ");
+        }
+    }
+
+    printf("\n");
+}
+
 int main(int argc, const char *argv[]) {
     if (argc != 3) {
         printf("Your programm must start with: %s <FLAG> <NUMBER>\n", argv[0]);
@@ -45,16 +65,7 @@ int main(int argc, const char *argv[]) {
             }
             break;
         case 's':
-            length = get_length(num);
-            switch(partition_number(num, &result_str, length)) {
-                case code_succes:
-                    printf("String of a number %d: %s\n", num, result_str);
-                    free(result_str);
-                    break;
-                default:
-                    printf("Something went wrong\n");
-                    break;
-            }
+            partition_number(argv[2]);
             break;
         case 'e':
             printf("Enter the number to raise to the power %d\n", num);
