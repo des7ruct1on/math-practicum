@@ -11,4 +11,8 @@
 
 #define STR_SIZE 256
 
+void generate_lexems(FILE* input_file, FILE* output_file);
+void rewrite_by_two_files(FILE* input_file1, FILE* input_file2, FILE* output_file);
+
+
 #endif
