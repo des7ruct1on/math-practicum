@@ -8,6 +8,10 @@
 #include "headers/lab.h"
 
 int main(int argc, const char *argv[]) {
+    if (argc < 4) {
+        printf("Your programm must start at least with: %s <FLAG> <FILE_1> <FILE_OUT>\n", argv[0]);
+        exit(1);
+    }
     if (argv[1][0] != '/' && argv[1][0] != '-') {
         printf("Your flag must start with '-' or '/' symbol!\n");
         exit(1);
