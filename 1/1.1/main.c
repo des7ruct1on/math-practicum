@@ -6,26 +6,6 @@
 #include <math.h>
 #include "headers/lab.h"
 
-void partition_number(const char* num) {
-    int length = strlen(num);
-    if (length == 1) {
-        printf("%s\n", num);
-        return;
-    }
-    int last_index = length - 1;
-    while (last_index >= 0 && num[last_index] == '0') {
-        last_index--;
-    }
-    for (int i = 0; i <= last_index; i++) {
-        printf("%c", num[i]);
-        if (i != last_index) {
-            printf(" ");
-        }
-    }
-
-    printf("\n");
-}
-
 int main(int argc, const char *argv[]) {
     if (argc != 3) {
         printf("Your programm must start with: %s <FLAG> <NUMBER>\n", argv[0]);

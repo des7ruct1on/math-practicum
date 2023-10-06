@@ -2,6 +2,7 @@
     "files.associations": {
         "lab.h": "c",
         "stdlib.h": "c",
-        "math.h": "c"
+        "math.h": "c",
+        "stdio.h": "c"
     }
 }
