@@ -1,0 +1,208 @@
+#include "../headers/lab.h"
+
+long double limit(long double function(int x), double epsilon) {
+    int i = 1;
+    int step = 1 / epsilon;
+    long double res = 0;
+    long double prev_res = 0;
+    while (fabs(res - prev_res) > epsilon || prev_res == 0) {
+        prev_res = res;
+        i += step;
+        res = function(i);
+    }
+
+    return res;
+}
+
+
+long double summ_row(long double function(int x), double epsilon, int begin) {
+    long double res = 0;
+    long double prev_res = 0;
+    while (fabs(res - prev_res) > epsilon || fabs(prev_res) < epsilon) {
+        prev_res = res;
+		res += function(begin);
+        begin++;
+    } 
+    return res;
+}
+
+long double prod(long double function(int x), double epsilon, int begin) {
+    long double res = 1;
+    long double prev_res = 0;
+    while (fabs(res - prev_res) > epsilon || fabs(prev_res) < epsilon) {
+        prev_res = res;
+		res *= function(begin);
+        begin++;
+    }
+    return res;
+}
+
+long double factorial(int n) {
+	if (n == 0) {
+		return 1;
+	}
+	int res = 1;
+	while (n > 0) {
+		res *= n;
+		n--;
+	}
+	return res;
+}
+
+long double function_exp_limit(int x) {
+    return pow(1 + 1.0 / x, x);
+}
+
+long double function_exp_row(int x) {
+    return 1 / factorial(x);
+}
+
+long double function_pi_row(int x) {
+	return 4 * pow(-1.0, x - 1) / (2.0 * x - 1);
+}
+
+long double function_log_2_lim(int x) {
+    return x * (pow(2, 1 / x) - 1);
+}
+
+long double function_log_2_row(int x) {
+    return pow(-1, x - 1) / x;
+}
+
+long double function_sqrt2_lim(double epsilon) {
+	int i = 0, j;
+	long double res = -0.5, prev_res = 0;
+
+	while (fabs(res - prev_res) > epsilon || prev_res == 0) {
+		prev_res = res;
+		res = res - ((res * res) / 2) + 1;
+	}
+	return res;
+}
+
+double equation_dichotomy(double equation(double x), double a, double b, double eps) {
+	double mid_res;
+	while (fabs(a - b) > eps) {
+		mid_res = equation((a + b) / 2);
+		if (equation(a) * mid_res > 0) {
+			a = (a + b) / 2;
+		}
+
+		if (equation(b) * mid_res > 0) {
+			b = (a + b) / 2;
+		}
+	}
+	return (a + b) / 2;
+}
+
+long double function_sqrt2_row(int x) {
+    return pow(2, pow(2, -x));
+}
+
+double function_exp_equation(double x) {
+    return log(x) - 1;
+}
+
+double function_pi_equation(double x) {
+    return sin(x);
+}
+
+double function_sqrt_equation(double x) {
+    return pow(x, 2) - 2;
+}
+
+long double function_pi_limit(double eps) {
+    long double n = 1;
+    long double res = 4;
+    long double prev;
+    do {
+        prev = res;
+        res *= 4.0 * ((n + 1) * n) / pow(2 * n + 1, 2);
+        n++;
+    } while (fabs(res - prev) > eps);
+    return res;
+}
+
+long double function_gamma_limit(double epsilon) {
+    int n = 2;
+    long double result  = 1;
+    long double prev;
+    do {
+        prev = result;
+        result = 0;
+        for (int i = 1; i <= n; i++) {
+            result += 1.0 / i;
+        }
+        result -= log(n);
+        n++;
+        
+    } while (fabs(result - prev) > epsilon);
+    return result;
+}
+
+double function_gamma_row() {
+    double epsilon = 1e-13;
+    double pi = acos(-1);
+    double res = 0.5;
+    double prev;
+    double tmp_res;
+    for (int k = 3; fabs(res - prev) > epsilon; k++) {
+        prev = res;
+        tmp_res = ((1.0 / pow(floor(sqrt(k)), 2)) - (1.0 / k));
+        res += tmp_res;
+        if (tmp_res < epsilon) {
+            prev = 0.0;
+        }
+    } 
+    return res - pi * pi/ 6.0;
+}
+
+status_code sieve_eratosthene(int n, bool** arr_primes) {
+    if (n < 2) {
+        return code_invalid_param;
+    }
+    *arr_primes = (bool*)malloc((n + 1) * sizeof(bool));
+    if (*arr_primes == NULL) {
+        return code_error_malloc;
+    }
+    for (int i = 0; i < n + 1; i++) {
+        (*arr_primes)[i] = true;  
+    }
+    for (int i = 2; i * i <= n; i++) {
+        if ((*arr_primes)[i]) {
+            for (int j = i * i; j <= n; j += i) {
+                (*arr_primes)[j] = false;
+            }
+        }
+    }
+    return code_success;
+}
+
+status_code function_gamma_equation(double epsilon, double* result) {
+    double tmp_res = -log(0.5 * log(2));
+    double prev;
+    double prod = 0.5;
+    int t;
+    bool* is_prime_num;
+    for (t = 3; fabs(tmp_res - prev) > epsilon; t++) {
+        prev = tmp_res;
+        tmp_res = -log(log(t));
+    }
+    switch (sieve_eratosthene(t, &is_prime_num)) {
+        case code_success:
+            break;
+        case code_invalid_param:
+            return code_invalid_param;
+        case code_error_malloc:
+            return code_error_malloc;
+    }
+    for (int i = 3; i < t + 1; i++) {
+        if (is_prime_num[i]) {
+            prod *= (i - 1.0) / i;
+        }
+    }
+    tmp_res -= log(prod);
+    *result = tmp_res;
+    free(is_prime_num);
+    return code_success;
+}
