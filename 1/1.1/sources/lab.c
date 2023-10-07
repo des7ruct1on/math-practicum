@@ -1,16 +1,16 @@
 #include "../headers/lab.h"
 
-void print_natural_number(int num) {
+status_code print_natural_number(int num) {
     if (num < 0) {
-        return;
+        return code_invalid_parameter;
     }
     if (num == 0 || num > HIGH_LIMIT_NATURAL_NUM) {
-        printf("There are no such numbers\n");
-        return;
+        return code_invalid_parameter;
     }
     for (int i = num; i <= HIGH_LIMIT_NATURAL_NUM; i += num) {
         printf("%d ", i);
     }
+    return code_succes;
 }
 
 status_code is_prime_num(int num, bool* result) {
@@ -79,7 +79,7 @@ status_code ariphm_progression(int num, int* result) {
 
 status_code factorial(int num, long* res) {
     if (num < 0) {
-        res = NULL; 
+        //res = NULL; 
         return code_invalid_parameter;
     }
     if (num == 0 || num == 1) {

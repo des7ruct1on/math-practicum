@@ -25,7 +25,16 @@ int main(int argc, const char *argv[]) {
     long result_fact;
     switch (flag) {
         case 'h':
-            print_natural_number(num);
+            switch(print_natural_number(num)) {
+                case code_succes:
+                    break;
+                case code_invalid_parameter:
+                    printf("Invalid parameter detected!!!\n");
+                    break;
+                case code_overflow:
+                    printf("Overflow detected!!!\n");
+                    break;
+            }
             break;
         case 'p':
             switch(is_prime_num(num, &result)) {

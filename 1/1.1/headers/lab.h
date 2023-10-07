@@ -24,7 +24,7 @@ typedef enum status_code {
 
 // functions 
 status_code factorial(int num, long* res);
-void print_natural_number(int num);
+status_code print_natural_number(int num);
 void partition_number(const char* num);
 status_code is_prime_num(int num, bool* result);
 status_code print_pow(int num_pow, int num);
