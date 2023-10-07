@@ -32,7 +32,6 @@ void swap_min_max(int arr[], int size) {
         }
     }
 
-    // swap min and max elements
     int temp = arr[min_index];
     arr[min_index] = arr[max_index];
     arr[max_index] = temp;

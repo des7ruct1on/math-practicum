@@ -29,9 +29,9 @@ status_code function_d(double x, long double* result) {
 }
 
 status_code midpoint_rule_with_precision(status_code function(double x, long double* res), long double* res, double a, double b, double epsilon) {
-    int num_intervals = 1; // Начальное количество подотрезков
+    int num_intervals = 1; 
     long double integral_prev = 0.0;
-    long double integral = epsilon + 1.0; // Чтобы гарантировать первую итерацию
+    long double integral = epsilon + 1.0; 
 
     while (fabs(integral - integral_prev) > epsilon) {
         integral_prev = integral;
@@ -53,7 +53,7 @@ status_code midpoint_rule_with_precision(status_code function(double x, long dou
         }
 
         integral *= length_interval;
-        num_intervals *= 2; // Удвоение количества подотрезков на каждой итерации
+        num_intervals *= 2; 
     }
     *res = integral;
     return code_success;

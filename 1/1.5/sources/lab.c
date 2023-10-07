@@ -64,25 +64,6 @@ status_code double_factorial(int num, double* res, double epsilon) {
     return code_succes;
 }
 
-
-status_code binary_power(double x, int n, double* res) {
-    double result = 1.0;
-    while (n > 0) {
-        *res = result;
-        if (*res > result) {
-            return code_overflow;
-        }
-        if (n % 2 == 1) {
-            (result) *= x;
-        }
-        x *= x;
-        n /= 2;
-    }
-    *res = result;
-    return code_succes;
-}
-
-
 status_code summary_a(double epsilon, double x, double* result) {
     double sum = 0;
     int n = 0;
@@ -101,14 +82,7 @@ status_code summary_a(double epsilon, double x, double* result) {
             default:
                 break;
         }
-        switch (binary_power(x, n, &pow_res)) {
-            case code_invalid_parameter:
-                return code_invalid_parameter;
-            case code_overflow:
-                return code_overflow;
-            default:
-                break;
-        }
+        pow_res = pow(x, n);
         if (n == 0) {
             *result =  pow_res / fact_res;
         } else {
@@ -144,22 +118,8 @@ status_code summary_b(double epsilon, double x, double* result) {
             default:
                 break;
         }
-        switch (binary_power(-1, n, &first_pow_res)) {
-            case code_invalid_parameter:
-                return code_invalid_parameter;
-            case code_overflow:
-                return code_overflow;
-            default:
-                break;
-        }
-        switch (binary_power(x, 2 * n, &second_pow_res)) {
-            case code_invalid_parameter:
-                return code_invalid_parameter;
-            case code_overflow:
-                return code_overflow;
-            default:
-                break;
-        }
+        first_pow_res = pow(-1, n);
+        second_pow_res = pow(x, 2 * n);
         if (n == 0) {
             *result =  (first_pow_res * second_pow_res) / fact_res;
         } else {
@@ -203,30 +163,9 @@ status_code summary_c(double epsilon, double x, double* result) {
             default:
                 break;
         }
-        switch (binary_power(3, 3 * n, &first_pow_res)) {
-            case code_invalid_parameter:
-                return code_invalid_parameter;
-            case code_overflow:
-                return code_overflow;
-            default:
-                break;
-        }
-        switch (binary_power(second_pow_res, 3, &second_pow_res)) {
-            case code_invalid_parameter:
-                return code_invalid_parameter;
-            case code_overflow:
-                return code_overflow;
-            default:
-                break;
-        }
-        switch (binary_power(x, 2 * n, &third_pow_res)) {
-            case code_invalid_parameter:
-                return code_invalid_parameter;
-            case code_overflow:
-                return code_overflow;
-            default:
-                break;
-        }
+        first_pow_res = pow(3, 3 * n);
+        second_pow_res = pow(second_pow_res, 3);
+        third_pow_res = pow(x, 2 * n);
         if (n == 0) {
             *result =  (first_pow_res * second_pow_res * third_pow_res) / fact_res;
         } else {
@@ -270,22 +209,8 @@ status_code summary_d(double epsilon, double x, double* result) {
             default:
                 break;
         }
-        switch (binary_power(-1, n, &first_pow_res)) {
-            case code_invalid_parameter:
-                return code_invalid_parameter;
-            case code_overflow:
-                return code_overflow;
-            default:
-                break;
-        }
-        switch (binary_power(x, 2 * n, &third_pow_res)) {
-            case code_invalid_parameter:
-                return code_invalid_parameter;
-            case code_overflow:
-                return code_overflow;
-            default:
-                break;
-        }
+        first_pow_res = pow(-1, n);
+        third_pow_res = pow(x, 2 * n);
         if (n == 1) {
             *result =  (first_pow_res * second_pow_res * third_pow_res) / fact_res;
         } else {
