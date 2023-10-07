@@ -13,7 +13,8 @@
 
 typedef enum status_code {
     code_success,
-    code_invalid_parameter
+    code_invalid_parameter,
+    code_overflow
 } status_code;
 
 status_code function_a(double x, long double* result);

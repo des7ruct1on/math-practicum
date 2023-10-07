@@ -37,7 +37,8 @@ int main(int argc, const char *argv[]) {
             printf("Your programm must include path of the output file!!!\n");
             exit(1);
         }
-    } else if (flag == 'a') { 
+    }
+    else if (flag == 'a') {
         if (argc != 4) {
             printf("Your programm must start with: %s <FLAG> <FILE_IN> <FILE_OUT>\n", argv[0]);
             exit(1);
@@ -58,11 +59,6 @@ int main(int argc, const char *argv[]) {
         printf("Can`t open file\n");
         exit(1);
     }
-
-    char line_1[STR_SIZE];
-    char line_2[STR_SIZE];
-    bool file_1_ended = false;
-    bool file_2_ended = false;
     switch (flag) {
         case 'r':
             rewrite_by_two_files(input_file1, input_file2, output_file);

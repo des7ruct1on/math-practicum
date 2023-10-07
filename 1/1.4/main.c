@@ -28,10 +28,20 @@ int main(int argc, const char *argv[]) {
         }
     } else {
         flag = argv[1][1];
+        const char* last_slash = strrchr(input_name, '/');
         char *prefix = "out_";
         output_name = (char *)malloc(strlen(input_name) + strlen(prefix) + 1);
-        strcpy(output_name, prefix);
-        strcat(output_name, input_name);
+        if (output_name == NULL) {
+            printf("Error mallocation detected!!!\n");
+            exit(1);
+        }
+        if (last_slash != NULL) {
+            strcpy(output_name, prefix);
+            strcat(output_name, last_slash + 1);
+        } else {
+            strcpy(output_name, prefix);
+            strcat(output_name, input_name);
+        }
     }
     FILE* input_file = fopen(input_name, "r");
     if (input_file == NULL) {

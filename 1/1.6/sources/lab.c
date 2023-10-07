@@ -47,11 +47,15 @@ status_code midpoint_rule_with_precision(status_code function(double x, long dou
                     return code_invalid_parameter;
                 case code_success:
                     break;
+                default:
+                    break;
             }
             integral += tmp_res;
             tmp_res = 0;
         }
-
+        if (num_intervals > INT_MAX / 2) {
+            return code_overflow;
+        }
         integral *= length_interval;
         num_intervals *= 2; 
     }

@@ -21,6 +21,9 @@ int main(int argc, const char *argv[]) {
     case code_invalid_parameter:
         printf("Invalid parameter detected!!!\n");
         break;
+    case code_overflow:
+        printf("Overflow detected!!!\n");
+        break;
     }
     switch (midpoint_rule_with_precision(function_b, &integral_b, 0, 1, epsilon)) {
     case code_success:
@@ -28,6 +31,9 @@ int main(int argc, const char *argv[]) {
         break;
     case code_invalid_parameter:
         printf("Invalid parameter detected!!!\n");
+        break;
+    case code_overflow:
+        printf("Overflow detected!!!\n");
         break;
     }
     switch (midpoint_rule_with_precision(function_c, &integral_c, 0, 1, epsilon)) {
@@ -37,6 +43,9 @@ int main(int argc, const char *argv[]) {
     case code_invalid_parameter:
         printf("Invalid parameter detected!!!\n");
         break;
+    case code_overflow:
+        printf("Overflow detected!!!\n");
+        break;
     }
     switch (midpoint_rule_with_precision(function_d, &integral_d, 0, 1, epsilon)) {
     case code_success:
@@ -44,6 +53,9 @@ int main(int argc, const char *argv[]) {
         break;
     case code_invalid_parameter:
         printf("Invalid parameter detected!!!\n");
+        break;
+    case code_overflow:
+        printf("Overflow detected!!!\n");
         break;
     }
 

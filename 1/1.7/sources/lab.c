@@ -53,24 +53,22 @@ void rewrite_by_two_files(FILE* input_file1, FILE* input_file2, FILE* output_fil
     char line_2[STR_SIZE];
     bool file_1_ended = false;
     bool file_2_ended = false;
+
     while (true) {
-        if (file_1_ended && file_2_ended) {
-            break;
-        }
-        if (!file_1_ended) {
-            fscanf(input_file1, "%s", line_1);
+        if (!file_1_ended && fscanf(input_file1, "%s", line_1) == 1) {
             fprintf(output_file, "%s ", line_1);
-            if (feof(input_file1)) {
-                file_1_ended = true;
-            }
+        } else {
+            file_1_ended = true;
         }
 
-        if (!file_2_ended) {
-            fscanf(input_file2, "%s", line_2);
+        if (!file_2_ended && fscanf(input_file2, "%s", line_2) == 1) {
             fprintf(output_file, "%s ", line_2);
-            if (feof(input_file2)) {  
-                file_2_ended = true;
-            }
+        } else {
+            file_2_ended = true;
+        }
+
+        if (file_1_ended && file_2_ended) {
+            break;
         }
     }
 }

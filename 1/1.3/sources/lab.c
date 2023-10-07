@@ -26,40 +26,41 @@ void reverse(double *arr, int begin, int end) {
     }
 }
 
-void bubble_sort_descending(double* arr, int size, double epsilon) {
-    for (int i = 0; i < size; i++) {
-        for (int j = size - 1; j > i; j--) {
-            if (compare_double_bigger(arr[i], arr[j], epsilon)) {
+void quick_sort(double* arr, int low, int high, double epsilon) {
+    if (low < high) {
+        double pivot = arr[high]; 
+        int i = low - 1; 
+
+        for (int j = low; j <= high - 1; j++) {
+            if (arr[j] - epsilon <= pivot) {
+                i++; 
                 swap(arr, i, j);
             }
         }
+        swap(arr, i + 1, high);
+        quick_sort(arr, low, i, epsilon);
+        quick_sort(arr, i + 2, high, epsilon);
     }
 }
 
-// Функция для нахождения следующей перестановки массива
+
 bool next_permutation(double *arr, int n) {
     int i = n - 2;
 
-    // Находим самый длинный суффикс, который не убывает
     while (i >= 0 && arr[i] >= arr[i + 1]) {
         i--;
     }
 
     if (i < 0) {
-        return false; // Перестановок больше нет
+        return false;
     }
 
     int j = n - 1;
-
-    // Находим элемент, который больше arr[i]
     while (arr[j] <= arr[i]) {
         j--;
     }
 
-    // Меняем местами элементы arr[i] и arr[j]
     swap(arr, i, j);
-
-    // Переворачиваем суффикс, чтобы получить следующую перестановку
     reverse(arr, i + 1, n - 1);
 
     return true;

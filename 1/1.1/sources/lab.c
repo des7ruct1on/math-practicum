@@ -1,6 +1,9 @@
 #include "../headers/lab.h"
 
 void print_natural_number(int num) {
+    if (num < 0) {
+        return;
+    }
     if (num == 0 || num > HIGH_LIMIT_NATURAL_NUM) {
         printf("There are no such numbers\n");
         return;

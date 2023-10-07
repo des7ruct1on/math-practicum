@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
     int a = atoi(argv[1]);
     int b = atoi(argv[2]);
     srand(time(NULL));
-    int size = rand() % 10 + 1; 
+    int const size = 128; 
     int arr[size];
     fill_array(arr, size, a, b);
     printf("Original array: ");

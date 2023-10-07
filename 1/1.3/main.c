@@ -30,7 +30,7 @@ int main(int argc, const char *argv[]) {
             double coef2 = atof(argv[4]);
             double coef3 = atof(argv[5]);
             double coefs[3] = {coef1, coef2, coef3};
-            bubble_sort_descending(coefs, 3, epsilon_q);
+            quick_sort(coefs, 0, 2, epsilon_q);
             double root1, root2;
             do {
                 printf("Equation: %.3f.*x^2 + (%.3f*x) + (%.3f)\n", coefs[0], coefs[1], coefs[2]);
@@ -80,7 +80,11 @@ int main(int argc, const char *argv[]) {
             double side2 = atof(argv[4]);
             double side3 = atof(argv[5]);
             double sides[3] = {side1, side2, side3};
-            bubble_sort_descending(sides, 3, epsilon_q);
+            quick_sort(sides, 0, 2, epsilon_q);
+            if (compare_double_less(sides[0] + sides[1], sides[2], epsilon_q) || compare_double_equal(sides[0] + sides[1], sides[2], epsilon_q)){
+                printf("This triangle can not exist!!!\n");
+                break;
+            }
             do {
                 switch(is_triangle(sides, epsilon_q, &result)) {
                     case code_succes:
