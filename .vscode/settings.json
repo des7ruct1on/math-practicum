@@ -3,6 +3,6 @@
         "lab.h": "c",
         "stdlib.h": "c",
         "math.h": "c",
-        "stdio.h": "c"
+        "stdarg.h": "c"
     }
 }
