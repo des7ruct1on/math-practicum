@@ -7,6 +7,7 @@
 #include <math.h>
 #include "headers/lab.h"
 
+
 int main(int argc, const char *argv[]) {
     if (argc < 2 || argc > 4) {
         printf("Your programm must start with: %s <FLAG> <INPUT_FILE>\n", argv[0]);
@@ -54,43 +55,22 @@ int main(int argc, const char *argv[]) {
         fclose(input_file);
         exit(1);
     }
-
-    char line[STR_SIZE];
-    int counter;
-    char tmp_output[STR_SIZE];
-    while (fgets(line, sizeof(line), input_file)) {
-        switch (flag) {
-            case 'd':
-                for (int i = 0; line[i] != '\0'; i++) {
-                    if (!isdigit(line[i])) {
-                        fprintf(output_file, "%c", line[i]);
-                    }
-                } 
-                break;
-            case 'i':
-                count_latin_letters(line, &counter);
-                fprintf(output_file, "%d\n", counter);
-                break;
-            case 's':
-                count_non_alpha_numeric(line, &counter);
-                fprintf(output_file, "%d\n", counter);
-                break;
-            case 'a':
-                for (int i = 0; line[i] != '\0'; i++) {
-                    if (isspace(line[i])) {
-                        fprintf(output_file, " ");
-                    } else if (isdigit(line[i])) {
-                        fprintf(output_file, "%c", line[i]);
-                    } else if (isascii(line[i])) { 
-                        fprintf(output_file, "%02X", line[i]);
-                    }
-                }
-                fprintf(output_file, "\n");
-                break;
-            default:
-                printf("Unknown flag!\n");
-                break;
-        }
+    switch (flag) {
+        case 'd':
+            remove_digits(input_file, output_file);
+            break;
+        case 'i':
+            count_latin_letters(input_file, output_file);
+            break;
+        case 's':
+            count_non_alpha_numeric(input_file, output_file);
+            break;
+        case 'a':
+            remove_non_digits_by_ascii(input_file, output_file);
+            break;
+        default:
+            printf("Unknown flag!\n");
+            break;
     }
     fclose(input_file);
     fclose(output_file);

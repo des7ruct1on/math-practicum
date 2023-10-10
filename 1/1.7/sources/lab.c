@@ -1,47 +1,54 @@
 #include "../headers/lab.h"
 
+int convert_from_decimal(int num, int base) {
+    int number = 0, k = 1;
+    while (num > 0) {
+        int remainder = num % base;
+        number += remainder * k;
+        num /= base;
+        k *= 10;
+    }
+    return number;
+}
+
 void generate_lexems(FILE* input_file, FILE* output_file) {
-    char lexem[STR_SIZE];
+    char symbol = fgetc(input_file);
     int lexeme_counter = 1;
-    while (fscanf(input_file, "%s", lexem) != EOF) {
-        int length = strlen(lexem);
+    while (symbol != EOF) {
+        while(isspace(symbol)) {
+            symbol = fgetc(input_file);
+        }
         if (lexeme_counter % 10 == 0) {
-            for (int i = 0; i < length; i++) {
-                printf("%c", tolower(lexem[i]));
-                if (isalpha(lexem[i])) {
-                    int new_symb_ascii = toascii(tolower(lexem[i]));
-                    int new_num = 0;
-                    int k = 1;
-                    while (new_symb_ascii > 0) {
-                        int remainder = new_symb_ascii % 4;
-                        new_num += remainder * k;
-                        new_symb_ascii /= 4;
-                        k *= 10;
-                    }
-                    fprintf(output_file, "%d", new_num);
+            while (!isspace(symbol) && symbol != EOF) {
+                if (isalpha(symbol)) {
+                    int digit = toascii(tolower(symbol));
+                    fprintf(output_file, "%d", convert_from_decimal(digit, 4));
                 } else {
-                    fprintf(output_file, "%c", lexem[i]);
+                    fprintf(output_file, "%c", symbol);
                 }
+                symbol = fgetc(input_file);
             }
         } else if (lexeme_counter % 5 == 0 && lexeme_counter % 10 != 0) {
-            for (int i = 0; i < length; i++) {
-                int new_symb_ascii = toascii(lexem[i]);
-                int new_num = 0;
-                int k = 1;
-                while (new_symb_ascii > 0) {
-                    int remainder = new_symb_ascii % 8;
-                    new_num += remainder * k;
-                    new_symb_ascii /= 8;
-                    k *= 10;
-                }
-                fprintf(output_file, "%d", new_num);
+            while (!isspace(symbol) && symbol != EOF) {
+                int digit = toascii(symbol);
+                fprintf(output_file, "%d", convert_from_decimal(digit, 8));
+                symbol = fgetc(input_file);
             }
         } else if (lexeme_counter % 2 == 0 && lexeme_counter % 10 != 0) {
-            for (int i = 0; i < length; i++) {
-                fprintf(output_file, "%c", tolower(lexem[i]));
+            while (!isspace(symbol) && symbol != EOF) {
+                if (isalpha(symbol)) {
+                    fprintf(output_file, "%c", tolower(symbol));
+                } else {
+                    fprintf(output_file, "%c", symbol);
+                }  
+                symbol = fgetc(input_file);
             }
+            
         } else {
-            fprintf(output_file, "%s", lexem);
+            while(!isspace(symbol)) {
+                fprintf(output_file, "%c", symbol);
+                symbol = fgetc(input_file);
+            }
         }
         fprintf(output_file, " ");
         lexeme_counter++;
@@ -49,25 +56,32 @@ void generate_lexems(FILE* input_file, FILE* output_file) {
 }
 
 void rewrite_by_two_files(FILE* input_file1, FILE* input_file2, FILE* output_file) {
-    char line_1[STR_SIZE];
-    char line_2[STR_SIZE];
-    bool file_1_ended = false;
-    bool file_2_ended = false;
-
+    char symb_file1 = fgetc(input_file1);
+    char symb_file2 = fgetc(input_file2);
+    bool is_feof1 = feof(input_file1);
+    bool is_feof2 = feof(input_file2);
     while (true) {
-        if (!file_1_ended && fscanf(input_file1, "%s", line_1) == 1) {
-            fprintf(output_file, "%s ", line_1);
-        } else {
-            file_1_ended = true;
+        while(isspace(symb_file1)) {
+            symb_file1 = fgetc(input_file1);
         }
-
-        if (!file_2_ended && fscanf(input_file2, "%s", line_2) == 1) {
-            fprintf(output_file, "%s ", line_2);
-        } else {
-            file_2_ended = true;
+        while(isspace(symb_file2)) {
+            symb_file2 = fgetc(input_file2);
         }
-
-        if (file_1_ended && file_2_ended) {
+        while (!isspace(symb_file1) && symb_file1 != EOF) {
+            fprintf(output_file, "%c", symb_file1);
+            symb_file1 = fgetc(input_file1);
+        }
+        if (symb_file1 != EOF) {
+            fprintf(output_file, " ");
+        }
+        while (!isspace(symb_file2) && symb_file2 != EOF) {
+            fprintf(output_file, "%c", symb_file2);
+            symb_file2 = fgetc(input_file2);
+        }
+        if (symb_file2 != EOF) {
+            fprintf(output_file, " ");
+        }
+        if (symb_file1 == EOF && symb_file2 == EOF) {
             break;
         }
     }

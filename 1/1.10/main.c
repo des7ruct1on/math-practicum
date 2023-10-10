@@ -6,6 +6,16 @@
 #include <stdlib.h>
 #include "headers/lab.h"
 
+typedef enum status_input {
+    status_succes,
+    status_stop,
+    status_error_malloc
+} status_input;
+
+status_input scan_num_char(char** number_str) {
+
+} 
+
 int main(int argc, char* argv[]) {
     int base;
     printf("Enter the base value [2 - 36]: ");
@@ -14,12 +24,16 @@ int main(int argc, char* argv[]) {
         printf("Invalid parameter of base!!!\n");
         exit(1);
     }
-    char input_value[MAX_NUM_SIZE];
-    char max_value[MAX_NUM_SIZE];
+    char* input_value;
     int decimal_max = 0;
+    int len_max_num = 0;
     bool started = false;
-    while(scanf("%s", input_value)) {
-        if (!strcmp(input_value, "Stop")) {
+    while(true) {
+        status_input input = scan_num_char(&input_value);
+        if (input == status_error_malloc) {
+            printf("Error malloc detected!!!\n");
+            exit(1);
+        } else if (input == status_stop) {
             break;
         }
         started = true;
@@ -31,13 +45,24 @@ int main(int argc, char* argv[]) {
         } else {
             if (decimal_tmp > decimal_max || decimal_tmp == 0) {
                 decimal_max = decimal_tmp;
-                strcpy(max_value, input_value);
+                len_max_num = strlen(input_value);
             }
         }
     } 
     if (!started) {
         printf("You did not enter a single number\n");
         return 0;
+    }
+    char* max_value = (char*)malloc((len_max_num + 1) * sizeof(char));
+    if (max_value == NULL) {
+        printf("Error malloc detected!!!\n");
+        exit(1);
+    }
+    
+    status_code from_decimal_status = convert_from_decimal(decimal_max, base, max_value);
+    if (from_decimal_status == code_error_malloc) {
+        printf("Error malloc detected!!!\n");
+        exit(1);
     }
     printf("Max input number in %d base is: %s\n", base, max_value);
     int max_num_no_zeros = remove_trailing_zeros(decimal_max);
@@ -46,7 +71,6 @@ int main(int argc, char* argv[]) {
     char* max_eighteen_base = NULL;
     char* max_twenty_seven_base = NULL;
     char* max_thirty_six_base = NULL;
-    status_code from_decimal_status;
     from_decimal_status = convert_from_decimal(max_num_no_zeros, base, &max_base_no_zeros);
     if (from_decimal_status == code_error_malloc) {
         printf("Error malloc detected!!!\n");
