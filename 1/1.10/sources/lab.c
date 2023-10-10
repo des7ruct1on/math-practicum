@@ -1,7 +1,7 @@
 #include "../headers/lab.h"
 
-status_code convert_to_decimal(char* number_str, int base, int* dec_number) {
-    int decimal_number = 0;
+status_code convert_to_decimal(char* number_str, int base, int * dec_number) {
+    unsigned int decimal_number = 0;
     int power = strlen(number_str) - 1;  
     for (int i = 0; i < strlen(number_str); i++) {
         char digit = number_str[i];
@@ -18,6 +18,9 @@ status_code convert_to_decimal(char* number_str, int base, int* dec_number) {
         decimal_number += digit_value * pow(base, power);
         power--;
     }
+    if (decimal_number > INT_MAX) {
+        return code_invalid_parameter;
+    }
     *dec_number = abs(decimal_number);
     return code_success;
 }
@@ -28,6 +31,7 @@ status_code convert_from_decimal(int decimal_number, int base,  char** result) {
     if(*result == NULL) {
         return code_error_malloc;
     }
+    int size = 0;
     char tmp_res[MAX_NUM_SIZE];
     if (decimal_number == 0) {
         (*result)[index] = '0';
@@ -39,6 +43,10 @@ status_code convert_from_decimal(int decimal_number, int base,  char** result) {
             (*result)[index++] = remainder + '0';
         } else {
             (*result)[index++] = remainder - 10 + 'A';
+        }
+        size++;
+        if (size > sizeof(*result) / 2) {
+            (*result) = realloc(*result, size * 2 * sizeof(char));
         }
         decimal_number /= base;
     }

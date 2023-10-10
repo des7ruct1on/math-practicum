@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include <math.h>
 #include <stdlib.h>
+#include <limits.h>
 #define MAX_NUM_SIZE 32
 
 typedef enum status_code {

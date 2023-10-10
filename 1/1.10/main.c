@@ -7,14 +7,44 @@
 #include "headers/lab.h"
 
 typedef enum status_input {
-    status_succes,
+    status_success,
     status_stop,
     status_error_malloc
 } status_input;
 
 status_input scan_num_char(char** number_str) {
+    (*number_str) = (char*)malloc(MAX_NUM_SIZE * sizeof(char));
+    if (*number_str == NULL) {
+        return status_error_malloc;
+    }
 
-} 
+    int size = 0;
+    char symbol = getchar();
+    while (isspace(symbol)) {
+        symbol = getchar();
+    }
+    while (!isspace(symbol)) {
+        (*number_str)[size] = symbol;
+        size++;
+        if (size >= sizeof(*number_str) / 2) {
+            (*number_str) = realloc(*number_str, sizeof(char) * size * 2);
+            if (*number_str == NULL) {
+                free(*number_str);
+                return status_error_malloc;
+            }
+        }
+        symbol = getchar();
+    }
+    (*number_str)[size] = '\0';
+    if (size == 0 || strcmp("Stop", *number_str) == 0) {
+        free(*number_str);
+        return status_stop;
+    }
+    
+
+    return status_success;
+}
+
 
 int main(int argc, char* argv[]) {
     int base;
@@ -53,13 +83,8 @@ int main(int argc, char* argv[]) {
         printf("You did not enter a single number\n");
         return 0;
     }
-    char* max_value = (char*)malloc((len_max_num + 1) * sizeof(char));
-    if (max_value == NULL) {
-        printf("Error malloc detected!!!\n");
-        exit(1);
-    }
-    
-    status_code from_decimal_status = convert_from_decimal(decimal_max, base, max_value);
+    char* max_value;
+    status_code from_decimal_status = convert_from_decimal(decimal_max, base, &max_value);
     if (from_decimal_status == code_error_malloc) {
         printf("Error malloc detected!!!\n");
         exit(1);

@@ -188,6 +188,10 @@ status_code function_gamma_equation(double epsilon, double* result) {
             size++;
             if (size > sizeof(prime_nums) / 2) {
                 prime_nums = realloc(prime_nums, sizeof(int) * size * 2);
+                if (prime_nums == NULL) {
+                    free(prime_nums)
+                    return code_error_malloc;
+                }
             }
         } else {
             continue;
