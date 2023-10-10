@@ -114,7 +114,7 @@ double function_sqrt_equation(double x) {
 long double function_pi_limit(double eps) {
     long double n = 1;
     long double res = 4;
-    long double prev;
+    long double prev = 0;
     do {
         prev = res;
         res *= 4.0 * ((n + 1) * n) / pow(2 * n + 1, 2);
@@ -125,8 +125,8 @@ long double function_pi_limit(double eps) {
 
 long double function_gamma_limit(double epsilon) {
     int n = 2;
-    long double result  = 1;
-    long double prev;
+    long double result  = 1.0;
+    long double prev = 0.0;
     do {
         prev = result;
         result = 0;
@@ -144,8 +144,8 @@ double function_gamma_row() {
     double epsilon = 1e-13;
     double pi = acos(-1);
     double res = 0.5;
-    double prev;
-    double tmp_res;
+    double prev = 0.0;
+    double tmp_res = 0.0;
     for (int k = 3; fabs(res - prev) > epsilon; k++) {
         prev = res;
         tmp_res = ((1.0 / pow(floor(sqrt(k)), 2)) - (1.0 / k));
@@ -157,52 +157,44 @@ double function_gamma_row() {
     return res - pi * pi/ 6.0;
 }
 
-status_code sieve_eratosthene(int n, bool** arr_primes) {
-    if (n < 2) {
-        return code_invalid_param;
-    }
-    *arr_primes = (bool*)malloc((n + 1) * sizeof(bool));
-    if (*arr_primes == NULL) {
-        return code_error_malloc;
-    }
-    for (int i = 0; i < n + 1; i++) {
-        (*arr_primes)[i] = true;  
-    }
-    for (int i = 2; i * i <= n; i++) {
-        if ((*arr_primes)[i]) {
-            for (int j = i * i; j <= n; j += i) {
-                (*arr_primes)[j] = false;
-            }
-        }
-    }
-    return code_success;
-}
-
 status_code function_gamma_equation(double epsilon, double* result) {
     double tmp_res = -log(0.5 * log(2));
     double prev;
     double prod = 0.5;
-    int t;
-    bool* is_prime_num;
+    int t = 3;
     for (t = 3; fabs(tmp_res - prev) > epsilon; t++) {
         prev = tmp_res;
         tmp_res = -log(log(t));
     }
-    switch (sieve_eratosthene(t, &is_prime_num)) {
-        case code_success:
-            break;
-        case code_invalid_param:
-            return code_invalid_param;
-        case code_error_malloc:
-            return code_error_malloc;
+    int size = 0;
+    int* prime_nums = (int*)malloc(16 * sizeof(int));
+    if (prime_nums == NULL) {
+        return code_error_malloc;
     }
-    for (int i = 3; i < t + 1; i++) {
-        if (is_prime_num[i]) {
-            prod *= (i - 1.0) / i;
+    prime_nums[0] = 2;
+    size = 1;
+    bool is_prime;
+    for (int i = 3; i * i <= t; i++) {
+        is_prime = true;
+        for (int j = 0; j < size; j++) {
+            if (i % prime_nums[j] == 0) {
+                is_prime = false;
+                break;
+            }
+        }
+        if (is_prime) {
+            prime_nums[size] = i;
+            prod *= (prime_nums[size - 1] - 1.0) / prime_nums[size - 1];
+            size++;
+            if (size > sizeof(prime_nums) / 2) {
+                prime_nums = realloc(prime_nums, sizeof(int) * size * 2);
+            }
+        } else {
+            continue;
         }
     }
     tmp_res -= log(prod);
     *result = tmp_res;
-    free(is_prime_num);
+    free(prime_nums);
     return code_success;
 }

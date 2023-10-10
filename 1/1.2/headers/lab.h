@@ -32,6 +32,5 @@ double function_sqrt_equation(double x);
 long double function_pi_limit(double eps);
 long double function_gamma_limit(double epsilon);
 double function_gamma_row();
-status_code sieve_eratosthene(int n, bool** arr_primes);
 status_code function_gamma_equation(double epsilon, double* result);
 #endif
