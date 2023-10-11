@@ -27,6 +27,11 @@ int main(int argc, char* argv[]) {
         } else if (input == status_stop) {
             break;
         }
+        if (!is_valid_input(input_value, base)) {
+            printf("Invalid parameter detected!!!\n");
+            free(input_value);
+            exit(1);
+        }
         int decimal_tmp;
         status_code check_valid = convert_to_decimal(input_value, base, &decimal_tmp);
         if (check_valid == code_invalid_parameter) {

@@ -22,7 +22,7 @@ typedef enum status_input {
     status_error_malloc
 } status_input;
 
-
+bool is_valid_input(char* input_str, int base);
 status_input scan_num_char(char** number_str, bool* is_minus);
 status_code convert_to_decimal(char* number_str, int base, int* dec_number);
 status_code convert_from_decimal(int decimal_number, int base,  char** result);

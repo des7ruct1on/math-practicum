@@ -48,6 +48,24 @@ status_input scan_num_char(char** number_str, bool* is_minus) {
     return status_success;
 }
 
+bool is_valid_input(char* input_str, int base) {
+    for (int i = 0; i < strlen(input_str); ++i) {
+        if (i == 0 && input_str[i] == '-') {
+            continue;
+        }
+        if (!(input_str[i] >= 'A' && input_str[i] <= 'Z') && !(input_str[i] >= '0' && input_str[i] <= '9')) {
+            return false;
+        }
+        if (input_str[i] >= '0' && input_str[i] <= '9' && (input_str[i] - '0') >= base) {
+            return false;
+        }
+        if (input_str[i] >= 'A' && input_str[i] <= 'Z' && (input_str[i] - 55) >= base) {
+            return false;
+        }
+    }
+    return true;
+}
+
 status_code convert_to_decimal(char* number_str, int base, int * dec_number) {
     unsigned int decimal_number = 0;
     int power = strlen(number_str) - 1;  
