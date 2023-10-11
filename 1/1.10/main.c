@@ -6,46 +6,6 @@
 #include <stdlib.h>
 #include "headers/lab.h"
 
-typedef enum status_input {
-    status_success,
-    status_stop,
-    status_error_malloc
-} status_input;
-
-status_input scan_num_char(char** number_str) {
-    (*number_str) = (char*)malloc(MAX_NUM_SIZE * sizeof(char));
-    if (*number_str == NULL) {
-        return status_error_malloc;
-    }
-
-    int size = 0;
-    char symbol = getchar();
-    while (isspace(symbol)) {
-        symbol = getchar();
-    }
-    while (!isspace(symbol)) {
-        (*number_str)[size] = symbol;
-        size++;
-        if (size >= sizeof(*number_str) / 2) {
-            (*number_str) = realloc(*number_str, sizeof(char) * size * 2);
-            if (*number_str == NULL) {
-                free(*number_str);
-                return status_error_malloc;
-            }
-        }
-        symbol = getchar();
-    }
-    (*number_str)[size] = '\0';
-    if (size == 0 || strcmp("Stop", *number_str) == 0) {
-        free(*number_str);
-        return status_stop;
-    }
-    
-
-    return status_success;
-}
-
-
 int main(int argc, char* argv[]) {
     int base;
     printf("Enter the base value [2 - 36]: ");
@@ -59,25 +19,33 @@ int main(int argc, char* argv[]) {
     int len_max_num = 0;
     bool started = false;
     while(true) {
-        status_input input = scan_num_char(&input_value);
+        bool is_minus;
+        status_input input = scan_num_char(&input_value, &is_minus);
         if (input == status_error_malloc) {
             printf("Error malloc detected!!!\n");
             exit(1);
         } else if (input == status_stop) {
             break;
         }
-        started = true;
         int decimal_tmp;
         status_code check_valid = convert_to_decimal(input_value, base, &decimal_tmp);
         if (check_valid == code_invalid_parameter) {
             printf("Invalid parameter detected!!!\n");
+            free(input_value);
             exit(1);
         } else {
-            if (decimal_tmp > decimal_max || decimal_tmp == 0) {
+            if (abs(decimal_tmp) > abs(decimal_max) || !started) {
+                started = true;
+                //printf("%d---%d\n", abs(decimal_tmp), abs(decimal_max));
                 decimal_max = decimal_tmp;
+                if (is_minus) {
+                    decimal_max *= -1;
+                    is_minus = false;
+                }
                 len_max_num = strlen(input_value);
             }
         }
+        free(input_value);
     } 
     if (!started) {
         printf("You did not enter a single number\n");
@@ -101,20 +69,20 @@ int main(int argc, char* argv[]) {
         printf("Error malloc detected!!!\n");
         exit(1);
     }
-    from_decimal_status = convert_from_decimal(decimal_max, 9, &max_nine_base);
+    from_decimal_status = convert_from_decimal(abs(decimal_max), 9, &max_nine_base);
     if (from_decimal_status == code_error_malloc) {
         printf("Error malloc detected!!!\n");
         free(max_base_no_zeros);
         exit(1);
     }
-    from_decimal_status = convert_from_decimal(decimal_max, 18, &max_eighteen_base);
+    from_decimal_status = convert_from_decimal(abs(decimal_max), 18, &max_eighteen_base);
     if (from_decimal_status == code_error_malloc) {
         printf("Error malloc detected!!!\n");
         free(max_base_no_zeros);
         free(max_nine_base);
         exit(1);
     }
-    from_decimal_status = convert_from_decimal(decimal_max, 27, &max_twenty_seven_base);
+    from_decimal_status = convert_from_decimal(abs(decimal_max), 27, &max_twenty_seven_base);
     if (from_decimal_status == code_error_malloc) {
         printf("Error malloc detected!!!\n");
         free(max_base_no_zeros);
@@ -122,7 +90,7 @@ int main(int argc, char* argv[]) {
         free(max_eighteen_base);
         exit(1);
     }
-    from_decimal_status = convert_from_decimal(decimal_max, 36, &max_thirty_six_base);
+    from_decimal_status = convert_from_decimal(abs(decimal_max), 36, &max_thirty_six_base);
     if (from_decimal_status == code_error_malloc) {
         printf("Error malloc detected!!!\n");
         free(max_base_no_zeros);
@@ -136,6 +104,7 @@ int main(int argc, char* argv[]) {
     printf("Max number in 18 base: %s\n", max_eighteen_base);
     printf("Max number in 27 base: %s\n", max_twenty_seven_base);
     printf("Max number in 36 base: %s\n", max_thirty_six_base);
+    free(max_value);
     free(max_base_no_zeros);
     free(max_nine_base);
     free(max_eighteen_base);

@@ -1,34 +1,35 @@
 #include "../headers/lab.h"
 
-status_input scan_num_char(char** number_str, bool* is_minus) {
+status_input scan_num_char(FILE* in, FILE* out, char** number_str, bool* is_minus) {
     (*number_str) = (char*)malloc((MAX_NUM_SIZE + 1) * sizeof(char));
     if (*number_str == NULL) {
         return status_error_malloc;
     }
 
     int size = 0;
-    char symbol = getchar();
+    char symbol = fgetc(in);
     while (isspace(symbol)) {
-        symbol = getchar();
+        symbol = fgetc(in);
     }
     bool start = true;
-    while (!isspace(symbol)) {
+    while (!isspace(symbol) && symbol != EOF) {
         if (symbol == '-') {
             if (start) {
-                *is_minus = true;
                 (*number_str)[size] = symbol;
                 size++;
-                symbol = getchar();
+                symbol = fgetc(in);
                 start = false;
+                *is_minus = true;
                 continue;
             } else {
                 (*number_str)[size] = symbol;
                 size++;
-                symbol = getchar();
+                symbol = fgetc(in);
                 continue;
             }
         }
         start = false;
+        symbol = toupper(symbol);
         (*number_str)[size] = symbol;
         size++;
         if (size >= sizeof(*number_str) - 1) {
@@ -38,15 +39,16 @@ status_input scan_num_char(char** number_str, bool* is_minus) {
                 return status_error_malloc;
             }
         }
-        symbol = getchar();
+        symbol = fgetc(in);
     }
     (*number_str)[size] = '\0';
-    if (size == 0 || strcmp("Stop", *number_str) == 0) {
+    if (size == 0 || (size == 1 && (*number_str)[0] == '-')) {
         free(*number_str);
         return status_stop;
     }
     return status_success;
 }
+
 
 status_code convert_to_decimal(char* number_str, int base, int * dec_number) {
     unsigned int decimal_number = 0;
@@ -136,4 +138,37 @@ int remove_trailing_zeros(int number) {
     }
     
     return number_no_zeros;
+}
+
+status_code check_min_base(char* str_number, int* min_base) {
+    int size = strlen(str_number);
+    
+    char tmp_base = '1';
+    if (size == 0) {
+        return code_invalid_parameter;
+    }
+    bool start = true;
+    for (int i = 0; i < size; i++) {
+        printf("<%c>\n", tmp_base);
+        char symbol = str_number[i];
+        if (symbol == '-' && start) {
+            i++;
+            start = false;
+            continue;
+        }
+        start = false;
+        if (isalpha(symbol) || isdigit(symbol)) {
+            if (symbol > tmp_base) {
+                tmp_base = symbol;
+            }
+        } else {
+            return code_invalid_parameter;
+        }
+    }
+    if (isalpha(tmp_base)) {
+        *min_base = tmp_base - 55 + 1;
+    } else {
+        *min_base = tmp_base - '0' + 1;
+    }
+    return code_success;
 }

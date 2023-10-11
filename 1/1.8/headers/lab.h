@@ -23,10 +23,12 @@ typedef enum status_input {
 } status_input;
 
 
-status_input scan_num_char(char** number_str, bool* is_minus);
-status_code convert_to_decimal(char* number_str, int base, int* dec_number);
+
+status_input scan_num_char(FILE* in, FILE* out, char** number_str, bool* is_minus);
+status_code convert_to_decimal(char* number_str, int base, int * dec_number);
 status_code convert_from_decimal(int decimal_number, int base,  char** result);
 int remove_trailing_zeros(int number);
+status_code check_min_base(char* str_number, int* min_base);
 
 
 #endif

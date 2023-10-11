@@ -186,7 +186,7 @@ status_code function_gamma_equation(double epsilon, double* result) {
             prime_nums[size] = i;
             prod *= (prime_nums[size - 1] - 1.0) / prime_nums[size - 1];
             size++;
-            if (size > sizeof(prime_nums) / 2) {
+            if (size > sizeof(prime_nums) - 1) {
                 prime_nums = realloc(prime_nums, sizeof(int) * size * 2);
                 if (prime_nums == NULL) {
                     free(prime_nums)
