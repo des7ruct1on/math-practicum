@@ -130,16 +130,6 @@ status_code convert_from_decimal(int decimal_number, int base,  char** result) {
     return code_success;
 }
 
-int remove_trailing_zeros(int number) {
-    
-    int number_no_zeros = number;
-    while (number_no_zeros != 0 && number_no_zeros % 10 == 0) {
-        number_no_zeros /= 10;
-    }
-    
-    return number_no_zeros;
-}
-
 status_code check_min_base(char* str_number, int* min_base) {
     int size = strlen(str_number);
     
@@ -149,7 +139,6 @@ status_code check_min_base(char* str_number, int* min_base) {
     }
     bool start = true;
     for (int i = 0; i < size; i++) {
-        printf("<%c>\n", tmp_base);
         char symbol = str_number[i];
         if (symbol == '-' && start) {
             i++;

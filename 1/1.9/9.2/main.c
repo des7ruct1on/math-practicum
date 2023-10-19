@@ -6,7 +6,7 @@
 int main() {
     srand(time(NULL));
 
-    int size_a = rand() % (10000 - 10 + 1) + 10;
+    int size_a = rand() % 9991 + 10;
     int size_b = rand() % (10000 - 10 + 1) + 10;
 
     int *arr_a, *arr_b, *arr_c;

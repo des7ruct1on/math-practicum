@@ -59,7 +59,7 @@ void rewrite_by_two_files(FILE* input_file1, FILE* input_file2, FILE* output_fil
     char symb_file1 = fgetc(input_file1);
     char symb_file2 = fgetc(input_file2);
     bool is_feof1 = feof(input_file1);
-    bool is_feof2 = feof(input_file2);
+    bool is_feof2 = feof(input_file1);
     while (true) {
         while(isspace(symb_file1)) {
             symb_file1 = fgetc(input_file1);
@@ -68,6 +68,10 @@ void rewrite_by_two_files(FILE* input_file1, FILE* input_file2, FILE* output_fil
             symb_file2 = fgetc(input_file2);
         }
         while (!isspace(symb_file1) && symb_file1 != EOF) {
+            if (!is_feof2 && feof(input_file2)) {
+                fprintf(output_file, " ");
+                is_feof2 = true;
+            }
             fprintf(output_file, "%c", symb_file1);
             symb_file1 = fgetc(input_file1);
         }
@@ -75,12 +79,16 @@ void rewrite_by_two_files(FILE* input_file1, FILE* input_file2, FILE* output_fil
             fprintf(output_file, " ");
         }
         while (!isspace(symb_file2) && symb_file2 != EOF) {
+            if (!is_feof1 && feof(input_file1)) {
+                is_feof1 = true;
+                fprintf(output_file, " ");
+            }
             fprintf(output_file, "%c", symb_file2);
             symb_file2 = fgetc(input_file2);
         }
         if (symb_file2 != EOF) {
             fprintf(output_file, " ");
-        }
+        } 
         if (symb_file1 == EOF && symb_file2 == EOF) {
             break;
         }

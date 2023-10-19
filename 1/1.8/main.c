@@ -66,9 +66,7 @@ int main(int argc, char* argv[]) {
                 printf("Error malloc detected!!!\n");
                 exit(4);
         }
-        printf("%s - %d--\n", input_value, decimal_number);
-        free(input_value);
-        decimal_number = remove_trailing_zeros(decimal_number);
+        
         status_code number_no_zeros_status = convert_from_decimal(decimal_number, base, &number_no_zeros);
         switch (number_no_zeros_status) {
             case code_success:
@@ -83,6 +81,7 @@ int main(int argc, char* argv[]) {
                 printf("Error malloc detected!!!\n");
                 exit(4);
         }
+        free(input_value);
         fprintf(output, "\n");
         free(number_no_zeros);
     } 

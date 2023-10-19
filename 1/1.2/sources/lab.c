@@ -174,7 +174,7 @@ status_code function_gamma_equation(double epsilon, double* result) {
     prime_nums[0] = 2;
     size = 1;
     bool is_prime;
-    for (int i = 3; i * i <= t; i++) {
+    for (int i = 3; i * i <= t; i += 2) {
         is_prime = true;
         for (int j = 0; j < size; j++) {
             if (i % prime_nums[j] == 0) {
@@ -189,7 +189,7 @@ status_code function_gamma_equation(double epsilon, double* result) {
             if (size > sizeof(prime_nums) - 1) {
                 prime_nums = realloc(prime_nums, sizeof(int) * size * 2);
                 if (prime_nums == NULL) {
-                    free(prime_nums)
+                    free(prime_nums);
                     return code_error_malloc;
                 }
             }

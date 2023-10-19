@@ -3,5 +3,8 @@ min base = 16 dec = 15 no zeros = F
 min base = 14 dec = 81708315 no zeros = ABCD123 
 min base = 2 dec = 5 no zeros = 101 
 min base = 12 dec = 422392334 no zeros = B9560012 
-min base = 36 dec = 1270 no zeros = 3J 
-min base = 10 dec = -1234567890 no zeros = -123456789 
+min base = 36 dec = 1270 no zeros = ZA 
+min base = 10 dec = -1234567890 no zeros = -1234567890 
+min base = 4 dec = -27 no zeros = -123 
+min base = 2 dec = 0 no zeros = 0 
+min base = 2 dec = 0 no zeros = 0 

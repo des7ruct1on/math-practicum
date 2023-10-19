@@ -57,23 +57,25 @@ int main(int argc, char* argv[]) {
         return 0;
     }
     char* max_value;
+    //status_code no_zeros = remove_leading_zeros(char* number_str, char** number_str_no_zeros)
     status_code from_decimal_status = convert_from_decimal(decimal_max, base, &max_value);
     if (from_decimal_status == code_error_malloc) {
         printf("Error malloc detected!!!\n");
         exit(1);
     }
     printf("Max input number in %d base is: %s\n", base, max_value);
-    int max_num_no_zeros = remove_trailing_zeros(decimal_max);
+    //int max_num_no_zeros = remove_trailing_zeros(decimal_max);
     char* max_base_no_zeros = NULL;
     char* max_nine_base = NULL;
     char* max_eighteen_base = NULL;
     char* max_twenty_seven_base = NULL;
     char* max_thirty_six_base = NULL;
-    from_decimal_status = convert_from_decimal(max_num_no_zeros, base, &max_base_no_zeros);
+    /*from_decimal_status = convert_from_decimal(max_num_no_zeros, base, &max_base_no_zeros);
     if (from_decimal_status == code_error_malloc) {
         printf("Error malloc detected!!!\n");
         exit(1);
     }
+    */
     from_decimal_status = convert_from_decimal(abs(decimal_max), 9, &max_nine_base);
     if (from_decimal_status == code_error_malloc) {
         printf("Error malloc detected!!!\n");
@@ -104,7 +106,6 @@ int main(int argc, char* argv[]) {
         free(max_twenty_seven_base);
         exit(1);
     }
-    printf("Max number in input base with no trailing zeros: %s\n", max_base_no_zeros);
     printf("Max number in 9 base: %s\n", max_nine_base);
     printf("Max number in 18 base: %s\n", max_eighteen_base);
     printf("Max number in 27 base: %s\n", max_twenty_seven_base);
