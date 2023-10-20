@@ -16,6 +16,6 @@ typedef enum status_code {
     code_invalid_parameter
 } status_code;
 
-status_code find_substr(const char* substr, FILE* file, bool* found, int* index_row, int* index_symb);
+status_code find_substr(const char* substr, FILE* file);
 status_code find_first_in(char* substr, int count, ...);
 #endif

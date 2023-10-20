@@ -60,6 +60,16 @@ int main(int argc, char* argv[]) {
     }
     printf("\n\n\n");
 
+    st_find = find_first_in("11", 2, "input7.txt", "input8.txt");
+    printf("\n\n\n");
+    if (st_find == code_error_open_file) {
+        printf("Can't open file!\n");
+        exit(1);
+    } else if (st_find == code_invalid_parameter) {
+        printf("Invalid parameter detected!!!\n");
+        exit(2);
+    }
+    printf("\n\n\n");
 
     return 0;
 }
