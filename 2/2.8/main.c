@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
             break;
     }
     printf("\n");
-    switch (sum_numbers_by_base(10, &res, 1, "123")) {
+    switch (sum_numbers_by_base(10, &res, 1, "00000000")) {
         case code_success:
             printf("Result: %s\n", res);
             free_all(1, res);
