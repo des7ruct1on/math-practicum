@@ -1,3 +1,9 @@
 z
-x
-c
+    x
+        c
+
+    fds
+fds
+sd
+
+z   x   c

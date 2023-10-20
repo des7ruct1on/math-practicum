@@ -18,14 +18,35 @@ status_code find_substr(const char* substr, FILE* file, bool* found, int* index_
     *index_row = 1;
     *index_symb = 0;
     bool catch = false;
-    int index_catch = -1;
+    int index_symb_catch = -1;
+    int index_row_catch = -1;
+
     while (symb != EOF) {
-        printf("%d-%d\n", toascii(symb), toascii(substr[index]));
-        if (toascii(symb) == toascii(substr[index]) || (symb == '\r' && (substr[index] == '\n' || substr[index] == '\r'))) {
-            printf("yes\n");
-            if (!catch && index_catch == -1) {
+        //printf("%d index\n", *index_symb);
+        //printf("%d-%d\n", toascii(symb), toascii(substr[index]));
+        if (substr[index] == '\t' && symb == ' ') {
+            int count = 1;
+            for (count= 1; count < 3; count++) {
+                symb = fgetc(file);
+                //(*index_symb)++;
+                if (symb != ' ') {
+                    break;
+                }
+            }
+            if (count == 3) {
+                symb = '\t';
+            }
+            //printf("%c----%c ----%d\n", symb, substr[index], count);
+        }
+        int ascii_symb = toascii(symb);
+        int ascii_substr = toascii(substr[index]);
+        if (toascii(symb) == toascii(substr[index])) {
+            //printf("yes\n");
+            if (!catch && index_symb_catch == -1) {
                 catch = true;
-                index_catch = *index_symb;
+                index_symb_catch = *index_symb;
+                index_row_catch = *index_row;
+                //printf("%d>>\n", index_catch);
             }
             index++;
             if (index == len) {  
@@ -35,17 +56,19 @@ status_code find_substr(const char* substr, FILE* file, bool* found, int* index_
         } else {
             index = 0;
             catch = false;
-            index_catch = -1;
+            index_symb_catch = -1;
+            index_row_catch = -1;
         }
         
         (*index_symb)++;
         symb = fgetc(file);
-        if (symb == '\n') {
+        if (ascii_symb == 10) {
             (*index_row)++;
             *index_symb = 0;
         }
     }
-    *index_symb = index_catch;
+    *index_symb = index_symb_catch;
+    *index_row = index_row_catch;
 
     return code_success;  
 }
@@ -80,7 +103,7 @@ status_code find_first_in(char* substr, int count, ...) {
         if (catch) {
             printf("substr: %s, found in file: %s, at %d row, at %d symbol\n", substr, filename, index_row, index_symb);
         } else {
-            printf("%s not found in %s!\n", substr, filename);
+            printf("not found in %s!\n", filename);
         }
 
         fclose(file);
@@ -91,9 +114,9 @@ status_code find_first_in(char* substr, int count, ...) {
 }
 
 int main(int argc, char* argv[]) {
-     /*status_code st_find = find_first_in("zxc", 4, "input.txt", "input1.txt", "input3.txt", "input4.txt");*/
-    status_code st_find;
-    /*
+
+    status_code st_find = find_first_in("zxc", 4, "input.txt", "input1.txt", "input3.txt", "input4.txt");
+
     if (st_find == code_error_open_file) {
         printf("Can't open file!\n");
         exit(1);
@@ -101,8 +124,7 @@ int main(int argc, char* argv[]) {
         printf("Invalid parameter detected!!!\n");
         exit(2);
     }
-    */
-    /*
+    printf("\n\n\n");
     st_find = find_first_in("   zxc", 4, "input.txt", "input1.txt", "input3.txt", "input4.txt");
     printf("\n");
     if (st_find == code_error_open_file) {
@@ -112,9 +134,9 @@ int main(int argc, char* argv[]) {
         printf("Invalid parameter detected!!!\n");
         exit(2);
     }
-    */
-    st_find = find_first_in("z\nx\nc", 4, "input.txt", "input1.txt", "input3.txt", "input4.txt");
-    printf("\n");
+
+    st_find = find_first_in("z\nx\nc", 4, "input.txt", "input1.txt", "input3.txt", "input5.txt");
+    printf("\n\n\n");
     if (st_find == code_error_open_file) {
         printf("Can't open file!\n");
         exit(1);
@@ -122,6 +144,28 @@ int main(int argc, char* argv[]) {
         printf("Invalid parameter detected!!!\n");
         exit(2);
     }
+
+    st_find = find_first_in("z\tx\tc", 5, "input.txt", "input1.txt", "input3.txt", "input5.txt", "input4.txt");
+    printf("\n\n\n");
+    if (st_find == code_error_open_file) {
+        printf("Can't open file!\n");
+        exit(1);
+    } else if (st_find == code_invalid_parameter) {
+        printf("Invalid parameter detected!!!\n");
+        exit(2);
+    }
+    printf("\n\n\n");
+
+    st_find = find_first_in("\t\t\t", 2, "input.txt", "input6.txt");
+    printf("\n\n\n");
+    if (st_find == code_error_open_file) {
+        printf("Can't open file!\n");
+        exit(1);
+    } else if (st_find == code_invalid_parameter) {
+        printf("Invalid parameter detected!!!\n");
+        exit(2);
+    }
+    printf("\n\n\n");
 
 
     return 0;
