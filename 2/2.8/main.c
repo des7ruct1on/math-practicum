@@ -7,7 +7,6 @@
 int main(int argc, char* argv[]) {
 
     char* res = NULL;
-
     switch (sum_numbers_by_base(16, &res, 2, "AFB", "FBCAFC")) {
         case code_success:
             printf("Result: %s\n", res);
@@ -63,7 +62,7 @@ int main(int argc, char* argv[]) {
             break;
     }
     printf("\n");
-    switch (sum_numbers_by_base(10, &res, 1, "00000000")) {
+    switch (sum_numbers_by_base(10, &res, 3, "00000000", "0", "000000000000000000000000000000000")) {
         case code_success:
             printf("Result: %s\n", res);
             free_all(1, res);

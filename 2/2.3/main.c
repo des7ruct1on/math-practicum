@@ -76,7 +76,7 @@ int main(int argc, char* argv[]) {
             free(ins);
     }
 
-    st_find = find_first_in(&ins, &size, "\t\t\t", 2, "input.txt", "input6.txt");
+    st_find = find_first_in(&ins, &size, " ", 2, "input.txt", "input6.txt");
     printf("---\n\n\n");
     switch(st_find) {
         case code_error_malloc:

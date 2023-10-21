@@ -238,6 +238,7 @@ status_code sum_numbers_by_base(int base, char** result,int count,...) {
         status_code st_remove = remove_zeros(current_number, &current_number_no_zeros);\
         if (current_number_no_zeros != NULL) {
             has_zeros = true;
+            //printf("%s - %s\n", current_number, current_number_no_zeros);
         }
         if (i == 0) {
             if (has_zeros) {
@@ -263,6 +264,7 @@ status_code sum_numbers_by_base(int base, char** result,int count,...) {
             }
         }
         free(current_number_no_zeros);
+        current_number_no_zeros = NULL; // !
         has_zeros = false;
 
     }
@@ -273,7 +275,8 @@ status_code sum_numbers_by_base(int base, char** result,int count,...) {
 }
 
 bool is_valid_input(char* input_str, int base) {
-    for (int i = 0; i < strlen(input_str); ++i) {
+    int len = strlen(input_str);
+    for (int i = 0; i < len; ++i) {
         if (i == 0 && input_str[i] == '-') {
             continue;
         }

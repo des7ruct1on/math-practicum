@@ -48,7 +48,6 @@ status_code solve_coefs(double a, double** coefs_g, int* size_coefs, int degree,
     double coefs[degree + 1];
     for (int i = 0; i < degree + 1; i++) {
         coefs[i] = va_arg(ptr, double);
-        printf("%f--\n",coefs[i]);
     }
     va_end(ptr);
     double factorial_tmp = 1;
@@ -79,6 +78,31 @@ int main(int argc, char* argv[]) {
             printf("Error malloc detected!!!\n");
             exit(2);
     }
-    
+    degree = 3;
+    printf("\n");
+    switch (solve_coefs(2, &coefs_g, &size_coefs, degree, 2.0, 0.0, 3.0, 4.0)) {
+        case code_success:
+            print_coefs(coefs_g, degree + 1);
+            break;
+        case code_invalid_parameter:
+            printf("Invalid parameter detected!!!\n");
+            exit(1);
+        case code_alloc_error:
+            printf("Error malloc detected!!!\n");
+            exit(2);
+    }
+    degree = 0;
+    printf("\n");
+    switch (solve_coefs(2, &coefs_g, &size_coefs, degree, -4.1)) {
+        case code_success:
+            print_coefs(coefs_g, degree + 1);
+            break;
+        case code_invalid_parameter:
+            printf("Invalid parameter detected!!!\n");
+            exit(1);
+        case code_alloc_error:
+            printf("Error malloc detected!!!\n");
+            exit(2);
+    }
     return 0;
 }
