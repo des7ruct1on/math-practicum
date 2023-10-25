@@ -97,87 +97,32 @@ status_code fill_by_primes(int** prime_nums, int* size, int number) {
 }
 
 status_code is_finite_representation(int base, int denumerator, bool* result) {
-    int size_base = 32;
     int size_number = 32;
-    int* prime_nums_base = malloc(sizeof(int) * size_base);
-    status_free st_free;
-    if (!prime_nums_base) {
-        return code_error_alloc;
-    }
     int* prime_nums_number = malloc(sizeof(int) * size_number);
     if (!prime_nums_number) {
-        st_free = free_all(1, prime_nums_base);
-        if (st_free == status_free_fail) {
-            return code_error_alloc;
-        }
-        return code_error_alloc;
-    }
-    status_code st_base_prime = fill_by_primes(&prime_nums_base, &size_base, base);
-    if (st_base_prime == code_invalid_parameter) {
-        st_free = free_all(2, prime_nums_base, prime_nums_number);
-        if (st_free == status_free_fail) {
-            return code_error_alloc;
-        }
-        return code_invalid_parameter;
-    } else if (st_base_prime == code_error_alloc) {
-        st_free = free_all(2, prime_nums_base, prime_nums_number);
-        if (st_free == status_free_fail) {
-            return code_error_alloc;
-        }
+        free(prime_nums_number);
         return code_error_alloc;
     }
     status_code st_number_prime = fill_by_primes(&prime_nums_number, &size_number, denumerator);
     if (st_number_prime == code_invalid_parameter) {
-        st_free = free_all(2, prime_nums_base, prime_nums_number);
-        return code_invalid_parameter;
+        free(prime_nums_number);
     } else if (st_number_prime == code_error_alloc) {
-        st_free = free_all(2, prime_nums_base, prime_nums_number);
-        if (st_free == status_free_fail) {
-            return code_error_alloc;
-        }
+        free(prime_nums_number);
         return code_error_alloc;
     }
-    //printf("%d>%d\n", size_base, size_number);
-    if (size_base < size_number) {
-        //printf("111\n");
-        st_free = free_all(2, prime_nums_base, prime_nums_number);
-        *result = false;
-        if (st_free == status_free_fail) {
-            return code_error_alloc;
-        }
-        return code_success;
-    } else {
-        bool check = false;
-        //printf("%d - base, %d - denumenator\n", base, denumerator);
-        for (int i = 0; i < size_number; i++) {
-            //printf("%d - %d\n", prime_nums_number[i], prime_nums_base[i]);
-            for (int j = 0; j < size_base; j++) {
-                if (prime_nums_number[i] == prime_nums_base[j]) {
-                    check = true;
-                    break;
-                }
-            }
-            if (!check) {
-                *result = false;
-                st_free = free_all(2, prime_nums_base, prime_nums_number);
-                if (st_free == status_free_fail) {
-                    return code_error_alloc;
-                }
-                return code_success;
-            } else {
-                check = false;
-            }
+    for (int i = 0; i < size_number; i++) {
+        if (base % prime_nums_number[i] != 0) {
+            *result = false;
+            free(prime_nums_number);
+            return code_success;
         }
     }
-    st_free = free_all(2, prime_nums_base, prime_nums_number);
-    if (st_free == status_free_fail) {
-        return code_error_alloc;
-    }
+    free(prime_nums_number);
     *result = true;
     return code_success;
 }
 
-status_code check_finite(double** res, int base, int count,...) {
+status_code check_finite(double** res, int base, int* size, int count,...) {
     if (count < 1) {
         return code_invalid_parameter;
     }
@@ -210,15 +155,14 @@ status_code check_finite(double** res, int base, int count,...) {
         }
 
     }
+    *size = index;
     va_end(ptr);
     return code_success;
 }
 
 void print_arr(double arr[], int size) {
     for (int i = 0; i < size; i++) {
-        if (arr[i] > 1e-15) {
-            printf("%f ", arr[i]);
-        }
+        printf("%f ", arr[i]);
     }
     printf("\n");
 }

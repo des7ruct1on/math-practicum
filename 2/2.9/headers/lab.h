@@ -30,6 +30,6 @@ int my_len_double(double number);
 void to_common_fraction(double number, int* numerator, int* denumerator);
 status_code fill_by_primes(int** prime_nums, int* size, int number);
 status_code is_finite_representation(int base, int denumerator, bool* result);
-status_code check_finite(double** res, int base, int count,...);
+status_code check_finite(double** res, int base, int* size, int count,...);
 void print_arr(double arr[], int size);
 #endif
