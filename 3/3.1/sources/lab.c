@@ -125,7 +125,7 @@ status_code convert_from_decimal(long long int decimal_number, int base, char** 
     }
     decimal_number = abs(decimal_number);
     while (decimal_number) {
-        long long int remainder = decimal_number % base;
+        long long int remainder = decimal_number & (base - 1);
         if (remainder < 10) {
             (*result)[index] = plus(remainder, '0');
         } else {
