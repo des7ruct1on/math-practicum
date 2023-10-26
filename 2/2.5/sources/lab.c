@@ -206,10 +206,6 @@ int overfprintf(FILE * stream, char * format, ...) {
     int index = 0;
     char* flag = NULL;
     int ret_value = 0;
-    while(format[index] != '%' && index < size_format) {
-        ret_value += fprintf(stream, "%c", format[index]);
-        index++;
-    }
     for (int i = 0; i < argc; i++) {
         int size_flag = 1;
         int capacity_flag = 2;
@@ -222,7 +218,8 @@ int overfprintf(FILE * stream, char * format, ...) {
             return -1;
         }
         flag[0] = '%';
-        while ((isalpha(format[++index]) || isdigit(format[index]) || (format[index] == '%' && format[index - 1] == '%') ||
+        index++;
+        while ((isalpha(format[index]) || isdigit(format[index]) || (format[index] == '%' && format[index - 1] == '%') ||
         (format[index] == '.' && (isalpha(format[index + 1]) || isdigit(format[index + 1]) || format[index + 1] == '*'))
         || (format[index] == '#') || (format[index] == '+') || (format[index] == '-') || (format[index] == '0')) && (index < size_format))
         {
@@ -238,6 +235,7 @@ int overfprintf(FILE * stream, char * format, ...) {
                     return -1;
                 }
             }
+            index++;
 
         }
         flag[size_flag] = '\0';
@@ -416,7 +414,8 @@ int oversprintf(char* buf, char * format, ...) {
             return -1;
         }
         flag[0] = '%';
-        while ((isalpha(format[++index]) || isdigit(format[index]) || (format[index] == '%' && format[index - 1] == '%') ||
+        index++;
+        while ((isalpha(format[index]) || isdigit(format[index]) || (format[index] == '%' && format[index - 1] == '%') ||
         (format[index] == '.' && (isalpha(format[index + 1]) || isdigit(format[index + 1]) || format[index + 1] == '*'))
         || (format[index] == '#') || (format[index] == '+') || (format[index] == '-') || (format[index] == '0')) && (index < size_format))
         {
@@ -432,6 +431,7 @@ int oversprintf(char* buf, char * format, ...) {
                     return -1;
                 }
             }
+            index++;
 
         }
         flag[size_flag] = '\0';
