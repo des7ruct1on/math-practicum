@@ -34,6 +34,14 @@ typedef struct Employee {
     double salary;
 } Employee;
 
+typedef enum Type_sort {
+    ASCENDING,
+    DESCENDING
+} Type_sort;
+
 status_realloc my_realloc(void** var, int size);
 status_free free_all(int count, ...);
+status_code read_from_file(FILE* in, Employee** storage, int* capacity);
+int compare_employees(const void* a, const void* b);
+void write_file(FILE* out, Employee* storage, int size, Type_sort order_status);
 #endif

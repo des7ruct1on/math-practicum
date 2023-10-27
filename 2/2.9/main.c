@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
     }
     free(res);
     res = NULL;
-    switch (check_finite(&res, 10, &size, 5, 0.5, 0.25, 0.1, 0.9, 0.4)) {
+    switch (check_finite(&res, 10, &size, 9, 0.5, 0.25, 0.1, 0.9, 0.4, 0.0, 0.99, 0.35654, 0.01)) {
         case code_error_alloc:
             printf("Error alloc detected!!!\n");
             break;

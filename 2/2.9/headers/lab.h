@@ -27,7 +27,7 @@ typedef enum status_free {
 status_realloc my_realloc(void** var, int size);
 status_free free_all(int count, ...);
 int my_len_double(double number);
-void to_common_fraction(double number, int* numerator, int* denumerator);
+void to_common_fraction(double number, int* numerator, int* denumerator, int base);
 status_code fill_by_primes(int** prime_nums, int* size, int number);
 status_code is_finite_representation(int base, int denumerator, bool* result);
 status_code check_finite(double** res, int base, int* size, int count,...);

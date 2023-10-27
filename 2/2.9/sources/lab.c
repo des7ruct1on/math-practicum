@@ -47,7 +47,13 @@ int gcd(int a, int b) {
     return a;
 }
 
-void to_common_fraction(double number, int* numerator, int* denumerator) {
+void to_common_fraction(double number, int* numerator, int* denumerator, int base) {
+    const double epsilon = 1e-15;
+    if (fabs(number) < epsilon) {
+        *denumerator = base;
+        *numerator = 0;
+        return;
+    }
     int size = my_len_double(number);
     int pow = 1;
     *numerator = 0;
@@ -136,7 +142,7 @@ status_code check_finite(double** res, int base, int* size, int count,...) {
     for (int i = 0; i < count; i++) {
         int numeratur, denumerator;
         double number = va_arg(ptr, double);
-        to_common_fraction(number, &numeratur, &denumerator);
+        to_common_fraction(number, &numeratur, &denumerator, base);
         bool has_finite_representation;
         switch(is_finite_representation(base, denumerator, &has_finite_representation)) {
             case code_invalid_parameter:
