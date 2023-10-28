@@ -14,8 +14,8 @@ int main(int argc, char* argv[]) {
     overfprintf(stdout, "sfdsdf %to %TO %d%d\n", "abcdef", 16, "10", 10, 12, 12);
     overfprintf(stdout, "%mi %mu %md, %mf\n", (int)10, (unsigned int)12, (double)2.2, (double)2.3);
     overfprintf(stdout, "fsdwow number is: %Zr\n", (unsigned int)10);
-    overfprintf(in, "fsdwow number is: %Zk\n", (unsigned int)10);
-    overfprintf(stdout, "%Ro %CV %Ro %CV %CV\n", "XV", "1000", 2, "X", "10110", 2, "10001", 2);
+    overfprintf(in, "fsdwow number is: %Zk\n", (unsigned int)10); // 15 -- 10 -- 8 22 17
+    overfprintf(stdout, "\n%Ro %CV %Ro %CV %CV\n", 15, 10, 2, 15, 22, 2, 17, 2);
     char* buf = (char*)malloc(sizeof(char) * 32);
     printf("\n\n");
     oversprintf(buf, "wow number is: %Ro, %Cv\n", 5435, 1234, 16);
