@@ -25,6 +25,7 @@ typedef enum status_code {
 status_realloc my_realloc(void** var, int size);
 bool is_lower(char* str, int size);
 bool is_upper(char* str, int size);
+bool is_digit_str(char* str, int size);
 status_code from_roman_to_int(const char* number_str, int* num);
 status_code from_zeckendorf(const char* number_z, unsigned int* number);
 status_code convert_to_decimal(char* number_str, int base, int* dec_number, int flag);

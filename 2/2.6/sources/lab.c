@@ -10,6 +10,14 @@ status_realloc my_realloc(void** var, int size) {
     }
 }
 
+bool is_digit_str(char* str, int size) {
+    for (int i = 0; i < size; i++) {
+        if (!isdigit(str[i])) {
+            return false;
+        }
+    }
+    return true;
+}
 
 bool is_lower(char* str, int size) {
     for (int i = 0; i < size; i++) {
@@ -107,6 +115,7 @@ status_code from_zeckendorf(const char* number_z, unsigned int* number) {
 
 
 status_code convert_to_decimal(char* number_str, int base, int* dec_number, int flag) {
+    //printf("%s--\n", number_str);
     if (base < 2 || base > 36) {
         base = 10;
     }
@@ -216,7 +225,7 @@ int overfscanf(FILE * stream, const char * format, ...) {
             char number_str[STR_SIZE];
             ret_value += fscanf(stream, "%s", number_str);
             int size = strlen(number_str);
-            if (is_upper(number_str, size)) {
+            if (is_upper(number_str, size) && !is_digit_str(number_str, size)) {
                 printf("Letters are in upper case!!!\n");
                 (*arg_ptr) = 0;
             } else {
@@ -229,7 +238,7 @@ int overfscanf(FILE * stream, const char * format, ...) {
             char number_str[STR_SIZE];
             ret_value += fscanf(stream, "%s", number_str);
             int size = strlen(number_str);
-            if (is_lower(number_str, size)) {
+            if (is_lower(number_str, size) && !is_digit_str(number_str, size)) {
                 printf("Letters are in lower case!!!\n");
                 (*arg_ptr) = 0;
             } else {
@@ -262,6 +271,7 @@ int oversscanf(char * buf, const char * format, ...) {
             }
         }
     }
+    //printf("%d\n", argc);
     va_list ptr;
     va_start(ptr, argc);
     int index = 0;
@@ -300,6 +310,8 @@ int oversscanf(char * buf, const char * format, ...) {
 
         }
         flag[size_flag] = '\0';
+        //printf("%d %d\n", i, argc);
+        //printf("%s--\n", flag);
         if (!strcmp(flag, "%Ro\0")) {
             int* arg_ptr = va_arg(ptr, int*);
             char tmp[STR_SIZE];
@@ -320,12 +332,13 @@ int oversscanf(char * buf, const char * format, ...) {
             ret_value += sscanf(buf_index + buf, "%s", number_str);
             int size = strlen(number_str);
             buf_index += size + 1;
-            if (is_upper(number_str, size)) {
+            if (is_upper(number_str, size) && !is_digit_str(number_str, size)) {
                 printf("Letters are in upper case!!!\n");
                 (*arg_ptr) = 0;
             } else {
                 status_code st_convert = convert_to_decimal(number_str, base, arg_ptr, 0);
             }
+            argc--;
         } else if (!strcmp(flag, "%CV\0")) {
             int* arg_ptr = va_arg(ptr, int*);
             argc++;
@@ -334,12 +347,15 @@ int oversscanf(char * buf, const char * format, ...) {
             ret_value += sscanf(buf_index + buf, "%s", number_str);
             int size = strlen(number_str);
             buf_index += size + 1;
-            if (is_lower(number_str, size)) {
+            if (is_lower(number_str, size) && !is_digit_str(number_str, size)) {
                 printf("Letters are in lower case!!!\n");
                 (*arg_ptr) = 0;
             } else {
+                //printf("check1\n");
                 status_code st_convert = convert_to_decimal(number_str, base, arg_ptr, 1);
+                //printf("check1\n");
             }
+            argc--;
         } else {
             void* tmp_arg = va_arg(ptr, void*);
             ret_value += sscanf(buf_index + buf, flag, tmp_arg);

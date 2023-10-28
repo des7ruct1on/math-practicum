@@ -46,12 +46,15 @@ status_code read_from_file(FILE* in, Student** storage, int* capacity) {
             free(line);
             return code_error_alloc;
         }
+        //line[read - 1] = '\0';
         Student tmp;
-        if (!sscanf(line, "%d %s %s %s %c %c %c %c %c", &(tmp.id), tmp.name, tmp.surname, tmp.group, tmp.marks[0], tmp.marks[1], tmp.marks[2], tmp.marks[3], tmp.marks[4]))  {
+        if (!sscanf(line, "%ld %s %s %s %c %c %c %c %c", &(tmp.id), tmp.name, tmp.surname, tmp.group, &(tmp.marks[0]), &(tmp.marks[1]), &(tmp.marks[2]), &(tmp.marks[3]), &(tmp.marks[4])))  {
             free(line);
             return code_invalid_parameter;
         }
+       
         (*storage)[index_storage] = tmp;
+         printf("%d %s %s %s %c %c %c %c %c\n", (*storage)[index_storage].id, (*storage)[index_storage].name, (*storage)[index_storage].surname, (*storage)[index_storage].group, (*storage)[index_storage].marks[0], (*storage)[index_storage].marks[1], (*storage)[index_storage].marks[2], (*storage)[index_storage].marks[3], (*storage)[index_storage].marks[4]);
         index_storage++;
         if (*capacity - 1 == index_storage) {
             *capacity *= 2;
@@ -70,6 +73,7 @@ status_code read_from_file(FILE* in, Student** storage, int* capacity) {
     }
     free(line);
     *capacity = index_storage;
+    print_table(*storage, *capacity);
     return code_success;
 }
 
@@ -103,11 +107,13 @@ bool is_sorted(Student* storage, int size) {
 }
 
 double get_avg_ball(Student* student) {
-    int sum = 0;
+    double sum = 0;
     for (int i = 0; i < 5; i++) {
-        sum += student->marks[i];
+        int mark = student->marks[i] - '0';
+        sum += mark;
+        printf("%lf - %d\n", sum, mark);
     }
-    return (double)sum / 5.0;
+    return sum / 5;
 }
 
 void print_table(Student* storage, int size) {
@@ -120,14 +126,19 @@ void print_table(Student* storage, int size) {
     printf("|----------------------------------------|\n");
 }
 
-void rewrite_file(FILE* out, Student* storage, int size) {
+status_code rewrite_file(const char* file_name, Student* storage, int size) {
+    FILE* out = fopen(file_name, "w");
+    if (!out) {
+        return code_error_oppening;
+    }
     for (int i = 0; i < size; i++) {
         Student tmp = storage[i];
         fprintf(out, "%d %s %s %s %c %c %c %c %c", tmp.id, tmp.name, tmp.surname, tmp.group, tmp.marks[0], tmp.marks[1], tmp.marks[2], tmp.marks[3], tmp.marks[4]);
     }
+    return code_success;
 }
 
-Student* get_student_name(Student* storage, int size, int* index, const char* find_name) {
+status_code get_student_name(Student* storage, Student** res, int size, const char* find_name) {
     int left = 0;
     int right = size - 1;
     int mid;
@@ -138,15 +149,16 @@ Student* get_student_name(Student* storage, int size, int* index, const char* fi
         } else if (strcmp(storage[mid].name, find_name) < 0) {
             left = mid + 1;
         } else {
-            *index = mid;
-            return &storage[mid];
+            *res = &storage[mid];
+            return code_success;
         }
 
     }
-    return NULL;
+    *res = NULL;
+    return code_success;
 }
 
-Student* get_student_surname(Student* storage, int size, int* index, const char* find_surname) {
+status_code get_student_surname(Student* storage, Student** res, int size, const char* find_surname) {
     int left = 0;
     int right = size - 1;
     int mid;
@@ -157,15 +169,16 @@ Student* get_student_surname(Student* storage, int size, int* index, const char*
         } else if (strcmp(storage[mid].surname, find_surname) < 0) {
             left = mid + 1;
         } else {
-            *index = mid;
-            return &storage[mid];
+            *res = &storage[mid];
+            return code_success;
         }
 
     }
-    return NULL;
+    *res = NULL;
+    return code_success;
 }
 
-Student* get_student_id(Student* storage, int size, int* index, unsigned int find_id) {
+status_code get_student_id(Student* storage, Student** res, int size, unsigned int find_id) {
     int left = 0;
     int right = size - 1;
     int mid;
@@ -176,15 +189,16 @@ Student* get_student_id(Student* storage, int size, int* index, unsigned int fin
         } else if (storage[mid].id < find_id) {
             left = mid + 1;
         } else {
-            *index = mid;
-            return &storage[mid];
+            *res = &storage[mid];
+            return code_success;
         }
 
     }
-    return NULL;
+    *res = NULL;
+    return code_success;
 }
 
-Student* get_student_group(Student* storage, int size, int* index, const char* find_group) {
+status_code get_student_group(Student* storage, Student** res, int size, const char* find_group) {
     int left = 0;
     int right = size - 1;
     int mid;
@@ -195,21 +209,62 @@ Student* get_student_group(Student* storage, int size, int* index, const char* f
         } else if (strcmp(storage[mid].group, find_group) < 0) {
             left = mid + 1;
         } else {
-            *index = mid;
-            return &storage[mid];
+            *res = &storage[mid];
+            return code_success;
         }
 
     }
-    return NULL;
+    *res = NULL;
+    return code_success;
 }
 
 
-void print_student_chars(FILE* out, Student* stud) {
+status_code print_student_chars(const char* file_name, Student* stud) {
+    FILE* out;
+    if (file_name != NULL) {
+        out = fopen(file_name, "w");
+        if (!out) {
+            return code_error_oppening;
+        }
+    }
     double avg_ball = get_avg_ball(stud);
-    fprintf(out, "%d %s %s %s %lf\n", stud->id, stud->name, stud->surname, stud->group, avg_ball);
+    if (!file_name) {
+        fprintf(stdout, "%d %s %s %s %lf\n", stud->id, stud->name, stud->surname, stud->group, avg_ball);
+    } else {
+        fprintf(out, "%d %s %s %s %lf\n", stud->id, stud->name, stud->surname, stud->group, avg_ball);
+    }
+    return code_success;
 }
 
-void print_stud_bigger_avg(FILE* out, Student* storage, int size) {
+status_code print_students_group(const char* file_name, char* group_name, Student* storage, int size) {
+    FILE* out;
+    if (file_name != NULL) {
+        out = fopen(file_name, "w");
+        if (!out) {
+            return code_error_oppening;
+        }
+    }
+    for (int i = 0; i < size; i++) {
+        Student* tmp = &storage[i];
+        if (!strcmp(tmp->group, group_name)) {
+            if (!file_name) {
+                fprintf(stdout, "%d %s %s %s %c %c %c %c %c\n", tmp->id, tmp->name, tmp->surname, tmp->group, tmp->marks[0], tmp->marks[1], tmp->marks[2], tmp->marks[3], tmp->marks[4]);
+            } else {
+                fprintf(out, "%d %s %s %s %c %c %c %c %c\n", tmp->id, tmp->name, tmp->surname, tmp->group, tmp->marks[0], tmp->marks[1], tmp->marks[2], tmp->marks[3], tmp->marks[4]);
+            }
+        }
+    }
+    return code_success;
+}
+
+status_code print_stud_bigger_avg(const char* file_name, Student* storage, int size) {
+    FILE* out;
+    if (file_name != NULL) {
+        out = fopen(file_name, "w");
+        if (!out) {
+            return code_error_oppening;
+        }
+    }
     const double epsilon = 1e-10;
     double avg = 0.0;
     for (int i = 0; i < size; i++) {
@@ -220,8 +275,86 @@ void print_stud_bigger_avg(FILE* out, Student* storage, int size) {
         Student* tmp = &storage[i];
         double tmp_avg = get_avg_ball(tmp);
         if (fabs(tmp_avg - avg) > epsilon) {
-            print_student_chars(out, tmp);
+            if (!file_name) {
+                fprintf(stdout, "%d %s %s %s %c %c %c %c %c\n", tmp->id, tmp->name, tmp->surname, tmp->group, tmp->marks[0], tmp->marks[1], tmp->marks[2], tmp->marks[3], tmp->marks[4]);
+            } else {
+                fprintf(out, "%d %s %s %s %c %c %c %c %c\n", tmp->id, tmp->name, tmp->surname, tmp->group, tmp->marks[0], tmp->marks[1], tmp->marks[2], tmp->marks[3], tmp->marks[4]);
+            }
         }
     }
+    fclose(out);
+    return code_success;
 }
 
+status_cmd command(char** arg_one, char** arg_two) {
+    char* cmd = (char*)malloc(sizeof(char) * STR_SIZE);
+    if (!cmd) {
+        return cmd_error_alloc;
+    }
+    int index = 0;
+    char symbol = getchar();
+    while (!isspace(symbol)) {
+        cmd[index++] = symbol;
+        symbol = getchar();
+    }
+    cmd[index] = '\0';
+    index = 0;
+    if (!strcmp(cmd, "Exit")) {
+        free(cmd);
+        return cmd_exit;
+    } else if (!strcmp(cmd, "Sort")) {
+        free(cmd);
+        return cmd_sort;
+    } else if (!strcmp(cmd, "Table")) {
+        free(cmd);
+        return cmd_table;
+    } else if (!strcmp(cmd, "Avg")) {
+        free(cmd);
+        return cmd_print_stud_more_avg;
+    } else if (!strcmp(cmd, "Rewrite")) {
+        free(cmd);
+        return cmd_rewrite_file;
+    } else if (!strcmp(cmd, "Find")) {
+        free(cmd);
+        (*arg_one) = (char*)malloc(STR_SIZE * sizeof(char));
+        if (*arg_one == NULL) {
+            return cmd_error_alloc;
+        }
+        while (!isspace(symbol)) {
+            (*arg_one)[index++] = symbol;
+            symbol = getchar();
+        }
+        (*arg_one)[index] = '\0';
+        index = 0;
+        (*arg_two) = (char*)malloc(STR_SIZE * sizeof(char));
+        if (*arg_two == NULL) {
+            return cmd_error_alloc;
+        }
+        while (!isspace(symbol)) {
+            (*arg_two)[index++] = symbol;
+            symbol = getchar();
+        }
+        (*arg_two)[index] = '\0';
+        index = 0;
+        if (!strcmp(*arg_one, "Id")) {
+            free(*arg_one);
+            return cmd_find_id;
+        } else if (!strcmp(*arg_one, "Surname")) {
+            free(*arg_one);
+            return cmd_find_surname;
+        } else if (!strcmp(*arg_one, "Name")) {
+            free(*arg_one);
+            return cmd_find_name;
+        } else if (!strcmp(*arg_one, "Group")) {
+            free(*arg_one);
+            return cmd_find_group;
+        } else {
+            free(*arg_one);
+            free(*arg_two);
+            return cmd_invalid_parameter;
+        }
+    } else {
+        free(cmd);
+        return cmd_invalid_parameter;
+    }
+}

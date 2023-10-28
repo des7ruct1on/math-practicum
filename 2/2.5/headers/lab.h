@@ -29,6 +29,7 @@ status_code convert_from_decimal(long long int decimal_number, int base, int fla
 status_code convert_to_decimal(char* number_str, int base, long long int * dec_number, int flag);
 bool is_lower(char* str, int size);
 bool is_upper(char* str, int size);
+bool is_digit_str(char* str, int size);
 int overfprintf(FILE * stream, char * format, ...);
 int oversprintf(char* buf, char * format, ...);
 #endif

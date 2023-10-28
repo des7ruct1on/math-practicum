@@ -185,6 +185,15 @@ bool is_upper(char* str, int size) {
     return true;
 } 
 
+bool is_digit_str(char* str, int size) {
+    for (int i = 0; i < size; i++) {
+        if (!isdigit(str[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
 int overfprintf(FILE * stream, char * format, ...) {
     if (!stream) {
         return -1;
