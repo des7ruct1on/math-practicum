@@ -48,13 +48,17 @@ status_code read_from_file(FILE* in, Student** storage, int* capacity) {
         }
         //line[read - 1] = '\0';
         Student tmp;
-        if (!sscanf(line, "%ld %s %s %s %c %c %c %c %c", &(tmp.id), tmp.name, tmp.surname, tmp.group, &(tmp.marks[0]), &(tmp.marks[1]), &(tmp.marks[2]), &(tmp.marks[3]), &(tmp.marks[4])))  {
+        tmp.marks = malloc(sizeof(unsigned char) * 5);
+        if (!tmp.marks) {
+            free(line);
+            return code_error_alloc;
+        }
+        if (sscanf(line, "%d %s %s %s %c %c %c %c %c", &(tmp.id), tmp.name, tmp.surname, tmp.group, &(tmp.marks[0]), &(tmp.marks[1]), &(tmp.marks[2]), &(tmp.marks[3]), &(tmp.marks[4])) != 9)  {
             free(line);
             return code_invalid_parameter;
         }
-       
         (*storage)[index_storage] = tmp;
-         printf("%d %s %s %s %c %c %c %c %c\n", (*storage)[index_storage].id, (*storage)[index_storage].name, (*storage)[index_storage].surname, (*storage)[index_storage].group, (*storage)[index_storage].marks[0], (*storage)[index_storage].marks[1], (*storage)[index_storage].marks[2], (*storage)[index_storage].marks[3], (*storage)[index_storage].marks[4]);
+        //printf("%d %s %s %s %c %c %c %c %c\n", (*storage)[index_storage].id, (*storage)[index_storage].name, (*storage)[index_storage].surname, (*storage)[index_storage].group, (*storage)[index_storage].marks[0], (*storage)[index_storage].marks[1], (*storage)[index_storage].marks[2], (*storage)[index_storage].marks[3], (*storage)[index_storage].marks[4]);
         index_storage++;
         if (*capacity - 1 == index_storage) {
             *capacity *= 2;
@@ -96,10 +100,34 @@ int compare_students(const void* a, const void* b) {
     return strcmp(((Student *)a)->group, ((Student *)b)->group);
 }
 
-bool is_sorted(Student* storage, int size) {
+int compare_students_group(const void* a, const void* b) {
+    return strcmp(((Student *)a)->group, ((Student *)b)->group);
+}
+
+int compare_students_surname(const void* a, const void* b) {
+    int surname_diff = strcmp(((Student *)a)->surname, ((Student *)b)->surname);
+    return surname_diff;
+}
+
+int compare_students_name(const void* a, const void* b) {
+    int name_diff = strcmp(((Student *)a)->name, ((Student *)b)->name);
+    return name_diff;
+}
+
+int compare_students_id(const void* a, const void* b) {
+    const double epsilon = 1e-10;
+    int diff_id = ((Student *)a)->id - ((Student *)b)->id;
+    if (diff_id > 0) {
+        return 1;
+    } else if (diff_id < 0) {
+        return -1;
+    }
+}
+
+bool is_sorted(Student* storage, int size, int (*compare)(const Student*, const Student*)) {
     for (int i = 0; i < size - 1; i++) {
-        int check = compare_students(&storage[i], &storage[i + 1]);
-        if (check < 0) {
+        int check = compare(&storage[i], &storage[i + 1]);
+        if (check > 0) {
             return false;
         }
     }
@@ -111,13 +139,14 @@ double get_avg_ball(Student* student) {
     for (int i = 0; i < 5; i++) {
         int mark = student->marks[i] - '0';
         sum += mark;
-        printf("%lf - %d\n", sum, mark);
+        //printf("%lf - %d\n", sum, mark);
     }
     return sum / 5;
 }
 
 void print_table(Student* storage, int size) {
     printf("| Surname | Name | id | Group | Avg Ball |\n");
+    printf("|----------------------------------------|\n");
     for (int i = 0; i < size; i++) {
         Student tmp = storage[i];
         printf("| %-8s| %-5s| %3d| %-6s| %.2f     |\n", tmp.surname, tmp.name, tmp.id, tmp.group, get_avg_ball(&tmp));
@@ -126,14 +155,10 @@ void print_table(Student* storage, int size) {
     printf("|----------------------------------------|\n");
 }
 
-status_code rewrite_file(const char* file_name, Student* storage, int size) {
-    FILE* out = fopen(file_name, "w");
-    if (!out) {
-        return code_error_oppening;
-    }
+status_code rewrite_file(FILE* file, Student* storage, int size) {
     for (int i = 0; i < size; i++) {
         Student tmp = storage[i];
-        fprintf(out, "%d %s %s %s %c %c %c %c %c", tmp.id, tmp.name, tmp.surname, tmp.group, tmp.marks[0], tmp.marks[1], tmp.marks[2], tmp.marks[3], tmp.marks[4]);
+        fprintf(file, "%d %s %s %s %c %c %c %c %c\n", tmp.id, tmp.name, tmp.surname, tmp.group, tmp.marks[0], tmp.marks[1], tmp.marks[2], tmp.marks[3], tmp.marks[4]);
     }
     return code_success;
 }
@@ -221,49 +246,38 @@ status_code get_student_group(Student* storage, Student** res, int size, const c
 
 status_code print_student_chars(const char* file_name, Student* stud) {
     FILE* out;
-    if (file_name != NULL) {
-        out = fopen(file_name, "w");
-        if (!out) {
-            return code_error_oppening;
-        }
+    out = fopen(file_name, "a");
+    if (!out) {
+        return code_error_oppening;
     }
     double avg_ball = get_avg_ball(stud);
-    if (!file_name) {
-        fprintf(stdout, "%d %s %s %s %lf\n", stud->id, stud->name, stud->surname, stud->group, avg_ball);
-    } else {
-        fprintf(out, "%d %s %s %s %lf\n", stud->id, stud->name, stud->surname, stud->group, avg_ball);
-    }
+    fprintf(out, "%d %s %s %s %lf\n", stud->id, stud->name, stud->surname, stud->group, avg_ball);
+ 
+    fclose(out);
     return code_success;
 }
 
 status_code print_students_group(const char* file_name, char* group_name, Student* storage, int size) {
     FILE* out;
-    if (file_name != NULL) {
-        out = fopen(file_name, "w");
-        if (!out) {
-            return code_error_oppening;
-        }
+    out = fopen(file_name, "a");
+    if (!out) {
+        return code_error_oppening;
     }
     for (int i = 0; i < size; i++) {
         Student* tmp = &storage[i];
-        if (!strcmp(tmp->group, group_name)) {
-            if (!file_name) {
-                fprintf(stdout, "%d %s %s %s %c %c %c %c %c\n", tmp->id, tmp->name, tmp->surname, tmp->group, tmp->marks[0], tmp->marks[1], tmp->marks[2], tmp->marks[3], tmp->marks[4]);
-            } else {
-                fprintf(out, "%d %s %s %s %c %c %c %c %c\n", tmp->id, tmp->name, tmp->surname, tmp->group, tmp->marks[0], tmp->marks[1], tmp->marks[2], tmp->marks[3], tmp->marks[4]);
-            }
+        if (!strcmp(tmp->group, group_name)) {         
+            fprintf(out, "%d %s %s %s %c %c %c %c %c\n", tmp->id, tmp->name, tmp->surname, tmp->group, tmp->marks[0], tmp->marks[1], tmp->marks[2], tmp->marks[3], tmp->marks[4]);
         }
     }
+    fclose(out);
     return code_success;
 }
 
 status_code print_stud_bigger_avg(const char* file_name, Student* storage, int size) {
     FILE* out;
-    if (file_name != NULL) {
-        out = fopen(file_name, "w");
-        if (!out) {
-            return code_error_oppening;
-        }
+    out = fopen(file_name, "a");
+    if (!out) {
+        return code_error_oppening;
     }
     const double epsilon = 1e-10;
     double avg = 0.0;
@@ -274,12 +288,8 @@ status_code print_stud_bigger_avg(const char* file_name, Student* storage, int s
     for (int i = 0; i < size; i++) {
         Student* tmp = &storage[i];
         double tmp_avg = get_avg_ball(tmp);
-        if (fabs(tmp_avg - avg) > epsilon) {
-            if (!file_name) {
-                fprintf(stdout, "%d %s %s %s %c %c %c %c %c\n", tmp->id, tmp->name, tmp->surname, tmp->group, tmp->marks[0], tmp->marks[1], tmp->marks[2], tmp->marks[3], tmp->marks[4]);
-            } else {
-                fprintf(out, "%d %s %s %s %c %c %c %c %c\n", tmp->id, tmp->name, tmp->surname, tmp->group, tmp->marks[0], tmp->marks[1], tmp->marks[2], tmp->marks[3], tmp->marks[4]);
-            }
+        if (tmp_avg - avg > epsilon) {
+            fprintf(out, "%d %s %s %s %c %c %c %c %c\n", tmp->id, tmp->name, tmp->surname, tmp->group, tmp->marks[0], tmp->marks[1], tmp->marks[2], tmp->marks[3], tmp->marks[4]);
         }
     }
     fclose(out);
@@ -304,6 +314,18 @@ status_cmd command(char** arg_one, char** arg_two) {
         return cmd_exit;
     } else if (!strcmp(cmd, "Sort")) {
         free(cmd);
+        (*arg_one) = (char*)malloc(STR_SIZE * sizeof(char));
+        if (*arg_one == NULL) {
+            return cmd_error_alloc;
+        }
+        while(isspace(symbol)) {
+            symbol = getchar();
+        }
+        while (!isspace(symbol)) {
+            (*arg_one)[index++] = symbol;
+            symbol = getchar();
+        }
+        (*arg_one)[index] = '\0';
         return cmd_sort;
     } else if (!strcmp(cmd, "Table")) {
         free(cmd);
@@ -320,6 +342,9 @@ status_cmd command(char** arg_one, char** arg_two) {
         if (*arg_one == NULL) {
             return cmd_error_alloc;
         }
+        while(isspace(symbol)) {
+            symbol = getchar();
+        }
         while (!isspace(symbol)) {
             (*arg_one)[index++] = symbol;
             symbol = getchar();
@@ -330,31 +355,26 @@ status_cmd command(char** arg_one, char** arg_two) {
         if (*arg_two == NULL) {
             return cmd_error_alloc;
         }
+        while(isspace(symbol)) {
+            symbol = getchar();
+        }
         while (!isspace(symbol)) {
             (*arg_two)[index++] = symbol;
             symbol = getchar();
         }
         (*arg_two)[index] = '\0';
         index = 0;
-        if (!strcmp(*arg_one, "Id")) {
-            free(*arg_one);
-            return cmd_find_id;
-        } else if (!strcmp(*arg_one, "Surname")) {
-            free(*arg_one);
-            return cmd_find_surname;
-        } else if (!strcmp(*arg_one, "Name")) {
-            free(*arg_one);
-            return cmd_find_name;
-        } else if (!strcmp(*arg_one, "Group")) {
-            free(*arg_one);
-            return cmd_find_group;
-        } else {
-            free(*arg_one);
-            free(*arg_two);
-            return cmd_invalid_parameter;
-        }
+        return cmd_find;
     } else {
         free(cmd);
         return cmd_invalid_parameter;
     }
+}
+
+status_free free_storage(Student* storage, int size) {
+    for (int i = 0; i < size; i++) {
+        free(storage[i].marks);
+    }
+    free(storage);
+    return status_free_ok;
 }

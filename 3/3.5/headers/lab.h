@@ -34,10 +34,7 @@ typedef enum status_cmd {
     cmd_invalid_parameter,
     cmd_sort,
     cmd_rewrite_file,
-    cmd_find_surname,
-    cmd_find_name,
-    cmd_find_id,
-    cmd_find_group,
+    cmd_find,
     cmd_print_stud_more_avg,
     cmd_table
 } status_cmd;
@@ -53,13 +50,17 @@ typedef struct Student {
 status_cmd command(char** arg_one, char** arg_two);
 status_realloc my_realloc(void** var, int size);
 status_free free_all(int count, ...);
+status_free free_storage(Student* storage, int size);
 status_code read_from_file(FILE* in, Student** storage, int* capacity);
-int compare_students(const void* a, const void* b);
+int compare_students_group(const void* a, const void* b);
+int compare_students_surname(const void* a, const void* b);
+int compare_students_name(const void* a, const void* b);
+int compare_students_id(const void* a, const void* b);
 status_code write_file(const char* out, Student* storage, int size);
-bool is_sorted(Student* storage, int size);
+bool is_sorted(Student* storage, int size, int (*compare)(const Student*, const Student*));
 double get_avg_ball(Student* student);
 void print_table(Student* storage, int size);
-status_code rewrite_file(const char* file_name, Student* storage, int size);
+status_code rewrite_file(FILE* file, Student* storage, int size);
 status_code get_student_name(Student* storage, Student** res, int size, const char* find_name);
 status_code get_student_surname(Student* storage, Student** res, int size, const char* find_surname);
 status_code get_student_id(Student* storage, Student** res, int size, unsigned int find_id);
