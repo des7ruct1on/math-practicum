@@ -1,0 +1,45 @@
+Expression: A(B(E(G,T,R(W,Z))),C(F(L,M)))
+
+         M    
+         L    
+      F    
+   C    
+            Z    
+            W    
+         R    
+         T    
+         G    
+      E    
+   B    
+A    
+
+Expression: A
+
+A    
+
+Expression: B(E,C,D(Z,X(P,Q,R),V),G,H(A,F,L))
+
+      L    
+      F    
+      A    
+   H    
+   G    
+      V    
+         R    
+         Q    
+         P    
+      X    
+      Z    
+   D    
+   C    
+   E    
+B    
+
+Expression: A(B,C),X(Y,Z)
+   Z    
+   Y    
+X    
+   C    
+   B    
+A    
+
