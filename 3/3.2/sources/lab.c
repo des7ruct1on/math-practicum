@@ -169,6 +169,9 @@ status_code get_max_len_vector(Vector*** max_vectors, int* size, status_code nor
     //print_vector(&first, dimension);
     double max = 0.0;
     status_code st_norm = norm(&max, &first, dimension, p);
+    if (st_norm == code_error_alloc) {
+        return code_error_alloc;
+    }
     int index_max = 0;
     //printf("len = %lf\n", max);
     for (int i = 1; i < count; i++) {
@@ -176,6 +179,9 @@ status_code get_max_len_vector(Vector*** max_vectors, int* size, status_code nor
         //print_vector(&tmp, dimension);
         double len_tmp;
         st_norm = norm(&len_tmp, &tmp, dimension, p);
+        if (st_norm == code_error_alloc) {
+            return code_error_alloc;
+        }
         //printf("len = %lf\n", len_tmp);
         if (len_tmp - max > epsilon) {
             max = len_tmp;
