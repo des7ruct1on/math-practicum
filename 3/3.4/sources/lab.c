@@ -28,3 +28,28 @@ status_free free_all(int count, ...) {
     return status_free_ok;
 }
 
+
+My_string* String(unsigned int _size) {
+    My_string* new = malloc(sizeof(My_string));
+    new->data = malloc(sizeof(char) * (_size + 1));
+    new->size = _size;
+    return new;
+}
+
+
+
+void String_clear(My_string* str) {
+    
+}
+
+
+
+status_code my_strcpy(My_string* destination, const My_string* source);
+
+
+
+My_string* my_strcpy_new(const My_string* source);
+
+
+
+int my_strcmp(My_string* left, My_string* right);

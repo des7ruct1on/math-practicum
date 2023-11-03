@@ -38,7 +38,8 @@ int main(int argc, char* argv[]) {
     vector5.coordinates[2] = 4.0;
     int count = 5;
     int size;
-    status_code st_find = get_max_len_vector(&maxs, &size, dimension, count, vector1, vector2, vector3, vector4, vector5);
+    int p = 2;
+    status_code st_find = get_max_len_vector(&maxs, &size, get_matrix_norm, dimension, p, count, vector1, vector2, vector3, vector4, vector5);
     if (st_find == code_invalid_parameter) {
         printf("Invalid parameter detected!!!\n");
         free_all(6, vector1.coordinates, vector2.coordinates, vector3.coordinates, vector4.coordinates, vector5.coordinates, maxs);

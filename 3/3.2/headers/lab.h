@@ -32,9 +32,15 @@ typedef struct Vector {
     double* coordinates;
 } Vector;
 
-status_code get_euclidean_norm(double* res, Vector* vector, int dimension);
-void print_vector(Vector* arr, int size);
-status_code get_max_len_vector(Vector** max_vectors, int* size, int dimension, int count,...);
+
+
 status_realloc my_realloc(void** var, int size);
 status_free free_all(int count, ...);
+void print_vector(Vector* arr, int size);
+status_code binary_pow(double* res, double value, int degree);
+status_code get_golder_norm(double* res, Vector* vect, int n, int p);
+status_code get_golder_inf(double* res, Vector* vect, int n, int p);
+status_code mult_matr_vect(double* a[], double* x, double** res, int size_m,  int size_v);
+status_code get_matrix_norm(double* res, Vector* vect, int n, int p);
+status_code get_max_len_vector(Vector*** max_vectors, int* size, status_code norm(double* res, Vector* vect, int n, int p), int dimension, int p, int count,...);
 #endif
