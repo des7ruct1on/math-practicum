@@ -6,6 +6,7 @@
         "stdarg.h": "c",
         "string.h": "c",
         "limits.h": "c",
-        "ctype.h": "c"
+        "ctype.h": "c",
+        "stdio.h": "c"
     }
 }
