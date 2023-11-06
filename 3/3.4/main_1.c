@@ -40,5 +40,12 @@ int main(int argc, char* argv[]) {
     free(str_b);
     string_clear(str_c);
     free(str_c);
+    str_b = String("bb");
+    str_c = String("bbb");
+    printf("%d--\n", my_strcmp(str_b, str_c));
+    string_clear(str_b);
+    free(str_b);
+    string_clear(str_c);
+    free(str_c);
     return 0;
 }
