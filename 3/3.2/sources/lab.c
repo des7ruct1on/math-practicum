@@ -46,7 +46,7 @@ status_code binary_pow(double* res, double value, int degree) {
         *res = 1.0;
         return code_success;
     }
-    if (fabs(value) < EPS && fabs(degree) < EPS) {
+    if (fabs(value) < EPS && abs(degree) < EPS) {
         return code_invalid_parameter;
     }
     double tmp;
@@ -125,6 +125,10 @@ status_code get_matrix_norm(double* res, Vector* vect, int n, int p) {
     for (int i = 0; i < n; i++) {
         A[i] = (double*)malloc(sizeof(double) * n);
         if (!A[i]) {
+            for (int j = 0; j < i; j++) {
+                free(A[j]);
+            }
+            free(A);
             return code_error_alloc;
         }
     }
@@ -153,19 +157,19 @@ status_code get_matrix_norm(double* res, Vector* vect, int n, int p) {
     return code_success;
 }
 
-status_code get_max_len_vector(Vector*** max_vectors, int* size, status_code norm(double* res, Vector* vect, int n, int p), int dimension, int p, int count,...) {
+status_code get_max_len_vector(Vector** max_vectors, int* size, status_code norm(double* res, Vector* vect, int n, int p), int dimension, int p, int count,...) {
     if (count < 0 || dimension < 1) {
         return code_invalid_parameter;
     }
     *size = count;
     const double epsilon = 1e-10;
     va_list ptr;
-    (*max_vectors) = (Vector*)malloc(sizeof(Vector*) * count);
+    (*max_vectors) = (Vector*)malloc(sizeof(Vector) * count);
     if (!(*max_vectors)) {
         return code_error_alloc;
     }
     va_start(ptr, count);
-    Vector* first = va_arg(ptr, Vector*);
+    Vector first = va_arg(ptr, Vector);
     //print_vector(&first, dimension);
     double max = 0.0;
     status_code st_norm = norm(&max, &first, dimension, p);
@@ -174,7 +178,7 @@ status_code get_max_len_vector(Vector*** max_vectors, int* size, status_code nor
     }
     int index_max = 0;
     for (int i = 1; i < count; i++) {
-        Vector*  tmp = va_arg(ptr, Vector*);
+        Vector  tmp = va_arg(ptr, Vector);
         //print_vector(&tmp, dimension);
         double len_tmp;
         st_norm = norm(&len_tmp, &tmp, dimension, p);

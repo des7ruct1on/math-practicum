@@ -42,5 +42,5 @@ status_code get_golder_norm(double* res, Vector* vect, int n, int p);
 status_code get_golder_inf(double* res, Vector* vect, int n, int p);
 status_code mult_matr_vect(double* a[], double* x, double** res, int size_m,  int size_v);
 status_code get_matrix_norm(double* res, Vector* vect, int n, int p);
-status_code get_max_len_vector(Vector*** max_vectors, int* size, status_code norm(double* res, Vector* vect, int n, int p), int dimension, int p, int count,...);
+status_code get_max_len_vector(Vector** max_vectors, int* size, status_code norm(double* res, Vector* vect, int n, int p), int dimension, int p, int count,...);
 #endif

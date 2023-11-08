@@ -1,9 +1,4 @@
-2 name2 surname2 102 1 2 2 2 1
-4 name4 surname4 102 5 4 3 2 1
-5 name5 surname5 102 5 4 3 2 1
 7 name7 surname7 107 3.000000
-8 name8 surname8 108 5 5 5 5 5
-9 name9 surname9 109 4 4 4 4 4
-7 name7 surname7 107 3.000000
+6 name6 surname6 106 2.600000
 8 name8 surname8 108 5 5 5 5 5
 9 name9 surname9 109 4 4 4 4 4

@@ -77,7 +77,7 @@ status_code read_from_file(FILE* in, Student** storage, int* capacity) {
     }
     free(line);
     *capacity = index_storage;
-    print_table(*storage, *capacity);
+    //print_table(*storage, *capacity);
     return code_success;
 }
 
