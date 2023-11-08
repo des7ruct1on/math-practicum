@@ -61,13 +61,13 @@ status_code remove_mail(Post* cur_post, const My_string* id);
 bool check_equal(Adress* left, Adress* right);
 int free_adress(Adress* tmp);
 int free_mail(Mail* tmp);
-Post* find_post(Post* posts, const My_string* id, int size);
+Post* find_post(Post** posts, const My_string* id, int size);
 void get_date(My_string* tmp, int* day, int* month, int* year, int* hour, int* minute, int* seconds);
 Mail* find_mail(Post* _mails, My_string id, int size);
 int compare_mails(const void* a, const void* b);
-status_code find_expired_mails(Post* post, Mail** exp_mails, int* size);
-status_code find_non_expired_mails(Post* post, Mail** exp_mails, int* size);
-int compare_mails_date_expired(const void* a, const void* b);
-int compare_mails_date_non_expired(const void* a, const void* b);
+status_code find_expired_mails(Post* post, Mail*** exp_mails, int* size);
+status_code find_non_expired_mails(Post* post, Mail*** exp_mails, int* size);
+int is_expired(const Mail* a) ;
+int compare_mails_date_create(const void* a, const void* b);
 void print_mails(Mail* mails, int size);
 #endif
