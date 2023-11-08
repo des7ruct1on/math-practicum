@@ -41,9 +41,9 @@ typedef enum status_cmd {
 
 typedef struct Student {
     unsigned int id;
-    char name[256];
-    char surname[256];
-    char group[256];
+    char name[STR_SIZE];
+    char surname[STR_SIZE];
+    char group[STR_SIZE];
     unsigned char* marks;
 } Student;
 
