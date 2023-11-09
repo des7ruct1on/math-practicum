@@ -178,7 +178,7 @@ status_code create_post(Post** new_post, const My_string* info) {
     return code_success;
 }
 
-status_code add_post_storage(Post*** new_post, Post* new, int* capacity, int* size) {
+status_code add_post_storage(Post* new_post, Post* new, int* capacity, int* size) {
     if (!new) {
         return code_invalid_parameter;
     }
@@ -191,7 +191,7 @@ status_code add_post_storage(Post*** new_post, Post* new, int* capacity, int* si
     }
     */
     print_str(new->cur_id->index);
-    (*new_post)[*size] = new;
+    new_post[*size] = *new;
     (*size)++;
     status_realloc st_realloc;
     if (*size == *capacity - 1) {
@@ -298,7 +298,7 @@ int free_mail(Mail* tmp) {
 }
 
 
-Post* find_post(Post** posts, const My_string* id, int size) {
+Post* find_post(Post* posts, const My_string* id, int size) {
     if (!id->size) {
         return NULL;
     }
@@ -310,10 +310,10 @@ Post* find_post(Post** posts, const My_string* id, int size) {
     }
     print_str(check->index);
     int _size = size;
-    Post* current = (posts)[0];
+    Post* current = &posts[0];
     print_str(current->cur_id->index);
     for (int i = 0; i < _size; i++) {
-        current = (posts)[i];
+        current = &posts[i];
         //print_str(current->cur_id->index);
         if (check_equal(check, current->cur_id)) {
             free(check);

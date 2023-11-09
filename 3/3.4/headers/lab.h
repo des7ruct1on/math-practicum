@@ -52,7 +52,7 @@ typedef enum status_cmd {
 } status_cmd;
 
 status_code free_storage(Post* posts, int size);
-status_code add_post_storage(Post*** new_post, Post* new, int* capacity, int* size);
+status_code add_post_storage(Post* new_post, Post* new, int* capacity, int* size);
 status_cmd command(char** arg_one, char** arg_two, My_string** info);
 status_code create_adress(Adress** new_adress, const My_string* info);
 status_code create_mail(Mail** new_mail, const My_string* info);
@@ -63,7 +63,7 @@ bool check_equal(Adress* left, Adress* right);
 int free_adress(Adress* tmp);
 int free_mail(Mail* tmp);
 bool is_sorted(Mail* mails, int size);
-Post* find_post(Post** posts, const My_string* id, int size);
+Post* find_post(Post* posts, const My_string* id, int size);
 void get_date(My_string* tmp, int* day, int* month, int* year, int* hour, int* minute, int* seconds);
 Mail* find_mail(Post* _mails, My_string id, int size);
 int compare_mails(const void* a, const void* b);

@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
                 } else if (st_activ == code_invalid_parameter) {
                     printf("Invalid parameter detected!!!\n");
                 } else {
-                    st_activ = add_post_storage(&storage_posts, current, &capacity_storage, &size_storage);
+                    st_activ = add_post_storage(storage_posts, current, &capacity_storage, &size_storage);
                     if (st_activ == code_error_alloc) {
                         printf("Error alloc detected!!!\n");
                     } else if (st_activ == code_invalid_parameter) {
@@ -205,7 +205,7 @@ int main(int argc, char* argv[]) {
             break;
         }
     }
-    free_storage(&storage_posts, size_storage);
+    free_storage(storage_posts, size_storage);
     free(storage_posts);
     return 0;
 }
