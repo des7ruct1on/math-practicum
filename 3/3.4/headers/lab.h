@@ -51,7 +51,7 @@ typedef enum status_cmd {
     cmd_find_mail
 } status_cmd;
 
-status_code free_storage(Post** posts, int size);
+status_code free_storage(Post* posts, int size);
 status_code add_post_storage(Post*** new_post, Post* new, int* capacity, int* size);
 status_cmd command(char** arg_one, char** arg_two, My_string** info);
 status_code create_adress(Adress** new_adress, const My_string* info);

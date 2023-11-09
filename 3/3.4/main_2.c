@@ -160,6 +160,7 @@ int main(int argc, char* argv[]) {
                     printf("Invalid parameter detected!!!\n");
                 } else {
                     qsort(tmp_mail, tmp_size, sizeof(Mail), compare_mails_date_create);
+                    print_mails(tmp_mail, tmp_size);
                     free(tmp_mail);
                     tmp_mail = NULL;
                     tmp_size = 32;
@@ -205,5 +206,6 @@ int main(int argc, char* argv[]) {
         }
     }
     free_storage(&storage_posts, size_storage);
+    free(storage_posts);
     return 0;
 }

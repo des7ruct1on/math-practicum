@@ -41,7 +41,7 @@ status_code create_adress(Adress** new_adress, const My_string* info) {
     (*new_adress)->street = String(_street);
     (*new_adress)->block = String(_block);
     (*new_adress)->index = String(_index);
-    st_free = free_all(5, *new_adress, _city, _street, _block, _index);
+    st_free = free_all(4,  _city, _street, _block, _index);
     if (st_free == status_free_fail) {
         return code_error_alloc;
     }
@@ -52,7 +52,6 @@ status_code create_adress(Adress** new_adress, const My_string* info) {
 bool check_valid_time(My_string* time) {
     int day, month, year, hour, minute, sec;
     get_date(time, &day, &month, &year, &hour, &minute, &sec);
-    printf("%d %d %d T %d %d %d\n", day, month, year, hour, minute, sec);
     if (day > 31) return false;
     if (month > 12) return false;
     if (hour >= 24) return false;
@@ -139,7 +138,13 @@ status_code create_mail(Mail** new_mail, const My_string* info) {
         st_free = free_all(5, *new_mail, _id,_time_create_date, _time_create_time, _time_get_date);
         return code_invalid_parameter;
     }
-    (*new_mail)->time_get = time_get_date;
+    if (!my_strcmp(null_string, time_get_date)) {
+        (*new_mail)->time_get = String("");
+        string_clear(time_get_date);
+        free(time_get_date);
+    } else {
+        (*new_mail)->time_get = time_get_date;
+    }
     string_clear(time_cr_time);
     string_clear(null_string);
     string_clear(time_get_time);
@@ -159,6 +164,7 @@ status_code create_post(Post** new_post, const My_string* info) {
     Adress* new_ad = NULL;
     status_code st_adress = create_adress(&new_ad, info);
     if (st_adress == code_error_alloc) {
+        free_adress(new_ad);
         return code_error_alloc;
     }
     (*new_post)->size = 0;
@@ -225,7 +231,6 @@ status_code add_mail(Post** cur_post, const My_string* info) {
 }
 
 status_code remove_mail(Post* cur_post, const My_string* id) {
-    print_str(id);
     if (!cur_post || !id || !id->size) {
         return code_invalid_parameter;
     }
@@ -263,15 +268,16 @@ int free_adress(Adress* tmp) {
     if (!tmp) {
         return 0;
     }
-    string_clear(tmp->city);
-    string_clear(tmp->street);
-    string_clear(tmp->block);
-    string_clear(tmp->index);
+    if (tmp->city->data) string_clear(tmp->city);
+    if (tmp->street->data) string_clear(tmp->street);
+    if (tmp->block->data) string_clear(tmp->block);
+    if (tmp->index->data) string_clear(tmp->index);
     status_free st_free = free_all(4, tmp->city, tmp->street, tmp->block, tmp->index);
     if (st_free == status_free_fail) {
         return -1;
     }
     free(tmp);
+    tmp = NULL;
     return 1;
 }
 
@@ -279,15 +285,15 @@ int free_mail(Mail* tmp) {
     if (!tmp) {
         return 0;
     }
-    string_clear(tmp->id);
-    string_clear(tmp->time_create);
-    if (tmp->time_get) string_clear(tmp->time_get);
-    status_free st_free = free_all(3, tmp->id, tmp->time_create, tmp->time_get);
-    if (st_free == status_free_fail) {
-        return -1;
-    }
+    if (tmp->id->data) string_clear(tmp->id);
+    if (tmp->time_create->data) string_clear(tmp->time_create);
+    if (tmp->time_get->data) string_clear(tmp->time_get);
+    //status_free st_free = free_all(3, tmp->id, tmp->time_create, tmp->time_get);
+    //if (st_free == status_free_fail) {
+       // return -1;
+    //}
     int check = free_adress(&tmp->ad);
-    free(tmp);
+    //free(tmp);
     return check + 1;
 }
 
@@ -385,8 +391,7 @@ status_code find_expired_mails(Post* post, Mail** exp_mails, int* size) {
     for (int i = 0; i < tmp_size; i++) {
         current = post->mails[i];
         check = is_expired(&current);
-        printf("%d , id = %s\n", check, current.id->data);
-        if (is_expired(&current) == 0) {
+        if (check == 1) {
             (*exp_mails)[index] = current;
             index++;
             if (index == *size - 1) {
@@ -394,8 +399,9 @@ status_code find_expired_mails(Post* post, Mail** exp_mails, int* size) {
                 status_realloc st_realloc = my_realloc(exp_mails, *size);
             }
         }
+        check = 0;
     }
-    *size = index;
+    *size = index;                      
     return code_success;
 }
 
@@ -414,8 +420,7 @@ status_code find_non_expired_mails(Post* post, Mail** exp_mails, int* size) {
     for (int i = 0; i < tmp_size; i++) {
         current = post->mails[i];
         check = is_expired(&current);
-        printf("%d , id = %s\n", check, current.id->data);
-        if (is_expired(&current) != 0) {
+        if (check == -1) {
             (*exp_mails)[index] = current;
             index++;
             if (index == *size - 1) {
@@ -423,6 +428,7 @@ status_code find_non_expired_mails(Post* post, Mail** exp_mails, int* size) {
                 status_realloc st_realloc = my_realloc(exp_mails, *size);
             }
         }
+        check = 0;
     }
     *size = index;
     return code_success;
@@ -431,34 +437,53 @@ status_code find_non_expired_mails(Post* post, Mail** exp_mails, int* size) {
 int is_expired(const Mail* a) {
     My_string* left_date_get = a->time_get;
     My_string* null_string = String("");
-    if (!left_date_get || my_strcmp(left_date_get, null_string) == 0) {
+    if (left_date_get->size == 0|| my_strcmp(left_date_get, null_string) == 0) {
         string_clear(null_string);
         free(null_string);
         return 1;
     }
-    time_t current_time = time(NULL);
     int l_day, l_month, l_year, l_hour, l_minute, l_sec;
     get_date(left_date_get, &l_day, &l_month, &l_year, &l_hour, &l_minute, &l_sec);
-
-    if (l_year < 100) {
-        l_year += (l_year < 70) ? 2000 : 1900;
+    time_t raw_time;
+    struct tm* time_info;
+    time(&raw_time);
+    time_info = localtime(&raw_time);
+    int diff_year, diff_month, diff_day, diff_hour, diff_minute, diff_sec;
+    diff_year = l_year - time_info->tm_year - 1900;
+    if (diff_year > 0) {
+        return 1;
+    } else if (diff_year < 0) {
+        return -1;
     }
-
-    struct tm left_tm = {
-        .tm_sec = l_sec,
-        .tm_min = l_minute,
-        .tm_hour = l_hour,
-        .tm_mday = l_day,
-        .tm_mon = l_month - 1,
-        .tm_year = l_year - 1900
-    };
-
-    time_t left_time = mktime(&left_tm);
-
-    if (left_time <= current_time) {
-        string_clear(null_string);
-        free(null_string);
-        return 1; 
+    diff_month = l_month - time_info->tm_mon - 1;
+    if (diff_month > 0) {
+        return 1;
+    } else if (diff_month < 0) {
+        return -1;
+    }
+    diff_day = l_day - time_info->tm_mday;
+    if (diff_day > 0) {
+        return 1;
+    } else if (diff_day < 0) {
+        return -1;
+    }
+    diff_hour = l_hour - time_info->tm_hour;
+    if (diff_hour > 0) {
+        return 1;
+    } else if (diff_hour < 0) {
+        return -1;
+    }
+    diff_minute = l_minute - time_info->tm_min;
+    if (diff_minute > 0) {
+        return 1;
+    } else if (diff_minute < 0) {
+        return -1;
+    }
+    diff_sec = l_sec - time_info->tm_sec;
+    if (diff_sec > 0) {
+        return 1;
+    } else if (diff_sec < 0) {
+        return -1;
     }
     string_clear(null_string);
     free(null_string);
@@ -671,37 +696,39 @@ status_cmd command(char** arg_one, char** arg_two, My_string** info) {
 }
 
 status_code free_post(Post* post) {
-    if (free_adress(&post->cur_id) != 1) {
-        return code_invalid_parameter;
-    }
+    //if (free_adress(&post->cur_id) != 1) {
+        //return code_invalid_parameter;
+    //}
     int _size = post->size;
     Mail* current;
     status_free st_free;
     for (int i = 0; i < _size; i++) {
         current = &post->mails[i];
-        string_clear(current->id);
-        string_clear(current->time_create);
-        string_clear(current->time_get);
-        string_clear(current->ad.city);
-        string_clear(current->ad.street);
-        string_clear(current->ad.block);
-        string_clear(current->ad.index);
+        if (current->id->data) string_clear(current->id);
+        if (current->time_create->data) string_clear(current->time_create);
+        if (current->time_get->data) string_clear(current->time_get);
+        if (current->ad.city->data) string_clear(current->ad.city);
+        if (current->ad.street->data) string_clear(current->ad.street);
+        if (current->ad.block->data) string_clear(current->ad.block);
+        if (current->ad.index->data) string_clear(current->ad.index);
         st_free = free_all(7, current->id, current->time_create, current->time_get, current->ad.city, current->ad.street, current->ad.block, current->ad.index);
         free(current);
+        current = NULL;
     }
-    free(post->mails);
+    //free(post->mails);
+    post->mails = NULL;
     post->size = 0;
     post->capacity = 1;
     return code_success;
 }
 
-status_code free_storage(Post** posts, int size) {
-    if (!(*posts)) {
+status_code free_storage(Post* posts, int size) {
+    if (!(posts)) {
         return code_invalid_parameter;
     }
+    printf("%d--\n", size);
     for (int i = 0; i < size; i++) {
-        free_post(posts[i]);
+        free_post(&posts[i]);
     }
-    free(*posts);
     return code_success;
 }
