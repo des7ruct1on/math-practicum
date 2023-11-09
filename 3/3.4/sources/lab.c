@@ -10,38 +10,55 @@ status_code create_adress(Adress** new_adress, const My_string* info) {
         return code_error_alloc;
     }
     int _size = info->size;
+    status_free st_free;
     char* _city = malloc(sizeof(char) * _size);
     if (!_city) {
+        st_free = free_all(2, *new_adress, _city);
         return code_error_alloc;
     }
     char* _street = malloc(sizeof(char) * _size);
     if (!_street) {
+        st_free = free_all(3, *new_adress, _city, _street);
         return code_error_alloc;
     }
     char* _block = malloc(sizeof(char) * _size);
     if (!_block) {
+        st_free = free_all(4, *new_adress, _city, _street, _block);
         return code_error_alloc;
     }
     char* _index = malloc(sizeof(char) * _size);
     if (!_index) {
+        st_free = free_all(5, *new_adress, _city, _street, _block, _index);
         return code_error_alloc;
     }
     int check;
     check = sscanf(info->data ,"%s %s %d %s %d %s", _city, _street, &(*new_adress)->house, _block, &(*new_adress)->flat, _index);
     if (check != 6) {
+        st_free = free_all(5, *new_adress, _city, _street, _block, _index);
         return code_invalid_parameter;
     }
     (*new_adress)->city = String(_city);
     (*new_adress)->street = String(_street);
     (*new_adress)->block = String(_block);
     (*new_adress)->index = String(_index);
-    status_free st_free;
-    st_free = free_all(4, _city, _street, _block, _index);
+    st_free = free_all(5, *new_adress, _city, _street, _block, _index);
     if (st_free == status_free_fail) {
         return code_error_alloc;
     }
     //printf("        %s %s %d %s %d %s\n", _city, _street, (*new_adress)->house, _block, (*new_adress)->flat, _index);
     return code_success;
+}
+
+bool check_valid_time(My_string* time) {
+    int day, month, year, hour, minute, sec;
+    get_date(time, &day, &month, &year, &hour, &minute, &sec);
+    printf("%d %d %d T %d %d %d\n", day, month, year, hour, minute, sec);
+    if (day > 31) return false;
+    if (month > 12) return false;
+    if (hour >= 24) return false;
+    if (minute >= 60) return false;
+    if (sec >= 60) return false;
+    return true;
 }
 
 status_code create_mail(Mail** new_mail, const My_string* info) {
@@ -76,22 +93,22 @@ status_code create_mail(Mail** new_mail, const My_string* info) {
     }
     char* _time_create_date = malloc(sizeof(char) * _size);  
     if (!_time_create_date) {
-        free(*new_mail);
+        st_free = free_all(2, *new_mail, _id);
         return code_error_alloc;
     }
     char* _time_create_time = malloc(sizeof(char) * _size);  
-    if (!_time_create_date) {
-        free(*new_mail);
+    if (!_time_create_time) {
+        st_free = free_all(3, *new_mail, _id,_time_create_date);
         return code_error_alloc;
     }
     char* _time_get_date = malloc(sizeof(char) * _size);  
     if (!_time_get_date) {
-        free(*new_mail);
+        st_free = free_all(4, *new_mail, _id, _time_create_date, _time_create_time);
         return code_error_alloc;
     }
     char* _time_get_time = malloc(sizeof(char) * _size);  
     if (!_time_get_time) {
-        free(*new_mail);
+        st_free = free_all(5, *new_mail, _id,_time_create_date, _time_create_time, _time_get_date);
         return code_error_alloc;
     }
     sscanf(information, "%lf %s %s %s %s %s", &(*new_mail)->weight, _id, _time_create_date, _time_create_time, _time_get_date, _time_get_time);
@@ -105,12 +122,28 @@ status_code create_mail(Mail** new_mail, const My_string* info) {
     concat_strings(&time_cr_date, time_cr_time);
     concat_strings(&time_get_date, null_string);
     concat_strings(&time_get_date, time_get_time);
+    if (!check_valid_time(time_cr_date)) {
+        string_clear(time_cr_time);
+        string_clear(null_string);
+        string_clear(time_get_time);
+        st_free = free_all(3, time_get_time, null_string, time_cr_time);
+        st_free = free_all(5, *new_mail, _id,_time_create_date, _time_create_time, _time_get_date);
+        return code_invalid_parameter;
+    }
     (*new_mail)->time_create = time_cr_date;
+    if (!check_valid_time(time_get_date) && time_get_date) {
+        string_clear(time_cr_time);
+        string_clear(null_string);
+        string_clear(time_get_time);
+        st_free = free_all(3, time_get_time, null_string, time_cr_time);
+        st_free = free_all(5, *new_mail, _id,_time_create_date, _time_create_time, _time_get_date);
+        return code_invalid_parameter;
+    }
     (*new_mail)->time_get = time_get_date;
     string_clear(time_cr_time);
     string_clear(null_string);
     string_clear(time_get_time);
-    st_free = free_all(3, time_get_time, null_string, time_cr_time);
+    st_free = free_all(8, time_get_time, null_string, _id, time_cr_time, _time_get_time, _time_create_date, _time_get_date, _time_create_time);
     return code_success;
 }
 
@@ -284,13 +317,22 @@ Post* find_post(Post** posts, const My_string* id, int size) {
     return NULL;
 }
 
+bool is_sorted(Mail* mails, int size) {
+    for (int i = 0; i < size - 1; i++) {
+        Mail left = mails[i];
+        Mail right = mails[i + 1];
+        if (my_strcmp(left.id, right.id) > 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void get_date(My_string* tmp, int* day, int* month, int* year, int* hour, int* minute, int* seconds) {
-    if (tmp) {
+    if (!tmp) {
         return;
     }
-    printf("%s--\n", tmp->data);
     sscanf(tmp->data, "%d:%d:%d %d:%d:%d", day, month, year, hour, minute, seconds);
-    printf("<<<%d:%d:%d %d:%d:%d\n", *day, *month, *year, *seconds, *minute, *hour);
 }
 
 Mail* find_mail(Post* _mails, My_string id, int size) {
@@ -299,12 +341,13 @@ Mail* find_mail(Post* _mails, My_string id, int size) {
     }
     int left_ind = 0;
     int right_ind = size - 1;
-    int mid_ind = left_ind + right_ind;
+    int mid_ind;
     while (left_ind <= right_ind) {
+        mid_ind = (left_ind + right_ind) / 2;
         if (my_strcmp(&id, _mails->mails[mid_ind].id) < 0) {
-            left_ind = mid_ind + 1;
-        } else if (my_strcmp(&id, _mails->mails[mid_ind].id) > 0) {
             right_ind = mid_ind - 1;
+        } else if (my_strcmp(&id, _mails->mails[mid_ind].id) > 0) {
+            left_ind = mid_ind + 1;
         } else {
             return &_mails->mails[mid_ind];
         }
@@ -322,22 +365,29 @@ int compare_mails(const void* a, const void* b) {
     return my_strcmp(((Mail*)a)->id, ((Mail*)b)->id);
 }
 
-status_code find_expired_mails(Post* post, Mail*** exp_mails, int* size) {
+int compare_mails_id(const void* a, const void* b) {
+    return my_strcmp(((Mail*)a)->id, ((Mail*)b)->id);
+}
+
+
+status_code find_expired_mails(Post* post, Mail** exp_mails, int* size) {
     if (!post) {
         return code_invalid_parameter;
     }
-    (*exp_mails) = malloc(sizeof(Mail*) * (*size));
+    (*exp_mails) = malloc(sizeof(Mail) * (*size));
     if (*exp_mails == NULL) {
         return code_error_alloc;
     }
     int tmp_size = post->size;
-    Mail* current;
+    Mail current;
     int index = 0;
+    int check;
     for (int i = 0; i < tmp_size; i++) {
-        current = &post->mails[i];
-        if (is_expired(current)) {
+        current = post->mails[i];
+        check = is_expired(&current);
+        printf("%d , id = %s\n", check, current.id->data);
+        if (is_expired(&current) == 0) {
             (*exp_mails)[index] = current;
-            print_str(current->id);
             index++;
             if (index == *size - 1) {
                 *size *= 2;
@@ -345,24 +395,27 @@ status_code find_expired_mails(Post* post, Mail*** exp_mails, int* size) {
             }
         }
     }
+    *size = index;
     return code_success;
 }
 
-status_code find_non_expired_mails(Post* post, Mail*** exp_mails, int* size) {
+status_code find_non_expired_mails(Post* post, Mail** exp_mails, int* size) {
     if (!post) {
         return code_invalid_parameter;
     }
-    (*exp_mails) = malloc(sizeof(Mail*) * (*size));
+    (*exp_mails) = malloc(sizeof(Mail) * (*size));
     if (*exp_mails == NULL) {
         return code_error_alloc;
     }
     int tmp_size = post->size;
-    Mail* current;
-    My_string* null_string = String("");
+    Mail current;
     int index = 0;
+    int check;
     for (int i = 0; i < tmp_size; i++) {
-        current = &post->mails[i];
-        if (!is_expired(current)) {
+        current = post->mails[i];
+        check = is_expired(&current);
+        printf("%d , id = %s\n", check, current.id->data);
+        if (is_expired(&current) != 0) {
             (*exp_mails)[index] = current;
             index++;
             if (index == *size - 1) {
@@ -371,70 +424,94 @@ status_code find_non_expired_mails(Post* post, Mail*** exp_mails, int* size) {
             }
         }
     }
+    *size = index;
     return code_success;
 }
 
 int is_expired(const Mail* a) {
     My_string* left_date_get = a->time_get;
-    print_str(left_date_get);
-    print_str(left_date_get);
-    print_str(left_date_get);
-    print_str(left_date_get);
-    print_str(left_date_get);
     My_string* null_string = String("");
     if (!left_date_get || my_strcmp(left_date_get, null_string) == 0) {
         string_clear(null_string);
         free(null_string);
         return 1;
     }
-    string_clear(null_string);
-    free(null_string);
-    time_t current_time;
-    struct tm* timeinfo;
-    time(&current_time);
-    timeinfo = localtime(&current_time);
+    time_t current_time = time(NULL);
     int l_day, l_month, l_year, l_hour, l_minute, l_sec;
     get_date(left_date_get, &l_day, &l_month, &l_year, &l_hour, &l_minute, &l_sec);
-    printf("%d:%d:%d %d:%d:%d\n", l_day, l_month, l_year, l_sec, l_minute, l_hour);
-    printf("    %d:%d:%d %d:%d:%d\n", timeinfo->tm_mday, timeinfo->tm_mon + 1, timeinfo->tm_year + 1900, timeinfo->tm_sec, timeinfo->tm_min, timeinfo->tm_hour);
-    int diff_year = l_year - timeinfo->tm_year + 1900;
-    if (diff_year > 0) return diff_year;
-    int diff_month = l_month - timeinfo->tm_mon + 1;
-    if (diff_month > 0) return diff_month;
-    int diff_day = l_day - timeinfo->tm_mday;
-    if (diff_day > 0) return diff_day;
-    int diff_hour = l_hour - timeinfo->tm_hour;
-    if (diff_hour > 0) return diff_hour;
-    int diff_min = l_minute - timeinfo->tm_min;
-    if (diff_min > 0) return diff_min;
-    int diff_sec = l_sec - timeinfo->tm_sec;
-    if (diff_sec > 0) return diff_sec;
+
+    if (l_year < 100) {
+        l_year += (l_year < 70) ? 2000 : 1900;
+    }
+
+    struct tm left_tm = {
+        .tm_sec = l_sec,
+        .tm_min = l_minute,
+        .tm_hour = l_hour,
+        .tm_mday = l_day,
+        .tm_mon = l_month - 1,
+        .tm_year = l_year - 1900
+    };
+
+    time_t left_time = mktime(&left_tm);
+
+    if (left_time <= current_time) {
+        string_clear(null_string);
+        free(null_string);
+        return 1; 
+    }
+    string_clear(null_string);
+    free(null_string);
     return 0;
 }
+
 
 
 int compare_mails_date_create(const void* a, const void* b) {
     Mail* left = (Mail*)a;
     Mail* right = (Mail*)b;
     My_string* left_date_create = left->time_create;
-    My_string* right_date_create = left->time_create;
+    My_string* right_date_create = right->time_create;
+    if (!left_date_create && !right_date_create) {
+        return 0;
+    }
+    if (!left_date_create) {
+        return -1;
+    }
+    if (!right_date_create) {
+        return 1;
+    }
     int l_day, l_month, l_year, l_hour, l_minute, l_sec;
-    int r_day, r_month, r_year, r_hour, r_minute, r_sec;
     get_date(left_date_create, &l_day, &l_month, &l_year, &l_hour, &l_minute, &l_sec);
+    if (l_year < 100) {
+        l_year += (l_year < 70) ? 2000 : 1900;
+    }
+
+    struct tm left_tm = {
+        .tm_sec = l_sec,
+        .tm_min = l_minute,
+        .tm_hour = l_hour,
+        .tm_mday = l_day,
+        .tm_mon = l_month - 1,  
+        .tm_year = l_year - 1900  
+    };
+    time_t left_time_create = mktime(&left_tm);
+    int r_day, r_month, r_year, r_hour, r_minute, r_sec;
     get_date(right_date_create, &r_day, &r_month, &r_year, &r_hour, &r_minute, &r_sec);
-    int diff_year = l_year - r_year;
-    if (diff_year > 0) return diff_year;
-    int diff_month = l_month - r_month;
-    if (diff_month > 0) return diff_month;
-    int diff_day = l_day - r_day;
-    if (diff_day > 0) return diff_day;
-    int diff_hour = l_hour - r_hour;
-    if (diff_hour > 0) return diff_hour;
-    int diff_min = l_minute - r_minute;
-    if (diff_min > 0) return diff_min;
-    int diff_sec = l_sec - r_sec;
-    if (diff_sec > 0) return diff_sec;
-    return 0;
+    if (r_year < 100) {
+        r_year += (r_year < 70) ? 2000 : 1900;
+    }
+    struct tm right_tm = {
+        .tm_sec = r_sec,
+        .tm_min = r_minute,
+        .tm_hour = r_hour,
+        .tm_mday = r_day,
+        .tm_mon = r_month - 1,  
+        .tm_year = r_year - 1900  
+    };
+    time_t right_time_create = mktime(&right_tm);
+
+    return (int)(left_time_create - right_time_create);
 }
 
 void print_mails(Mail* mails, int size) {
@@ -492,6 +569,24 @@ status_cmd command(char** arg_one, char** arg_two, My_string** info) {
         (*info) = String(*arg_one);
         free(*arg_one);
         return cmd_create_post;
+    } else if (!strcmp(cmd, "Find")) {
+        free(cmd);
+        (*arg_one) = (char*)malloc(STR_SIZE * sizeof(char));
+        if (*arg_one == NULL) {
+            return cmd_error_alloc;
+        }
+        while(isspace(symbol)) {
+            symbol = getchar();
+        }
+        while (symbol != '\n') {
+            (*arg_one)[index++] = symbol;
+            symbol = getchar();
+        }
+        (*arg_one)[index] = '\0';
+        index = 0;
+        (*info) = String(*arg_one);
+        free(*arg_one);
+        return cmd_find_mail;
     } else if (!strcmp(cmd, "Change")) {
         free(cmd);
         (*arg_one) = (char*)malloc(STR_SIZE * sizeof(char));
@@ -576,20 +671,23 @@ status_cmd command(char** arg_one, char** arg_two, My_string** info) {
 }
 
 status_code free_post(Post* post) {
-    if (free_adress(post->cur_id) != 1) {
+    if (free_adress(&post->cur_id) != 1) {
         return code_invalid_parameter;
     }
     int _size = post->size;
     Mail* current;
+    status_free st_free;
     for (int i = 0; i < _size; i++) {
         current = &post->mails[i];
         string_clear(current->id);
         string_clear(current->time_create);
         string_clear(current->time_get);
-        if (free_adress(&current->ad) != 1) {
-            return code_invalid_parameter;
-        }
-
+        string_clear(current->ad.city);
+        string_clear(current->ad.street);
+        string_clear(current->ad.block);
+        string_clear(current->ad.index);
+        st_free = free_all(7, current->id, current->time_create, current->time_get, current->ad.city, current->ad.street, current->ad.block, current->ad.index);
+        free(current);
     }
     free(post->mails);
     post->size = 0;
