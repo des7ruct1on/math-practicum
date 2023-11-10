@@ -37,6 +37,11 @@ status_code create_adress(Adress** new_adress, const My_string* info) {
         st_free = free_all(5, *new_adress, _city, _street, _block, _index);
         return code_invalid_parameter;
     }
+    if (strlen(_index) > 6) {
+        st_free = free_all(5, *new_adress, _city, _street, _block, _index);
+            return code_invalid_parameter;
+    }
+
     (*new_adress)->city = String(_city);
     (*new_adress)->street = String(_street);
     (*new_adress)->block = String(_block);
@@ -64,6 +69,7 @@ status_code create_mail(Mail** new_mail, const My_string* info) {
     if (!info->size) {
         return code_invalid_parameter;
     }
+    const double epsilon = 1e-8;
 
     *new_mail = (Mail*)malloc(sizeof(Mail));
     if (*new_mail == NULL) {
@@ -110,7 +116,13 @@ status_code create_mail(Mail** new_mail, const My_string* info) {
         st_free = free_all(5, *new_mail, _id,_time_create_date, _time_create_time, _time_get_date);
         return code_error_alloc;
     }
-    sscanf(information, "%lf %s %s %s %s %s", &(*new_mail)->weight, _id, _time_create_date, _time_create_time, _time_get_date, _time_get_time);
+    double _weight;
+    sscanf(information, "%lf %s %s %s %s %s", &_weight, _id, _time_create_date, _time_create_time, _time_get_date, _time_get_time);
+    if (_weight < epsilon || strlen(_id) > 14) {
+        st_free = free_all(5, *new_mail, _id,_time_create_date, _time_create_time, _time_get_date);
+        return code_invalid_parameter;
+    }
+    (*new_mail)->weight = _weight;
     (*new_mail)->id = String(_id);
     My_string* time_cr_date = String(_time_create_date);
     My_string* time_cr_time = String(_time_create_time);
@@ -214,7 +226,12 @@ status_code add_mail(Post** cur_post, const My_string* info) {
     if (st_mail == code_error_alloc) {
         return code_error_alloc;
     }
-
+    Mail* check = NULL;
+    check = find_mail((*cur_post)->mails, *new_mail->id, (*cur_post)->size);
+    if (check) {
+        free_mail(new_mail);
+        return code_invalid_parameter;
+    }
     int index = (*cur_post)->size;
     (*cur_post)->mails[index] = *new_mail;
     ((*cur_post)->size)++;
