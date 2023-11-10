@@ -8,3 +8,4 @@ Fedorov Pavel Nikolaevich 25:07:1985 M 80000.00
 Volkova Anna Alexeevna 19:09:1997 F 67000.00
 Egorov Dmitry Igorevich 02:02:1983 M 95000.00
 Morozova Irina Olegovna 14:12:1989 F 78000.00
+Kirillova Oksana 14:12:1982 F 65123.00

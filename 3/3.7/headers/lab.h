@@ -61,7 +61,7 @@ typedef struct Stack {
     int size;
 } Stack;
 
-status_cmd command(char** arg_one, char** arg_two, My_string** info);
+status_cmd command(char** arg_one, char** arg_two, char** arg_three, My_string** info);
 status_code stack_init(Stack** stack);
 status_code stack_push(Stack* node, Action* act);
 void free_liver(Liver* tmp);
@@ -75,10 +75,10 @@ int compare_time(const My_string* a, const My_string* b);
 status_code push_list(List_node** list, Liver* citizen, Stack* stack);
 bool check_valid(char* check, int size);
 int compare_citizen(Liver* cur, char* _name, char* _surname, char* _last_name);
-status_code remove_list(List_node* list, My_string* key, Stack* stack);
-status_code find_citizen(List_node* list, My_string* key, Liver* find);
+status_code remove_list(List_node** list, My_string* key, Stack* stack);
+status_code find_citizen(List_node* list, My_string* key, Liver** find, int* _index);
 status_code liver_copy(Liver** citizen, Liver* prev);
-status_code edit_surname(Liver* citizen, My_string* info, Stack* stack);
+status_code edit_surname(Liver* citizen, My_string* info, int _index, Stack* stack);
 status_code edit_name(Liver* citizen, My_string* info, int _index, Stack* stack);
 status_code edit_last_name(Liver* citizen, My_string* info, int _index, Stack* stack);
 status_code edit_date_birth(Liver* citizen, My_string* info, int _index, Stack* stack);

@@ -14,7 +14,7 @@ void print_menu() {
     printf("| Enter `File <INFO>` to add citizenz from file                                              |\n");
     printf("| Enter `Remove <INFO>` to remove citizen                                                    |\n");
     printf("| Enter `Find <Surname Name Last_name>` to add citizen                                       |\n");
-    printf("| Enter `Edit <Type>` to edit info about citizen                                             |\n");
+    printf("| Enter `Edit <Type> <Info> <Find info>` to edit info about citizen                          |\n");
     printf("|   Type: surname, name, last_name, birthday, gender, salary                                 |\n");
     printf("| Enter `Undo` to undo last N/2 operations                                                   |\n");
     printf("| Enter `Print <filename>` to print citizens in file                                         |\n");
@@ -26,21 +26,24 @@ int main(int argc, char* argv[]) {
     status_code st_act;
     List_node* storage = NULL;
     Stack* actions = NULL;
-    st_act = stack_init(&actions);
-    if (st_act == code_error_alloc) {
-        printf("Error alloc detected!\n");
-        return 1;
-    }
     status_cmd decision;
     char* arg_one = NULL;
     char* arg_two = NULL;
+    char* arg_three = NULL;
     My_string* info = NULL;
     My_string* find_key = NULL;
-    char find_initials[STR_SIZE];
+    int index_find;
     while (true) {
         Liver* tmp_liver = NULL;
         print_menu();
-        decision = command(&arg_one, &arg_two, &info);
+        decision = command(&arg_one, &arg_two, &arg_three, &info);
+        if (!actions) {
+            st_act = stack_init(&actions);
+            if (st_act == code_error_alloc) {
+                printf("Error alloc detected!\n");
+                return 1;
+            }
+        }
         switch (decision) {
             case cmd_file:
                 st_act = read_from_file(info->data, &storage, actions);
@@ -72,14 +75,13 @@ int main(int argc, char* argv[]) {
                 }
                 break;
             case cmd_remove:
-                st_act = remove_list(storage, info, actions);
+                st_act = remove_list(&storage, info, actions);
                 if (st_act == code_error_alloc) {
                     printf("Error alloc detected!!!\n");
                 } 
                 break;
             case cmd_find:
-                printf("111----\n");
-                st_act = find_citizen(storage, info, tmp_liver);
+                st_act = find_citizen(storage, info, &tmp_liver, &index_find);
                 if (st_act == code_invalid_parameter) {
                     printf("Invalid parameter detected!!!\n");
                 } else {
@@ -87,94 +89,83 @@ int main(int argc, char* argv[]) {
                 }
                 break;
             case cmd_edit_surname:
-                printf("Enter Surname Name Last_name: ");
-                scanf("%s", find_initials);
-                getchar();
-                find_key = String(find_initials);
-                st_act = find_citizen(storage, find_key, tmp_liver);
+                find_key = String(arg_three);
+                st_act = find_citizen(storage, find_key, &tmp_liver, &index_find);
                 if (st_act == code_invalid_parameter) {
                     printf("Invalid parameter detected!!!\n");
                 } else {
-                    st_act = edit_surname(tmp_liver, info, actions);
+                    st_act = edit_surname(tmp_liver, info, index_find, actions);
                     if (st_act == code_invalid_parameter) {
                         printf("Invalid parameter detected!!!\n");
                     } 
                 }
+                if (arg_three) free(arg_three); arg_three = NULL;
                 break;
             case cmd_edit_name:
-                printf("Enter Surname Name Last_name: ");
-                scanf("%s", find_initials);
-                getchar();
-                find_key = String(find_initials);
-                st_act = find_citizen(storage, find_key, tmp_liver);
+                find_key = String(arg_three);
+                st_act = find_citizen(storage, find_key, &tmp_liver, &index_find);
                 if (st_act == code_invalid_parameter) {
                     printf("Invalid parameter detected!!!\n");
                 } else {
-                    st_act = edit_surname(tmp_liver, info, actions);
+                    st_act = edit_name(tmp_liver, info, index_find, actions);
                     if (st_act == code_invalid_parameter) {
                         printf("Invalid parameter detected!!!\n");
                     } 
                 }
+                if (arg_three) free(arg_three); arg_three = NULL;
                 break;
             case cmd_edit_last_name:
-                printf("Enter Surname Name Last_name: ");
-                scanf("%s", find_initials);
-                getchar();
-                find_key = String(find_initials);
-                st_act = find_citizen(storage, find_key, tmp_liver);
+                find_key = String(arg_three);
+                st_act = find_citizen(storage, find_key, &tmp_liver, &index_find);
+                print_str(tmp_liver->surname);
                 if (st_act == code_invalid_parameter) {
                     printf("Invalid parameter detected!!!\n");
                 } else {
-                    st_act = edit_surname(tmp_liver, info, actions);
+                    st_act = edit_last_name(tmp_liver, info, index_find, actions);
                     if (st_act == code_invalid_parameter) {
                         printf("Invalid parameter detected!!!\n");
                     } 
                 }
+                if (arg_three) free(arg_three);
                 break;
             case cmd_edit_date_birth:
-                printf("Enter Surname Name Last_name: ");
-                scanf("%s", find_initials);
-                getchar();
-                find_key = String(find_initials);
-                st_act = find_citizen(storage, find_key, tmp_liver);
+                find_key = String(arg_three);
+                st_act = find_citizen(storage, find_key, &tmp_liver, &index_find);
                 if (st_act == code_invalid_parameter) {
                     printf("Invalid parameter detected!!!\n");
                 } else {
-                    st_act = edit_surname(tmp_liver, info, actions);
+                    st_act = edit_date_birth(tmp_liver, info, index_find, actions);
                     if (st_act == code_invalid_parameter) {
                         printf("Invalid parameter detected!!!\n");
                     } 
                 }
+                if (arg_three) free(arg_three); arg_three = NULL;
                 break;
             case cmd_edit_gender:
-                printf("Enter Surname Name Last_name: ");
-                scanf("%s", find_initials);
-                getchar();
-                find_key = String(find_initials);
-                st_act = find_citizen(storage, find_key, tmp_liver);
+                find_key = String(arg_three);
+                st_act = find_citizen(storage, find_key, &tmp_liver, &index_find);
                 if (st_act == code_invalid_parameter) {
                     printf("Invalid parameter detected!!!\n");
                 } else {
-                    st_act = edit_surname(tmp_liver, info, actions);
+                    st_act = edit_gender(tmp_liver, info, index_find, actions);
                     if (st_act == code_invalid_parameter) {
                         printf("Invalid parameter detected!!!\n");
                     } 
                 }
+                if (arg_three) free(arg_three); arg_three = NULL;
                 break;
             case cmd_edit_salary:
-                printf("Enter Surname Name Last_name: ");
-                scanf("%s", find_initials);
-                getchar();
-                find_key = String(find_initials);
-                st_act = find_citizen(storage, find_key, tmp_liver);
+                find_key = String(arg_three);
+                st_act = find_citizen(storage, find_key, &tmp_liver, &index_find);
                 if (st_act == code_invalid_parameter) {
                     printf("Invalid parameter detected!!!\n");
                 } else {
-                    st_act = edit_surname(tmp_liver, info, actions);
+                    st_act = edit_salary(tmp_liver, info, index_find, actions);
                     if (st_act == code_invalid_parameter) {
                         printf("Invalid parameter detected!!!\n");
                     } 
                 }
+                if (arg_three) free(arg_three); arg_three = NULL;
                 break;
             case cmd_print:
                 st_act = print_file(info->data, storage);
@@ -187,6 +178,8 @@ int main(int argc, char* argv[]) {
                 if (st_act == code_invalid_parameter) {
                     printf("Invalid parameter detected!!!\n");
                 }
+                //stack_destroy(actions);
+                actions = NULL;
                 break;
             case cmd_exit:
                 break;
@@ -195,6 +188,8 @@ int main(int argc, char* argv[]) {
         }
         string_clear(info);
         free(info);
+        if (arg_two) free(arg_two); arg_two = NULL;
+        if (find_key) string_clear(find_key); free(find_key); find_key = NULL;
         info = NULL;
         if (decision == cmd_error_alloc) {
             break;
@@ -208,5 +203,6 @@ int main(int argc, char* argv[]) {
     }
     stack_destroy(actions);
     free_list(storage);
+    free(actions);
     return 0;
 }
