@@ -1,0 +1,12 @@
+Number: 789
+Route 0: Yarosslavskoe -> Botanika 
+Route 1: Botanika -> Lenta -> Globus 
+Number: 903
+Route 0: MGSU -> ROSTOKINO 
+Number: 789
+Route 0: Yarosslavskoe -> Botanika 
+Route 1: Botanika -> Lenta -> Globus 
+Number: 903
+Route 0: MGSU -> ROSTOKINO 
+Number: 76
+Route 0: MGSU -> ROSTOKINO 

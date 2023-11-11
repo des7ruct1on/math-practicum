@@ -501,7 +501,6 @@ status_code remove_list(List_node** list, My_string* key, Stack* stack) {
     bool name_f = false;
     bool last_name_f = false;
     int str_size = key->size;
-    printf("str_size %d\n", str_size);
     for (int i = 0; i < str_size; i++) {
         if (!surname_f) {
             if (isspace(_key[i])) {
@@ -946,7 +945,6 @@ status_code undo(List_node* list, Stack* stack) {
 
         status_cmd was = now->command;
         Liver* cur = now->condition;
-        printf("xxxx\n");
 
         My_string* info = NULL;;
         My_string* info_delete = NULL;
@@ -1036,7 +1034,8 @@ status_code undo(List_node* list, Stack* stack) {
     }
     string_clear(sep);
     free(sep);
-    stack_destroy(tmp);
+    free(tmp);
+    //stack_destroy(tmp);
 }
 
 status_code print_file(const char* filename, List_node* list) {
@@ -1218,3 +1217,4 @@ void free_list(List_node* list) {
     }
     free(list);
 }
+
