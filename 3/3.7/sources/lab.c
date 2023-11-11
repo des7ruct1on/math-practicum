@@ -1215,6 +1215,5 @@ void free_list(List_node* list) {
         free(tmp);
         tmp = del;
     }
-    free(list);
 }
 
