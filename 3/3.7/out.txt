@@ -1,9 +1,4 @@
-| Surname | Name | Last name | Date birth | Gender | Salary |
-|===========================================================|
-|    Petrova |      Maria |   Ivanovna |      15:06:1990 |          F | 85000.000000 |
-|  Kuznetsov |     Alexey | Sergeyevich |      05:09:1988 |          M | 75000.000000 |
-|   Sidorova |       Olga |   Ivanovna |      08:04:1992 |          F | 72000.000000 |
-|    Ivanova |  Ekaterina | Dmitrievna |      20:03:1995 |          F | 90000.000000 |
-|    Smirnov |     Andrei | Alexeevich |      12:11:2000 |          M | 60000.000000 |
+|   Surname  |     Name   |  Last name  |    Date birth   |   Gender   |    Salary     |
+|======================================================================================|
 |     Lyapin |       Ivan | Alekseevich |      30:12:2003 |          M | 100000.000000 |
-|===========================================================|
+|======================================================================================|

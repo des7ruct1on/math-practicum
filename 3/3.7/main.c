@@ -33,6 +33,7 @@ int main(int argc, char* argv[]) {
     My_string* info = NULL;
     My_string* find_key = NULL;
     int index_find;
+    Action* tmp = NULL;
     while (true) {
         Liver* tmp_liver = NULL;
         print_menu();
@@ -117,7 +118,6 @@ int main(int argc, char* argv[]) {
             case cmd_edit_last_name:
                 find_key = String(arg_three);
                 st_act = find_citizen(storage, find_key, &tmp_liver, &index_find);
-                print_str(tmp_liver->surname);
                 if (st_act == code_invalid_parameter) {
                     printf("Invalid parameter detected!!!\n");
                 } else {
@@ -138,6 +138,10 @@ int main(int argc, char* argv[]) {
                     if (st_act == code_invalid_parameter) {
                         printf("Invalid parameter detected!!!\n");
                     } 
+                    st_act = remove_list(&storage, find_key, actions);
+                    tmp = stack_pop(actions);
+                    st_act = push_list(&storage, tmp->condition, actions);
+                    tmp = stack_pop(actions);
                 }
                 if (arg_three) free(arg_three); arg_three = NULL;
                 break;

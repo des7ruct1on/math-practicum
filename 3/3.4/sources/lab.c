@@ -37,10 +37,12 @@ status_code create_adress(Adress** new_adress, const My_string* info) {
         st_free = free_all(5, *new_adress, _city, _street, _block, _index);
         return code_invalid_parameter;
     }
+    
     if (strlen(_index) > 6) {
         st_free = free_all(5, *new_adress, _city, _street, _block, _index);
             return code_invalid_parameter;
     }
+    
 
     (*new_adress)->city = String(_city);
     (*new_adress)->street = String(_street);
@@ -118,10 +120,12 @@ status_code create_mail(Mail** new_mail, const My_string* info) {
     }
     double _weight;
     sscanf(information, "%lf %s %s %s %s %s", &_weight, _id, _time_create_date, _time_create_time, _time_get_date, _time_get_time);
+    
     if (_weight < epsilon || strlen(_id) > 14) {
         st_free = free_all(5, *new_mail, _id,_time_create_date, _time_create_time, _time_get_date);
         return code_invalid_parameter;
     }
+    
     (*new_mail)->weight = _weight;
     (*new_mail)->id = String(_id);
     My_string* time_cr_date = String(_time_create_date);
@@ -202,7 +206,6 @@ status_code add_post_storage(Post* new_post, Post* new, int* capacity, int* size
         }    
     }
     */
-    print_str(new->cur_id->index);
     new_post[*size] = *new;
     (*size)++;
     status_realloc st_realloc;
@@ -226,11 +229,16 @@ status_code add_mail(Post** cur_post, const My_string* info) {
     if (st_mail == code_error_alloc) {
         return code_error_alloc;
     }
+    
     Mail* check = NULL;
-    check = find_mail((*cur_post)->mails, *new_mail->id, (*cur_post)->size);
-    if (check) {
-        free_mail(new_mail);
-        return code_invalid_parameter;
+    if (!(*cur_post)) {
+        check = find_mail((*cur_post), *new_mail->id, (*cur_post)->size);
+        if (check != NULL) {
+            //print_str(info);
+            //print_str(new_mail->id);
+            free_mail(new_mail);
+            return code_success;
+        }
     }
     int index = (*cur_post)->size;
     (*cur_post)->mails[index] = *new_mail;
@@ -305,7 +313,7 @@ int free_mail(Mail* tmp) {
     if (tmp->id->data) string_clear(tmp->id);
     if (tmp->time_create->data) string_clear(tmp->time_create);
     if (tmp->time_get->data) string_clear(tmp->time_get);
-    //status_free st_free = free_all(3, tmp->id, tmp->time_create, tmp->time_get);
+    status_free st_free = free_all(3, tmp->id, tmp->time_create, tmp->time_get);
     //if (st_free == status_free_fail) {
        // return -1;
     //}
@@ -316,7 +324,7 @@ int free_mail(Mail* tmp) {
 
 
 Post* find_post(Post* posts, const My_string* id, int size) {
-    if (!id->size) {
+    if (!id->size || !posts) {
         return NULL;
     }
     //print_str((*new_post)[i]->cur_id->city);
@@ -325,13 +333,10 @@ Post* find_post(Post* posts, const My_string* id, int size) {
     if (st_adress == code_error_alloc) {
         return NULL;
     }
-    print_str(check->index);
     int _size = size;
     Post* current = &posts[0];
-    print_str(current->cur_id->index);
     for (int i = 0; i < _size; i++) {
         current = &posts[i];
-        //print_str(current->cur_id->index);
         if (check_equal(check, current->cur_id)) {
             free(check);
             return current;
@@ -706,10 +711,9 @@ status_cmd command(char** arg_one, char** arg_two, My_string** info) {
             free(*arg_one);
             return cmd_print_non_expired;
         }
-    } else {
-        free(cmd);
-        return cmd_invalid_parameter;
-    }
+    } 
+    free(cmd);
+    return cmd_invalid_parameter;
 }
 
 status_code free_post(Post* post) {
@@ -732,20 +736,19 @@ status_code free_post(Post* post) {
         free(current);
         current = NULL;
     }
-    //free(post->mails);
+    free(post->mails);
     post->mails = NULL;
     post->size = 0;
     post->capacity = 1;
     return code_success;
 }
 
-status_code free_storage(Post* posts, int size) {
+status_code free_storage(Post** posts, int size) {
     if (!(posts)) {
         return code_invalid_parameter;
     }
-    printf("%d--\n", size);
     for (int i = 0; i < size; i++) {
-        free_post(&posts[i]);
+        free_post(posts[i]);
     }
     return code_success;
 }

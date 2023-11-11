@@ -82,7 +82,7 @@ status_cmd command(char** arg_one) {
         }
         (*arg_one)[index] = '\0';
         index = 0;
-        return cmd_stat;
+        return cmd_find;
     } else {
         free(cmd);
         return cmd_invalid_parameter;
@@ -278,7 +278,6 @@ int find_depth(Node* root) {
     }
 }
 
-
 status_code read_from_file(char* argv[], int argc, Node** Tree, List_tree** Tree_list) {
     status_code st_act;
     FILE* in = fopen(argv[1], "r");
@@ -302,14 +301,12 @@ status_code read_from_file(char* argv[], int argc, Node** Tree, List_tree** Tree
                 scanned = true;
                 word_to_add[index] = symbol;
                 index++;
-                printf("%c %d\n", word_to_add[index - 1], index);
             } else {
                 if (scanned) {
                     word_to_add[index] = '\0';
                     index = 0;
                 }
                 if (!start && scanned) {
-                    printf("%s 555\n", word_to_add);
                     st_act = insert(Tree, word_to_add);
                     if (st_act != code_success) {
                         free(word_to_add);
@@ -317,7 +314,6 @@ status_code read_from_file(char* argv[], int argc, Node** Tree, List_tree** Tree
                         fclose(in);
                         return st_act;
                     }
-                    printf("%s 555\n", word_to_add);
                     free(word_to_add);
                     word_to_add = NULL;
                     word_to_add = malloc(sizeof(char) * STR_SIZE);

@@ -477,7 +477,6 @@ status_code remove_list(List_node** list, My_string* key, Stack* stack) {
     if (!(*list)) {
         return code_invalid_parameter;
     }
-    print_str(key);
     status_code st_push;
     char* _key = key->data;
     char* surname = malloc(sizeof(char) * key->size);
@@ -563,7 +562,25 @@ status_code remove_list(List_node** list, My_string* key, Stack* stack) {
     }
     List_node* cur = *list;
     int _index = 0;
-    int check;
+    int check = compare_citizen(cur->data, name, surname, last_name);
+    if (check == 0 && cur->next) {
+        List_node* new_next = cur->next;
+        Liver* deleted_citizen = cur->data;
+        Action* now = NULL;
+        st_push = make_action(deleted_citizen, cmd_remove, &now);
+        if (st_push == code_error_alloc) {
+            return code_error_alloc;
+        }
+        now->index = _index;
+        free(*list);
+        *list = new_next;
+        st_push = stack_push(stack, now);
+        if (st_push == code_error_alloc) {
+            return code_error_alloc;
+        }
+        st_free = free_all(3, surname, name, last_name);
+        return code_success;
+    }
     while (cur->next!= NULL) {
         check = compare_citizen(cur->next->data, name, surname, last_name);
         if (check == 0) {
@@ -587,7 +604,6 @@ status_code remove_list(List_node** list, My_string* key, Stack* stack) {
             if (st_push == code_error_alloc) {
                 return code_error_alloc;
             }
-            print_liver(deleted_citizen);
             now->index = _index;
             st_push = stack_push(stack, now);
             if (st_push == code_error_alloc) {
@@ -949,6 +965,7 @@ status_code undo(List_node* list, Stack* stack) {
         My_string* info = NULL;;
         My_string* info_delete = NULL;
         int check;
+        int _index;
         if (was == cmd_add) {
             info = my_strcpy_new(cur->surname);
             check = concat_strings(&info, sep);
@@ -1004,13 +1021,23 @@ status_code undo(List_node* list, Stack* stack) {
             free(change->last_name);
             change->last_name = my_strcpy_new(cur->last_name);
         } else if (was == cmd_edit_date_birth) {
-            Liver* change = find_index(list, now->index);
+            info = my_strcpy_new(cur->surname);
+            check = concat_strings(&info, sep);
+            check = concat_strings(&info, cur->name);
+            if (cur->last_name->size != 0) {
+                check = concat_strings(&info, sep);
+                check = concat_strings(&info, cur->last_name);
+            }
+            Liver* change = NULL;
+            st_act = find_citizen(list, info, &change, &_index);
             if (change == NULL) {
                 return code_invalid_parameter;
             }
             string_clear(change->date_birth);
             free(change->date_birth);
             change->date_birth = my_strcpy_new(cur->date_birth);
+            st_act = remove_list(&list, info, tmp);
+            st_act = push_list(&list, change, tmp);
         } else if (was == cmd_edit_gender) {
             Liver* change = find_index(list, now->index);
             if (change == NULL) {
@@ -1044,15 +1071,14 @@ status_code print_file(const char* filename, List_node* list) {
     if (!file) {
         return code_error_oppening;
     }
-    print_liver(list->data);
     List_node* current = list;
-    fprintf(file, "| Surname | Name | Last name | Date birth | Gender | Salary |\n");
-    fprintf(file, "|===========================================================|\n");
+    fprintf(file, "|   Surname  |     Name   |  Last name  |    Date birth   |   Gender   |    Salary     |\n");
+    fprintf(file, "|======================================================================================|\n");
     while (current != NULL) {
         fprintf(file, "| %10s | %10s | %10s | %15s | %10s | %5lf |\n", current->data->surname->data, current->data->name->data, current->data->last_name->data, current->data->date_birth->data, current->data->gender->data, current->data->salary);
         current = current->next;
     }
-    fprintf(file, "|===========================================================|\n");
+    fprintf(file, "|======================================================================================|\n");
     fclose(file);
     return code_success;
 }

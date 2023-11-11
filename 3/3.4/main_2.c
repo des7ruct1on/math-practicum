@@ -54,11 +54,11 @@ int main(int argc, char* argv[]) {
     int size_storage = 0;
     storage_posts = (Post*)malloc(sizeof(Post*) * (capacity_storage));
     Post* current = NULL;
-    Post* tmp_post = NULL;
     Mail* tmp_mail = NULL;
     Mail* tmp_find = NULL;
     int tmp_size = 32;
     while (true) {
+        Post* tmp_post = NULL;
         print_menu();
         print_cur_post(current);
         st_cmd = command(&arg_one, &arg_two, &info);
@@ -80,13 +80,14 @@ int main(int argc, char* argv[]) {
                 print_mails(current->mails, current->size);
                 break;
             case cmd_create_post:
-                st_activ = create_post(&current, info);
+                st_activ = create_post(&tmp_post, info);
+                if (!current) current = tmp_post;
                 if (st_activ == code_error_alloc) {
                     printf("Error alloc detected!!!\n");
                 } else if (st_activ == code_invalid_parameter) {
                     printf("Invalid parameter detected!!!\n");
                 } else {
-                    st_activ = add_post_storage(storage_posts, current, &capacity_storage, &size_storage);
+                    st_activ = add_post_storage(storage_posts, tmp_post, &capacity_storage, &size_storage);
                     if (st_activ == code_error_alloc) {
                         printf("Error alloc detected!!!\n");
                     } else if (st_activ == code_invalid_parameter) {
@@ -205,7 +206,7 @@ int main(int argc, char* argv[]) {
             break;
         }
     }
-    free_storage(storage_posts, size_storage);
+    free_storage(&storage_posts, size_storage);
     free(storage_posts);
     return 0;
 }

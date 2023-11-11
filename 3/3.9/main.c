@@ -20,12 +20,13 @@ void print_menu() {
 }
 
 int main(int argc, char* argv[]) {
-    if (argc < 3) {
+    if (argc < 2) {
         printf("Your programm must start with: %s <FILE_IN>\n", argv[0]);
         return -1;
     }
     Node* Tree = NULL;
     List_tree* list = NULL;
+    status_cmd st_decision;
     status_code st_activ = read_from_file(argv, argc, &Tree, &list);
     if (st_activ == code_error_alloc) {
         printf("Error alloc detected!!!\n");
@@ -42,8 +43,8 @@ int main(int argc, char* argv[]) {
     Node* find = NULL;
     while (true) {
         print_menu();
-        st_activ = command(&arg_one);
-        switch (st_activ) {
+        st_decision = command(&arg_one);
+        switch (st_decision) {
             case cmd_error_alloc:
                 printf("Error alloc detected!!!\n");
                 break;
@@ -79,7 +80,7 @@ int main(int argc, char* argv[]) {
             case cmd_exit:
                 break;
         }
-        if (st_activ == cmd_exit || st_activ == code_error_alloc) {
+        if (st_decision == cmd_exit || st_activ == code_error_alloc) {
             break;
         }
     }

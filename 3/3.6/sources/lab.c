@@ -284,7 +284,6 @@ status_code read_from_file(char* argv[], int argc, Vehicle** vehicles) {
     //if (!(*vehicles)) {
         //return code_error_alloc;
     //}
-    FILE* in;
     status_free st_free;
     status_code st_act;
     for (int i = 1; i < argc; i++) {
@@ -399,7 +398,9 @@ status_code read_from_file(char* argv[], int argc, Vehicle** vehicles) {
                 }
             }
             //st_free = free_all(6, _stop_type, line, _number, _name, _time_arr_date, _time_dep_date);
-            st_free = free_all(2, line, _stop_type);
+            st_free = free_all(1, _stop_type);
+            free(line);
+            line = NULL;
         }
         if (line) free(line);
         //printf("!!!!\n");
