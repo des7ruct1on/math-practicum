@@ -104,6 +104,10 @@ int main(int argc, char* argv[]) {
             case cmd_exit:
                 break;
         }
+        if (arg_one) {
+            free(arg_one);
+            arg_one = NULL;
+        }
         if (st_decision == cmd_exit || st_activ == code_error_alloc) {
             break;
         }

@@ -153,6 +153,8 @@ status_code get_tree_from_file(FILE* file, Node** root, List_tree** Tree_list) {
             line = NULL;
         }
     }
+    free(line);
+    line = NULL;
     st_act = add_nodes_to_list(*root, Tree_list);
     return st_act;
 }
@@ -405,6 +407,10 @@ status_code read_from_file(char* argv[], int argc, Node** Tree, List_tree** Tree
         //printf("\t%c---%d\n", symbol, index_word);
         symbol = fgetc(in);
     }
+    if (word) {
+        free(word);
+        word = NULL;
+    }
     st_act = add_nodes_to_list(*Tree, Tree_list);
     fclose(in);
     return st_act;
@@ -416,6 +422,8 @@ void destroy_list(List_tree* list) {
     while (tmp->next != NULL) {
         List_tree* del = tmp->next;
         free(tmp);
+        tmp = NULL;
         tmp = del;
     }
+    free(tmp);
 }
