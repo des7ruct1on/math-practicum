@@ -90,7 +90,7 @@ status_cmd command(char** arg_one) {
 }
 
 
-bool valid_word(char letter, char* seps[], int size) {
+bool valid_char(char letter, char* seps[], int size) {
     for (int i = 2; i < size; i++) {
         if (letter == seps[i][0]) {
             return false;
@@ -155,7 +155,7 @@ void free_tree(Node *root) {
 }
 
 int compare_mets(Node* a, Node* b) {
-    return a->count - b->count;
+    return b->count - a->count;
 }
 
 status_code push_list(List_tree** list, Node* add) {
@@ -203,21 +203,33 @@ status_code add_nodes_to_list(Node* root, List_tree** Tree_list) {
     return code_success;
 }
 
+void print_list(List_tree* list) {
+    if (!list) return;
+    List_tree* cur = list;
+    while (cur != NULL) {
+        printf("%s\t", cur->element->word);
+        cur = cur->next;
+    }
+}
+
 int size_list(List_tree* list) {
     if (!list) return 0;
     int count = 0;
     List_tree* tmp = list;
-    while (!tmp) {
+    while (tmp != NULL) {
         count++;
-        tmp = list->next;
+        tmp = tmp->next;
     }
     return count;
 }
 
+
 void print_common_words(List_tree* list, int n) {
     if (n == 0) return;
+    printf("wowow\n");
     List_tree* current = list;
     int _size_list = size_list(list);
+    printf("    %d\n", _size_list);
     int total_size = (_size_list < n) ? _size_list : n;
     for (int i = 0; i < total_size; i++) {
         int cur_size = current->element->count;
@@ -260,6 +272,11 @@ void print_least_len_word(List_tree* list) {
     printf("%s", less_word);
 }
 
+int get_size_tree(Node* tree) {
+    if (!tree) return 0;
+    return 1 + get_size_tree(tree->left) + get_size_tree(tree->right);
+}
+
 void print_stats(Node *root) {
     if (root != NULL) {
         print_stats(root->left);
@@ -282,58 +299,42 @@ status_code read_from_file(char* argv[], int argc, Node** Tree, List_tree** Tree
     status_code st_act;
     FILE* in = fopen(argv[1], "r");
     if (!in) return code_error_oppening;
-    char* line = NULL;
-    int read;
-    while ((read = getline(&line, &(size_t){0}, in)) != -1) {
-        if (read == -1) {
-            free(line);
-            return code_error_alloc;
-        }
-        int size = strlen(line);
-        int index = 0;
-        bool scanned = false;
-        char* word_to_add = malloc(sizeof(char) * STR_SIZE);
-        bool start = true;
-        for (int i = 0; i < size; i++) {
-            char symbol = line[i];
-            if (valid_word(symbol, argv, argc)) {
-                start = false;
-                scanned = true;
-                word_to_add[index] = symbol;
-                index++;
-            } else {
-                if (scanned) {
-                    word_to_add[index] = '\0';
-                    index = 0;
-                }
-                if (!start && scanned) {
-                    st_act = insert(Tree, word_to_add);
-                    if (st_act != code_success) {
-                        free(word_to_add);
-                        free(line);
-                        fclose(in);
-                        return st_act;
-                    }
-                    free(word_to_add);
-                    word_to_add = NULL;
-                    word_to_add = malloc(sizeof(char) * STR_SIZE);
-                    start = true;
-                    scanned = false;
-
-                }
-            }
-        }
-        st_act = add_nodes_to_list(*Tree, Tree_list);
-        if (st_act != code_success) {
-            free(line);
-            line = NULL;
-            return st_act;
-        }
-
-        free(line);
-        line = NULL;
+    char* word = (char*)malloc(sizeof(char) & STR_SIZE);
+    if (!word) {
+        fclose(in);
+        return code_error_alloc;
     }
-    if (line) free(line);
+    char symbol = fgetc(in);
+    int index_word = 0;
+    while (symbol != EOF) {
+        if (valid_char(symbol, argv, argc)) {
+            word[index_word] = symbol;
+            index_word++;
+            //printf("\t%c---%d\n", symbol, index_word);
+        } else {
+            if (index_word != 0) {
+                word[index_word] = '\0';
+                //printf("\t%s %d\n", word, index_word);
+                index_word = 0;
+                st_act = insert(Tree, word);
+                if (st_act != code_success) {
+                    free(word);
+                    fclose(in);
+                    return st_act;
+                }
+                free(word);
+                word = NULL;
+                word = (char*)malloc(sizeof(char) & STR_SIZE);
+                if (!word) {
+                    fclose(in);
+                    return code_error_alloc;
+                }
+            } 
+        }  
+        //printf("\t%c---%d\n", symbol, index_word);
+        symbol = fgetc(in);
+    }
+    st_act = add_nodes_to_list(*Tree, Tree_list);
     fclose(in);
-    return code_success;
+    return st_act;
 }

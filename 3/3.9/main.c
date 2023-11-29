@@ -41,6 +41,7 @@ int main(int argc, char* argv[]) {
     char* arg_one = NULL;
     int num;
     Node* find = NULL;
+    print_list(list);
     while (true) {
         print_menu();
         st_decision = command(&arg_one);

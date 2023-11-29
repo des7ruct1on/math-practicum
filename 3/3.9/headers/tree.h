@@ -42,7 +42,8 @@ typedef struct List_tree {
 } List_tree;
 
 status_cmd command(char** arg_one);
-bool valid_word(char letter, char* seps[], int size);
+void print_list(List_tree* list);
+bool valid_char(char letter, char* seps[], int size);
 status_code create_node(char* word, Node** node);
 status_code insert(Node** root, char* word);
 Node* search_in_tree(Node *root, char *word);
@@ -57,4 +58,5 @@ void print_least_len_word(List_tree* list);
 void print_stats(Node *root);
 int find_depth(Node* root);
 status_code read_from_file(char* argv[], int argc, Node** Tree, List_tree** Tree_list);
+int get_size_tree(Node* tree);
 #endif
