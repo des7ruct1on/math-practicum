@@ -8,5 +8,6 @@
         "limits.h": "c",
         "ctype.h": "c",
         "stdio.h": "c"
-    }
+    },
+    "editor.inlineSuggest.showToolbar": "onHover"
 }

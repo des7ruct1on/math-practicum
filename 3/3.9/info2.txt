@@ -1,4 +1,0 @@
-a----b----c----d----
-aa----bbb----ccc---df-
-a-b-c-d-a-a-a-b-b-b-c-
-count-kek-sel-trol

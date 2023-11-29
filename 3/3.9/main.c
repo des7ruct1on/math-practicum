@@ -14,8 +14,10 @@ void print_menu() {
     printf("[Len] <Max / Min> - to print word with max / min len\n");
     printf("[Print] <FILE> - to print tree in file\n");
     printf("[Stats] - to print stats about words\n");
-    printf("[Find] <Word>- to find exact word and print info about\n");
+    printf("[Find] <Word> - to find exact word and print info about\n");
     printf("[Exit] - to exit\n");
+    printf("[Depth] - get depth of tree\n");
+    printf("[Get] <File> - get tree from file\n");
     printf("\n");
 }
 
@@ -38,10 +40,11 @@ int main(int argc, char* argv[]) {
         printf("Can`t open file!!!\n");
         return -4;
     }
+
     char* arg_one = NULL;
     int num;
     Node* find = NULL;
-    print_list(list);
+    FILE* out;
     while (true) {
         print_menu();
         st_decision = command(&arg_one);
@@ -73,10 +76,30 @@ int main(int argc, char* argv[]) {
                     printf("Invalid parameter detected!!!\n");
                 }
                 break;
+            case cmd_depth:
+                printf("Depth: %d\n", find_depth(Tree));
+                break;
             case cmd_stat:
                 print_stats(Tree);
                 break;
+            case cmd_get_file:
+                out = fopen(arg_one, "r");
+                printf("111\n");
+                if (!out) {
+                    printf("Can`t open file!!!\n");
+                    break;
+                }
+                st_activ = get_tree_from_file(out, &Tree, &list);
+                fclose(out);
+                break;
             case cmd_print:
+                out = fopen(arg_one, "w");
+                if (!out) {
+                    printf("Can`t open file!!!\n");
+                    break;
+                }
+                write_to_file(out, Tree, 0);
+                fclose(out);
                 break;
             case cmd_exit:
                 break;
@@ -86,5 +109,6 @@ int main(int argc, char* argv[]) {
         }
     }
     free_tree(Tree);
+    destroy_list(list);
     return 0;
 }

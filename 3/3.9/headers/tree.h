@@ -26,7 +26,9 @@ typedef enum status_cmd {
     cmd_len,
     cmd_print,
     cmd_stat,
-    cmd_find
+    cmd_depth,
+    cmd_find,
+    cmd_get_file
 } status_cmd;
 
 typedef struct Node {
@@ -42,6 +44,8 @@ typedef struct List_tree {
 } List_tree;
 
 status_cmd command(char** arg_one);
+status_code get_tree_from_file(FILE* file, Node** root, List_tree** Tree_list);
+void write_to_file(FILE* file, Node* tree, int depth);
 void print_list(List_tree* list);
 bool valid_char(char letter, char* seps[], int size);
 status_code create_node(char* word, Node** node);
@@ -59,4 +63,5 @@ void print_stats(Node *root);
 int find_depth(Node* root);
 status_code read_from_file(char* argv[], int argc, Node** Tree, List_tree** Tree_list);
 int get_size_tree(Node* tree);
+void destroy_list(List_tree* list);
 #endif
