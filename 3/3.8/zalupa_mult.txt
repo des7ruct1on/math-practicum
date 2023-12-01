@@ -1,0 +1,5 @@
+    Mult(x^2,x^3+x^2+1+3x)
+    Mult(x^3)
+    Mult(x^4)
+    Mult(-x)
+    Add(x^15)

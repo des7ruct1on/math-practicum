@@ -1,0 +1,26 @@
+    [Sub(x+x^5-x^2-11,-x^4-x^2-11)   
+
+fsd
+fsdfsd
+fdsfsd
+          ]           
+          Sub(x+x^5-x^2-11,-x^4-x^2-11)    
+          
+          [
+
+fsdfs d
+ kak zhe zaebali eti polinomi s ebuchim interpretatorom
+fsdfsd
+
+
+
+          ]
+          Add(-x-x^4-x^5+1)
+          Mult(x^10) 
+          % wow m,eow
+        
+                        Add(x^3+x^4+2)
+
+
+          Cmps(x^7) 
+          Eval(2.0)

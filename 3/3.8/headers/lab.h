@@ -39,7 +39,7 @@ status_code sub(Polynom* first, Polynom* second, Polynom** res);
 status_code mult(Polynom* first, Polynom* second, Polynom** res);
 double binary_pow(double base, int power);
 status_code eval(Polynom* eq, double point, double* res);
-status_code diff(Polynom* eq);
+status_code diff(Polynom* eq, Polynom** res);
 status_code cmps(Polynom* F, Polynom* G, Polynom** res);
 //status_code div(Polynom* F, Polynom* G, Polynom** res);
 status_code action(char* cmd, Polynom* first, Polynom* second, Polynom** res, double point, double* res_sol);
