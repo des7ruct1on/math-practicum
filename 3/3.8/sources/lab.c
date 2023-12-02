@@ -119,7 +119,7 @@ status_code read_from_file(const char* filename) {
     if (!cmd) {
         return code_error_alloc;
     }
-    //printf("1\n");
+    printf("1\n");
     bool is_read_cmd = false;
     while ((read = getline(&line, &(size_t){0}, in)) != -1) {
         if (read == -1) {
@@ -128,12 +128,12 @@ status_code read_from_file(const char* filename) {
             return code_error_alloc;
         }
         if (!strcmp(line, "\n") || !strcmp(line, "\r\n")) {
-            //printf("111\n");
+            printf("111\n");
             free(line);
             line = NULL;
             continue;
         }
-        //printf("%s\n", line);
+        printf("%s\n", line);
         index = 0;
         symbol = line[index];
         while (isspace(symbol)) {
@@ -166,7 +166,7 @@ status_code read_from_file(const char* filename) {
         if (is_long_comment) {
             free(line);
             line = NULL;
-            //printf("notttt\n");
+            printf("notttt\n");
             index = 0;
             continue;
         }
@@ -183,9 +183,9 @@ status_code read_from_file(const char* filename) {
                 index_cmd++;
             }
         }
-        //printf("index cmd: %d\n", index_cmd);
+        printf("index cmd: %d\n", index_cmd);
         cmd[index_cmd] = '\0';
-        //printf("    cmd: %s\n", cmd);
+        printf("    cmd: %s\n", cmd);
         //printf("    cmd: %s\n", cmd);
         //printf("    cmd: %s\n", cmd);
         if (cmd[0] == '\0' && symbol == '%') {
@@ -323,7 +323,10 @@ status_code read_from_file(const char* filename) {
         destroy_polynomial(summator);
         summator = tmp_res;
         print_polynom(summator);
-        if (line) free(line);
+        if (line) {
+            free(line);
+            line = NULL;
+        }
         if (cmd) free(cmd);
         cmd = (char*)malloc(sizeof(char) * MAX_SIZE);
         if (!cmd) {
@@ -808,4 +811,5 @@ status_code action(char* cmd, Polynom* first, Polynom* second, Polynom** res, do
     } else {
         return code_invalid_parameter;
     }
+    return code_success;
 }
