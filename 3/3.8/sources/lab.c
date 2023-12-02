@@ -105,6 +105,54 @@ void destroy_polynomial(Polynom* list) {
     free(tmp);
 }
 
+
+status_code div_mod(Polynom* first, Polynom* second, Polynom** division_res, Polynom** mod_res) {
+    Polynom* tmp = NULL;
+    status_code st_act;
+    st_act = add(first, NULL, &tmp);
+    if (st_act != code_success) {
+        destroy_polynomial(tmp);
+        return st_act;
+    }
+    
+    while (tmp->degree >= second->degree) {
+        int coef = tmp->coef / second->coef;
+        if (!coef) {
+            (*mod_res) = tmp;
+            return code_success;
+        }
+        Polynom* mult_res = NULL;
+        st_act = push_monom(&mult_res, tmp->degree - second->degree, coef);
+        if (st_act != code_success) {
+            destroy_polynomial(mult_res);
+            destroy_polynomial(tmp);
+            return st_act;
+        }
+        if (!(*division_res)) {
+            st_act = push_monom(division_res, tmp->degree - second->degree, coef);
+            if (st_act != code_success) {
+                destroy_polynomial(mult_res);
+                destroy_polynomial(tmp);
+                return st_act;
+            }
+        } else {
+            st_act = push_monom(division_res, tmp->degree - second->degree, coef);
+            if (st_act != code_success) {
+                destroy_polynomial(mult_res);
+                destroy_polynomial(tmp);
+                return st_act;
+            }
+        }
+        Polynom* mult_res_second = NULL;
+        st_act = mult(mult_res, second, &mult_res_second);
+        if (st_act != code_success) {
+            destroy_polynomial(mult_res);
+            destroy_polynomial(tmp);
+            return st_act;
+        }
+    }
+}
+ 
 status_code read_from_file(const char* filename) {
     FILE* in = fopen(filename, "r");
     if (!in) return code_error_oppening;
@@ -119,7 +167,7 @@ status_code read_from_file(const char* filename) {
     if (!cmd) {
         return code_error_alloc;
     }
-    printf("1\n");
+   // printf("1\n");
     bool is_read_cmd = false;
     while ((read = getline(&line, &(size_t){0}, in)) != -1) {
         if (read == -1) {
@@ -128,12 +176,12 @@ status_code read_from_file(const char* filename) {
             return code_error_alloc;
         }
         if (!strcmp(line, "\n") || !strcmp(line, "\r\n")) {
-            printf("111\n");
+            //printf("111\n");
             free(line);
             line = NULL;
             continue;
         }
-        printf("%s\n", line);
+       // printf("%s\n", line);
         index = 0;
         symbol = line[index];
         while (isspace(symbol)) {
@@ -166,7 +214,7 @@ status_code read_from_file(const char* filename) {
         if (is_long_comment) {
             free(line);
             line = NULL;
-            printf("notttt\n");
+            //printf("notttt\n");
             index = 0;
             continue;
         }
@@ -183,9 +231,9 @@ status_code read_from_file(const char* filename) {
                 index_cmd++;
             }
         }
-        printf("index cmd: %d\n", index_cmd);
+        //printf("index cmd: %d\n", index_cmd);
         cmd[index_cmd] = '\0';
-        printf("    cmd: %s\n", cmd);
+        //printf("    cmd: %s\n", cmd);
         //printf("    cmd: %s\n", cmd);
         //printf("    cmd: %s\n", cmd);
         if (cmd[0] == '\0' && symbol == '%') {
@@ -521,7 +569,6 @@ status_code add(Polynom* first, Polynom* second, Polynom** res) {
                 }
                 left_cur = left_cur->next;
                 right_cur = right_cur->next;
-                //printf("    %d + %d coeffff %d\n", left_cur->coef,right_cur->coef,left_cur->coef + right_cur->coef);
             } else if (left_cur->degree < right_cur->degree) {
                 st_act = push_monom(res, left_cur->degree, left_cur->coef);
                 if (st_act != code_success) return st_act;
@@ -534,7 +581,6 @@ status_code add(Polynom* first, Polynom* second, Polynom** res) {
         }
         while (left_cur != NULL) {
             st_act = push_monom(res, left_cur->degree, left_cur->coef);
-            //printf("<<<%d %d>>>\n", left_cur->degree, left_cur->coef);
             if (st_act != code_success) return st_act;
             left_cur = left_cur->next;
         }
@@ -544,11 +590,6 @@ status_code add(Polynom* first, Polynom* second, Polynom** res) {
             right_cur = right_cur->next;
         }
     }
-    
-    //printf("\n---\n");
-    //print_polynom(*res);
-    //print_polynom_another(*res);
-    //printf("\n---\n");
     return code_success;
 }
 
@@ -598,8 +639,6 @@ status_code sub(Polynom* first, Polynom* second, Polynom** res) {
             right_cur = right_cur->next;
         } 
     }
-    //printf("\n---\n");
-    //printf("\n---\n");
     return code_success;
 }
 
