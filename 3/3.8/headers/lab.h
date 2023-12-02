@@ -41,6 +41,6 @@ double binary_pow(double base, int power);
 status_code eval(Polynom* eq, double point, double* res);
 status_code diff(Polynom* eq, Polynom** res);
 status_code cmps(Polynom* F, Polynom* G, Polynom** res);
-//status_code div(Polynom* F, Polynom* G, Polynom** res);
+status_code div_mod(Polynom* first, Polynom* second, Polynom** division_res, Polynom** mod_res);
 status_code action(char* cmd, Polynom* first, Polynom* second, Polynom** res, double point, double* res_sol);
 #endif

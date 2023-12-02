@@ -105,6 +105,43 @@ void destroy_polynomial(Polynom* list) {
     free(tmp);
 }
 
+status_code push_forward_monom(Polynom** equation, int degree, int coef) {
+    if (degree == 0 && coef == 0) return code_invalid_parameter;
+    Polynom* new = (Polynom*)malloc(sizeof(Polynom));
+    if (!new) return code_error_alloc;
+    new->coef = coef;
+    new->degree = degree;
+    if (!(*equation)) {
+        *equation = new;
+        new->next = NULL;
+    } else {
+        new->next = *equation;
+        *equation = new;
+    }
+    return code_success;
+}
+
+
+status_code push_back_monom(Polynom** equation, int degree, int coef) {
+    if (degree == 0 && coef == 0) return code_invalid_parameter;
+    Polynom* new = (Polynom*)malloc(sizeof(Polynom));
+    if (!new) return code_error_alloc;
+    new->coef = coef;
+    new->degree = degree;
+    if (!(*equation)) {
+        *equation = new;
+        new->next = NULL;
+    } else {
+        Polynom* cur = *equation;
+        while (cur->next != NULL) {
+            cur = cur->next;
+        }
+        cur->next = new;
+        new->next = NULL;
+    }
+    return code_success;
+}
+
 
 status_code div_mod(Polynom* first, Polynom* second, Polynom** division_res, Polynom** mod_res) {
     Polynom* tmp = NULL;
@@ -119,24 +156,25 @@ status_code div_mod(Polynom* first, Polynom* second, Polynom** division_res, Pol
         int coef = tmp->coef / second->coef;
         if (!coef) {
             (*mod_res) = tmp;
+            print_polynom(*mod_res);
             return code_success;
         }
         Polynom* mult_res = NULL;
-        st_act = push_monom(&mult_res, tmp->degree - second->degree, coef);
+        st_act = push_forward_monom(&mult_res, tmp->degree - second->degree, coef);
         if (st_act != code_success) {
             destroy_polynomial(mult_res);
             destroy_polynomial(tmp);
             return st_act;
         }
         if (!(*division_res)) {
-            st_act = push_monom(division_res, tmp->degree - second->degree, coef);
+            st_act = push_forward_monom(division_res, tmp->degree - second->degree, coef);
             if (st_act != code_success) {
                 destroy_polynomial(mult_res);
                 destroy_polynomial(tmp);
                 return st_act;
             }
         } else {
-            st_act = push_monom(division_res, tmp->degree - second->degree, coef);
+            st_act = push_back_monom(division_res, tmp->degree - second->degree, coef);
             if (st_act != code_success) {
                 destroy_polynomial(mult_res);
                 destroy_polynomial(tmp);
@@ -150,7 +188,39 @@ status_code div_mod(Polynom* first, Polynom* second, Polynom** division_res, Pol
             destroy_polynomial(tmp);
             return st_act;
         }
+
+        Polynom* copy_first = NULL;
+        st_act = add(tmp, NULL, &copy_first);
+        if (st_act != code_success) {
+            destroy_polynomial(tmp);
+            destroy_polynomial(mult_res);
+            destroy_polynomial(copy_first);
+            return st_act;
+        }
+        destroy_polynomial(tmp);
+        tmp = NULL;
+        st_act = sub(copy_first, mult_res_second, &tmp);
+        if (st_act != code_success) {
+            destroy_polynomial(tmp);
+            destroy_polynomial(mult_res);
+            destroy_polynomial(copy_first);
+            return st_act;
+        }
+
+        if (tmp->coef == 0) {
+            if (!tmp->next) {
+                (*mod_res) = tmp;
+                print_polynom(*mod_res);
+                return code_success;
+            }
+            Polynom* next = tmp->next;
+            free(tmp);
+            tmp = next;
+        }
     }
+    (*mod_res) = tmp;
+    print_polynom(*mod_res);
+    return code_success;
 }
  
 status_code read_from_file(const char* filename) {
@@ -346,7 +416,7 @@ status_code read_from_file(const char* filename) {
             st_act = action(cmd, summator, first, &tmp_res, point, &res_val);
             if (st_act != code_success) {
                 free(cmd);
-                cmd = NULL;
+                cmd = NULL;  
                 free(expr_bracket);
                 fclose(in);
                 destroy_polynomial(first);
@@ -822,10 +892,10 @@ status_code cmps(Polynom* F, Polynom* G, Polynom** res) {
 }
 
 
-
 status_code action(char* cmd, Polynom* first, Polynom* second, Polynom** res, double point, double* res_sol) {
     if (!cmd) return code_invalid_parameter;
     status_code st_act;
+    Polynom* tmp = NULL;
     if (!strcmp(cmd, "Add")) {
         st_act = add(first, second, res);
         if (st_act != code_success) return st_act;
@@ -833,8 +903,19 @@ status_code action(char* cmd, Polynom* first, Polynom* second, Polynom** res, do
         st_act = sub(first, second, res);
         if (st_act != code_success) return st_act;
     } else if (!strcmp(cmd, "Div")) {
-        st_act = add(first, second, res);
-        if (st_act != code_success) return st_act;
+        st_act = div_mod(first, second, res, &tmp);
+        if (st_act != code_success) {
+            destroy_polynomial(tmp);
+            return st_act;
+        }
+        destroy_polynomial(tmp);
+    } else if (!strcmp(cmd, "Mod")) {
+        st_act = div_mod(first, second, &tmp, res);
+        if (st_act != code_success) {
+            destroy_polynomial(tmp);
+            return st_act;
+        }
+        destroy_polynomial(tmp);
     } else if (!strcmp(cmd, "Mult")) {
         st_act = mult(first, second, res);
         if (st_act != code_success) return st_act;
