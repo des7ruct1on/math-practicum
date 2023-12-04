@@ -1,5 +1,5 @@
-                Sub(x^2+3x-4,x^3+2) %wow meow 
+                Sub(x^2+3x-4,x^3+2); %wow meow 
                 %
 
                  
-                Add(7-3x-x^2+x^3)
+                Add(7-3x-x^2+x^3);
