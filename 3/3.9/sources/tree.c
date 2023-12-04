@@ -133,28 +133,82 @@ status_code create_node(char* word, Node** node) {
 
 status_code get_tree_from_file(FILE* file, Node** root, List_tree** Tree_list) {
     status_code st_act;
-    char* line = NULL;
     if (*root) {
         free_tree(*root);
         *root = NULL;
     }
-    while (getline(&line, &(size_t){0}, file) != -1) {
-        int count = 0;
-        char word[STR_SIZE];
-        sscanf(line, "%d%s", &count, word);
-        printf("%d -- %s\n", count, word);
-        for (int i = 0; i < count; i++) {
-            st_act = insert(root, word);
-            if (st_act != code_success) {
-                free(line);
-                return st_act;
-            }
-            free(line);
-            line = NULL;
-        }
+    //bool is_read_word = false;
+    bool start_number_read = false;
+    bool is_read_number = false;
+    char symbol = fgetc(file);
+    int count = 0;
+    char number_str[STR_SIZE];
+    int index = 0;
+    char* word = (char*)malloc(sizeof(char) * STR_SIZE);
+    if (!word) {
+        return code_error_alloc;
     }
-    free(line);
-    line = NULL;
+    while (symbol != EOF) {
+        //printf("%c-- %d\n", symbol, index);
+        if (!is_read_number && isdigit(symbol)) {
+            number_str[index] = symbol;
+            index++;
+        }
+        if (index != 0 && !isdigit(symbol) && !is_read_number) {
+            index = 0;
+            count = atof(number_str);
+            number_str[index] = '\0';
+            is_read_number = true;
+            symbol = fgetc(file);
+            is_read_number = true;
+        }
+        if (is_read_number) {
+            if (symbol == '{') {
+                start_number_read = true;
+                symbol = fgetc(file);
+                continue;
+            }
+            if (start_number_read) {
+                if (symbol == '}') {
+                    symbol = fgetc(file);
+                    if (symbol != '\n') {
+                        //printf("%c----\n", symbol);
+                        fseek(file, -2, SEEK_CUR);
+                        symbol = fgetc(file);
+                        //printf("%c->>-\n", symbol);
+                        word[index] = symbol;
+                        index++;
+                        symbol = fgetc(file);
+                        //printf("%c-<<<>-\n", symbol);
+                        continue;
+                    }
+                    fseek(file, -1, SEEK_CUR);
+                    symbol = fgetc(file);
+                    word[index] = '\0';
+                    st_act = insert(root, word);
+                    if (st_act != code_success) {
+                        free(word);
+                        return st_act;
+                    }
+                    index = 0;
+                    free(word);
+                    word = NULL;
+                    word = (char*)malloc(sizeof(char) * STR_SIZE);
+                    if (!word) {
+                        return code_error_alloc;
+                    }
+                    start_number_read = false;
+                } else {
+                    word[index] = symbol;
+                    index++;
+                }
+            }
+        }   
+
+
+        symbol = fgetc(file);
+    }
+    if (word) free(word);
     st_act = add_nodes_to_list(*root, Tree_list);
     return st_act;
 }
@@ -363,7 +417,7 @@ int find_depth(Node* root) {
 void write_to_file(FILE* file, Node* tree, int depth) {
     if (!tree) return;
     for (int i = 0; i < depth; i++) fprintf(file, "\t");
-    fprintf(file, "%d %s\n", tree->count, tree->word);
+    fprintf(file, "%d {%s}\n", tree->count, tree->word);
     write_to_file(file, tree->left, depth + 1);
     write_to_file(file, tree->right, depth + 1);
 }
@@ -390,6 +444,7 @@ status_code read_from_file(char* argv[], int argc, Node** Tree, List_tree** Tree
                 //printf("\t%s %d\n", word, index_word);
                 index_word = 0;
                 st_act = insert(Tree, word);
+                //printf("%s--\n", word);
                 if (st_act != code_success) {
                     free(word);
                     fclose(in);
@@ -407,6 +462,20 @@ status_code read_from_file(char* argv[], int argc, Node** Tree, List_tree** Tree
         //printf("\t%c---%d\n", symbol, index_word);
         symbol = fgetc(in);
     }
+    if (index_word != 0) {
+        word[index_word] = '\0';
+                //printf("\t%s %d\n", word, index_word);
+        index_word = 0;
+        st_act = insert(Tree, word);
+        //printf("%s--\n", word);
+        if (st_act != code_success) {
+            free(word);
+            fclose(in);
+            return st_act;
+        }
+        free(word);
+        word = NULL;
+    } 
     if (word) {
         free(word);
         word = NULL;
