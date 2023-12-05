@@ -108,6 +108,7 @@ void destroy_polynomial(Polynom* list) {
     free(tmp);
 }
 
+
 status_code push_front_monom(Polynom** equation, int degree, int coef) {
     if (degree == 0 && coef == 0) return code_invalid_parameter;
     Polynom* new = (Polynom*)malloc(sizeof(Polynom));
@@ -147,8 +148,8 @@ status_code push_back_monom(Polynom** equation, int degree, int coef) {
 
 
 status_code div_mod(Polynom* first, Polynom* second, Polynom** division_res, Polynom** mod_res) {
-    print_polynom(first);
-    print_polynom(second);
+    //print_polynom(first);
+    //print_polynom(second);
     Polynom* first_copy = NULL;
     status_code st_act = add(first, NULL, &first_copy);
     if (st_act != code_success) {
@@ -156,63 +157,63 @@ status_code div_mod(Polynom* first, Polynom* second, Polynom** division_res, Pol
         return st_act;
     }
     while (first_copy->degree >= second->degree) {
+        //printf("%d -> %d\n", first_copy->degree, second->degree);
         int _coef = first_copy->coef / second->coef;
-        printf("%d--\n", _coef);
+        //printf("%d-- %d\n", _coef, first_copy->degree - second->degree);
         if (_coef == 0) {
             (*mod_res) = first_copy;
+            //printf("zxc\n");
             return code_success;
         }
 
-        Polynom* multiplier = NULL;
-        st_act = push_front_monom(&multiplier, _coef, first_copy->degree - second->degree);
+        Polynom* res_div = NULL;
+        st_act = push_front_monom(&res_div, first_copy->degree - second->degree, _coef);
         if (st_act != code_success) {
             destroy_polynomial(first_copy);
+            //printf("zxc2\n");
             return st_act;
         }
-        if ((*division_res) == NULL) {
-            st_act = push_front_monom(division_res, _coef, first_copy->degree - second->degree);
-            if (st_act != code_success) {
-                destroy_polynomial(first_copy);
-                return st_act;
-            }
-        } else {
-            st_act = push_back_monom(division_res, _coef, first_copy->degree - second->degree);
-            if (st_act != code_success) {
-                destroy_polynomial(first_copy);
-                return st_act;
-            }
+        st_act = push_monom(division_res, first_copy->degree - second->degree, _coef);
+        if (st_act != code_success) {
+            destroy_polynomial(first_copy);
+            //printf("zxc3\n");
+            return st_act;
         }
+        //printf("current div res:\n");
+        //print_polynom(*division_res);
 
-        Polynom* second_multiplier = NULL;
-        st_act = mult(multiplier, second, &second_multiplier);
+        Polynom* res_mult_divide = NULL;
+        st_act = mult(res_div, second, &res_mult_divide);
         if (st_act != code_success) {
             destroy_polynomial(first_copy);
-            destroy_polynomial(multiplier);
+            destroy_polynomial(res_div);
+            //printf("zxc4\n");
             return st_act;
         }
-
-        Polynom* first_copy_second = NULL;
-        st_act = sub(first_copy_second, second_multiplier, &first_copy);
+        //printf("2222\n");
+        Polynom* new_polynom = NULL;
+        st_act = sub(first_copy, res_mult_divide, &new_polynom);
         if (st_act != code_success) {
             destroy_polynomial(first_copy);
-            destroy_polynomial(multiplier);
-            destroy_polynomial(second_multiplier);
+            destroy_polynomial(res_div);
+            destroy_polynomial(res_mult_divide);
+            //printf("zxc5\n");
             return st_act;
         }
-        destroy_polynomial(first_copy_second);
-        destroy_polynomial(multiplier);
-        destroy_polynomial(second_multiplier);
-        if (first_copy->coef == 0) {
-            if (!first_copy->next) {
-                (*mod_res) = first_copy;
-                return code_success;
-            }
-            Polynom* addition = first_copy->next;
-            free(first_copy);
-            first_copy = NULL;
-            first_copy = addition;
+        destroy_polynomial(first_copy);
+        destroy_polynomial(res_mult_divide);
+        first_copy = new_polynom;
+        //printf("33333\n");
+        //printf("33333\n");
+        if (!first_copy) {
+            break;
         }
     }
+    //printf("33343223433\n");
+    //printf("mode:\n");
+    //print_polynom(first_copy);
+    //printf("div:\n");
+    //print_polynom(*division_res);
     (*mod_res) = first_copy;
     return code_success;
 }
@@ -946,8 +947,9 @@ status_code action(char* cmd, Polynom* first, Polynom* second, Polynom** res, do
             destroy_polynomial(tmp);
             return st_act;
         }
-        print_polynom(*res);
+        //print_polynom(*res);
         destroy_polynomial(tmp);
+        tmp = NULL;
     } else if (!strcmp(cmd, "Mod")) {
         st_act = div_mod(first, second, &tmp, res);
         if (st_act != code_success) {
@@ -955,7 +957,8 @@ status_code action(char* cmd, Polynom* first, Polynom* second, Polynom** res, do
             return st_act;
         }
         destroy_polynomial(tmp);
-        print_polynom(*res);
+        tmp = NULL;
+        //print_polynom(*res);
     } else if (!strcmp(cmd, "Mult")) {
         st_act = mult(first, second, res);
         if (st_act != code_success) return st_act;
