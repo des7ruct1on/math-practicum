@@ -150,6 +150,7 @@ status_code push_back_monom(Polynom** equation, int degree, int coef) {
 status_code div_mod(Polynom* first, Polynom* second, Polynom** division_res, Polynom** mod_res) {
     //print_polynom(first);
     //print_polynom(second);
+    if (!second) return code_invalid_parameter;
     Polynom* first_copy = NULL;
     status_code st_act = add(first, NULL, &first_copy);
     if (st_act != code_success) {
@@ -202,6 +203,7 @@ status_code div_mod(Polynom* first, Polynom* second, Polynom** division_res, Pol
         }
         destroy_polynomial(first_copy);
         destroy_polynomial(res_mult_divide);
+        destroy_polynomial(res_div);
         first_copy = new_polynom;
         //printf("33333\n");
         //printf("33333\n");
@@ -402,9 +404,11 @@ status_code read_from_file(const char* filename) {
                 cmd = NULL;
                 free(expr_bracket);
                 expr_bracket = NULL;
-                fclose(in);
+                //fclose(in);
                 destroy_polynomial(first);
                 destroy_polynomial(second);
+                destroy_polynomial(summator);
+                summator = NULL;
                 break;
             }
         } else {
@@ -412,8 +416,11 @@ status_code read_from_file(const char* filename) {
                 free(cmd);
                 cmd = NULL;
                 free(expr_bracket);
-                fclose(in);
-                //printf("kek\n");
+                expr_bracket = NULL;
+                //fclose(in);
+                destroy_polynomial(first);
+                destroy_polynomial(second);
+                destroy_polynomial(summator);
                 break;
             }
         }
@@ -461,6 +468,8 @@ status_code read_from_file(const char* filename) {
                 return code_error_alloc;
             }
         }
+        free(expr_bracket);
+        expr_bracket = NULL;
     }
     if (summator) destroy_polynomial(summator);
     if (line) free(line);

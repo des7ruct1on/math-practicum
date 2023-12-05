@@ -29,7 +29,8 @@ int main(int argc, char* argv[]) {
         printf("Your programm must start with: %s <FILE_IN>\n", argv[0]);
         return -1;
     }
-    status_code st_act = read_from_file(argv[1]);
+    const char* filename = argv[1];
+    status_code st_act = read_from_file(filename);
     print_error(st_act);
     return 0;
 }
