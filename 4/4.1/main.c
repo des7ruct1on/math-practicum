@@ -15,6 +15,18 @@ status_code process_file(const char* filename) {
         fclose(file);
         return code_error_oppening;
     }
+    char* tmp_filename = NULL;
+    tmp_filename = strdup("tmp_");
+    strcat(tmp_filename, filename);
+    if (!tmp_filename) {
+        fclose(file);
+        return code_invalid_parameter;
+    }
+    FILE* file_tmp = fopen(tmp_filename, "w");
+    if (!file) {
+        fclose(file);
+        return code_error_oppening;
+    }
     char* line = NULL;
     int read;
     Hash_table* table = NULL;
@@ -25,7 +37,6 @@ status_code process_file(const char* filename) {
         free_table(table);
         return st_act;
     }
-    int index = -1;
     while ((read = getline(&line, &(size_t){0}, file)) != -1) {
         if (read == -1) {
             free(line);
@@ -48,9 +59,13 @@ status_code process_file(const char* filename) {
             return code_error_alloc;
         }
         if (sscanf(line, "#define %s %s ", key, value) != 2) {
+            if (!strcmp(line, "\0") || !strcmp(line, "\n") || !strcmp(line, "\r\n")) {
+                fprintf(file_tmp, "%s", line);
+            }
             free(line);
             line = NULL;
-            index = ftell(file);
+            if (key) free(key);
+            if (value) free(value);
             break;
         }
         st_act = insert_table(table, key, value);
@@ -59,20 +74,90 @@ status_code process_file(const char* filename) {
             line = NULL;
             fclose(file);
             free_table(table);
-            free(key);
-            free(value);
+            if (key) free(key);
+            if (value) free(value);
             return st_act;
         }
+        fprintf(file_tmp, "%s", line);
         free(line);
         line = NULL;
-        free(key);
-        free(value);
         key = NULL;
         value = NULL;
+        printf("NOWWW\n");
+        print_table(table);
+        printf("    %d>\n", table->size);
+        printf("`~~~~~~NOWWW\n");
     }
-    print_table(table);
     free(line);
+    char c = fgetc(file);
+    int capacity = 256;
+    int index = 0;
+    char* word = (char*)malloc(sizeof(char) * capacity);
+    if (!word) {
+        fclose(file);
+        fclose(file_tmp);
+        free_table(table);
+        free(word);
+        return code_error_alloc;
+    }
+    bool word_scanned = false;
+    while (c != EOF) {
+        if (!isspace(c) && c != EOF) {
+            word[index] = c;
+            index++;
+            word_scanned = true;
+        } else {
+            if (word_scanned) {
+                word[index] = '\0';
+                index = 0;
+                char* to_replace = find_element(table, word);
+                //printf("%s--------\n", to_replace);
+                if (!to_replace) {
+                    fprintf(file_tmp, "%s", word);
+                    fprintf(file_tmp, "%c", c);
+                } else {
+                    fprintf(file_tmp, "%s", to_replace);
+                    fprintf(file_tmp, "%c", c);
+                }
+                free(word);
+                word = NULL;
+                word = (char*)malloc(sizeof(char) * capacity);
+                if (!word) {
+                    fclose(file);
+                    fclose(file_tmp);
+                    free_table(table);
+                    free(word);
+                    return code_error_alloc;
+                }
+                word_scanned = false;
+            } else {
+                fprintf(file_tmp, "%c", c);
+            }
+
+
+        }
+
+        c = fgetc(file);
+    }
+    if (word_scanned) {
+        word[index] = '\0';
+        index = 0;
+        char* to_replace = find_element(table, word);
+        //printf("%s--------\n", to_replace);
+        if (!to_replace) {
+            fprintf(file_tmp, "%s", word);
+        } else {
+            fprintf(file_tmp, "%s", to_replace);
+        }
+        free(word);
+        word = NULL;
+        word_scanned = false;
+    }
+    printf("%d size\n", table->size);
     fclose(file);
+    fclose(file_tmp);
+    free_table(table);
+    free(tmp_filename);
     return code_success;
 }
 
