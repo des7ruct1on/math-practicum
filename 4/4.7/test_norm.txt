@@ -5,3 +5,6 @@ print ccc;
 myvar=ccc;
 bg=ccc*myvar;
 print;
+bg=bg/1;
+zxc=2^5;
+print;

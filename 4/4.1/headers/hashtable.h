@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <time.h>
-#define TABLE_SIZE 5
+#define TABLE_SIZE 2
 
 typedef enum status_code {
     code_error_oppening,
@@ -32,17 +32,17 @@ typedef struct Hash_table {
 } Hash_table;
 
 unsigned long long int hash(const char* key);
-status_code create_table(Hash_table** new, int _size);
+status_code create_table(Hash_table** _new, int _size);
 bool is_prime(int number);
 int get_next_prime(int number);
-status_code create_cell(Cell** new, const char* key, const char* value);
+status_code create_cell(Cell** _new, const char* key, const char* value);
 status_code add_cell(Cell** head, Cell *item);
-status_code is_exist(bool *res, Cell* list, Cell* new);
+status_code is_exist(bool *res, Cell* list, Cell* _new);
 void free_cell(Cell* del);
 bool check_table_rebuild(Hash_table* table);
-status_code insert_table(Hash_table* table, char* key, char* value);
+status_code insert_table(Hash_table** table, char* key, char* value);
 void free_table(Hash_table* table);
-status_code resize_table(Hash_table* old, Hash_table** new);
+status_code resize_table(Hash_table** old);
 char* find_from_list(Cell* list, const char* key);
 char* find_element(Hash_table* table, const char* key);
 void print_table(Hash_table* table);

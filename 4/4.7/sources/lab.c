@@ -32,8 +32,6 @@ void free_cell(MemoryCell* cell) {
         free(cell->var);
         cell->var = NULL;
     }
-    free(cell);
-    cell = NULL;
 }
 
 void free_storage(Storage* st) {
@@ -47,6 +45,7 @@ void free_storage(Storage* st) {
         free(st->data);   
     }
     free(st);
+    st = NULL;
 }
 
 status_code create_cell(MemoryCell** cell, char* name, int val) {
@@ -71,7 +70,7 @@ int compare_cells(const void* a, const void* b) {
 
 int get_value_index(Storage* st, int index) {
     if (!st) return -1;
-    printf("index to check %d\n", index);
+    //printf("index to check %d\n", index);
     return st->data[index].value;
 }
 
@@ -96,12 +95,12 @@ status_code add_cell(Storage** st, char* name, int value) {
     int index = (*st)->size;
     MemoryCell* new = NULL;
     status_code st_act;
-    printf("suka %s\n", name);
+    //printf("suka %s\n", name);
     st_act = create_cell(&new, name, value);
     if (st_act != code_success) {
         return st_act;
     }
-    printf("        addd stroka %s\n", new->var);
+    //printf("        addd stroka %s\n", new->var);
     (*st)->data[index] = *new;
     if ((*st)->size + 1 == (*st)->capacity) {
         st_act = resize_storage(st);
@@ -116,7 +115,7 @@ status_code add_cell(Storage** st, char* name, int value) {
 }
 
 status_code edit_var(Storage* st, char* name, int new_val) {
-    printf("suka upper %s\n", name);
+    //printf("suka upper %s\n", name);
     int index = binary_search(st, name);
     if (index == -1) {
         return add_cell(&st, name, new_val);
@@ -137,7 +136,7 @@ void print_storage(Storage* st) {
 void print(Storage* st, char* name) {
     if (strcmp(name, "\0")) {
         int index = binary_search(st, name);
-        printf("%d---------------------------\n", index);
+        //printf("%d---------------------------\n", index);
         if (index == -1) {
             return;
         }
@@ -159,6 +158,8 @@ Operator get_op(char symb) {
             return POW;
         case '%':
             return MOD;    
+        case '/':
+            return DIV;  
         default:
             return INVALID;
     }
@@ -181,7 +182,7 @@ status_code process_line(char* line, Storage* st) {
 
     int size = strlen(line);
     int index = 0;  
-    printf("SIZE %d\n", size);
+    //printf("SIZE %d\n", size);
     char* cmd = (char*)malloc(sizeof(char) * size);
     if (!cmd) return code_error_alloc;
 
@@ -206,7 +207,7 @@ status_code process_line(char* line, Storage* st) {
     for (int i = 0; i < size; i++) {
         c = line[i];
         if (!isspace(c) && c != '\n' && c != '\r' && c != ';') {
-            printf("symbol %c\n", c);
+            //printf("symbol %c\n", c);
             Operator op = get_op(c);
             if (!is_read_first) {
                 if (c == '=') {
@@ -215,7 +216,7 @@ status_code process_line(char* line, Storage* st) {
                     is_read_first = true;
                 } else {
                     cmd[index] = c;
-                    printf("    cmd add %c\n", cmd[index]);
+                    //printf("    cmd add %c\n", cmd[index]);
                     index++;
                 }
             } 
@@ -223,7 +224,7 @@ status_code process_line(char* line, Storage* st) {
                 if (c == '=') continue;
                 if (op == INVALID) {
                     arg_one[index] = c;
-                    printf("zalupa %c\n", arg_one[index]);
+                    //printf("zalupa %c\n", arg_one[index]);
                     index++;
                 } else {
                     action = op;
@@ -242,7 +243,7 @@ status_code process_line(char* line, Storage* st) {
                     is_read_third = true;
                 }
             }
-            printf("    %d index\n", index);
+            //printf("    %d index\n", index);
         } else if (isspace(c) && c != '\n' && c != '\r') {
             if (!is_read_first) {
                 cmd[index] = '\0';
@@ -251,7 +252,7 @@ status_code process_line(char* line, Storage* st) {
             } 
         }
     }
-    printf("%d %d %d\n", is_read_first, is_read_second, is_read_third);
+    //printf("%d %d %d\n", is_read_first, is_read_second, is_read_third);
     if (!is_read_first) {
         cmd[index] = '\0';
         index = 0;
@@ -261,9 +262,9 @@ status_code process_line(char* line, Storage* st) {
         index = 0;
     }
     if (!is_read_third) arg_two[index] = '\0';
-    printf("command: %s %d\n", cmd, strlen(cmd));
-    printf("arg_one: %s %d\n", arg_one, strlen(arg_one));
-    printf("arg_two: %s %d\n", arg_two, strlen(arg_two));
+    //printf("command: %s %d\n", cmd, strlen(cmd));
+    //printf("arg_one: %s %d\n", arg_one, strlen(arg_one));
+    //printf("arg_two: %s %d\n", arg_two, strlen(arg_two));
     
     if (!strcmp(cmd, "print")) {
         print(st, arg_one);
@@ -272,7 +273,7 @@ status_code process_line(char* line, Storage* st) {
             int _value;
             if (is_number_str(arg_one)) {
                 _value = atof(arg_one);
-                printf("        numberrr %d\n", _value);
+                //printf("        numberrr %d\n", _value);
                 st_act = edit_var(st, cmd, _value);
                 if (st_act != code_success) {
                     free(cmd);
@@ -299,15 +300,15 @@ status_code process_line(char* line, Storage* st) {
                 }
             }
         } else {
-            printf("1111\n");
+            //printf("1111\n");
             int _value1, _value2;
-            print_storage(st);
+            //print_storage(st);
             if (is_number_str(arg_one)) {
                 _value1 = atof(arg_one);
-                printf("2222\n");
+                //printf("2222\n");
             } else {
                 int index_find = binary_search(st, arg_one);
-                printf("%d--\n", index);
+                //printf("%d--\n", index);
                 if (index_find == -1) {
                     free(cmd);
                     free(arg_one);
@@ -315,11 +316,11 @@ status_code process_line(char* line, Storage* st) {
                     return code_invalid_parameter;
                 }
                 _value1 = get_value_index(st, index_find);
-                printf("3333\n");
+                //printf("3333\n");
             }
             if (is_number_str(arg_two)) {
                 _value2 = atof(arg_two);
-                printf("4444\n");
+                //printf("4444\n");
             } else {
                 int index_find = binary_search(st, arg_two);
                 if (index_find == -1) {
@@ -329,10 +330,10 @@ status_code process_line(char* line, Storage* st) {
                     return code_invalid_parameter;
                 }
                 _value2 = get_value_index(st, index_find);
-                printf("5555\n");
+                //printf("5555\n");
             }
             int result;
-            printf("%d -- %d\n", _value1, _value2);
+            //printf("%d -- %d\n", _value1, _value2);
             st_act = solve_equation(action, _value1, _value2, &result);
             if (st_act != code_success) {
                 free(cmd);
@@ -340,7 +341,7 @@ status_code process_line(char* line, Storage* st) {
                 free(arg_two);
                 return st_act;
             }
-            printf("6666\n");
+            //printf("6666\n");
             printf("Result: %d\n", result);
             st_act = edit_var(st, cmd, result);
             if (st_act != code_success) {
@@ -358,7 +359,7 @@ status_code process_line(char* line, Storage* st) {
 }
 
 status_code solve_equation(Operator op, int a, int b, int* result) {
-    if (op == DIV && b == 0) {
+    if ((op == DIV || op == MOD) && b == 0) {
         return code_invalid_parameter;
     }
     if (op == PLUS) {
@@ -370,6 +371,7 @@ status_code solve_equation(Operator op, int a, int b, int* result) {
     } else if (op == DIV) {
         *result = a / b;
     } else if (op == POW) {
+        if (a == 0 && b == 0) return code_invalid_parameter;
         *result = pow(a, b);
     } else if (op == MOD) {
         *result = a % b;

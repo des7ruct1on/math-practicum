@@ -68,7 +68,7 @@ status_code process_file(const char* filename) {
             if (value) free(value);
             break;
         }
-        st_act = insert_table(table, key, value);
+        st_act = insert_table(&table, key, value);
         if (st_act != code_success) {
             free(line);
             line = NULL;
@@ -83,10 +83,10 @@ status_code process_file(const char* filename) {
         line = NULL;
         key = NULL;
         value = NULL;
-        printf("NOWWW\n");
-        print_table(table);
-        printf("    %d>\n", table->size);
-        printf("`~~~~~~NOWWW\n");
+        //printf("NOWWW\n");
+        //print_table(table);
+        //printf("    %d>\n", table->size);
+        //printf("`~~~~~~NOWWW\n");
     }
     free(line);
     char c = fgetc(file);
@@ -153,7 +153,13 @@ status_code process_file(const char* filename) {
         word = NULL;
         word_scanned = false;
     }
-    printf("%d size\n", table->size);
+    if (word) free(word);
+    if (rename(tmp_filename, filename)) {
+        fclose(file);
+        fclose(file_tmp);
+        free_table(table);
+        return code_error_oppening;
+    }
     fclose(file);
     fclose(file_tmp);
     free_table(table);

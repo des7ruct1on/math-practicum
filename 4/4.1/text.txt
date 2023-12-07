@@ -8,8 +8,8 @@
 #define registry svadba
 #define nikto kto-to
 #define outside tradicii
-#define number chislo
-#define bride most
+#define number chiselki
+#define bride kok
 #define survived konfffettttii
 #define to super-happy
 #define survived para

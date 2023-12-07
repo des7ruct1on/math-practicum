@@ -28,7 +28,7 @@ status_code process_file(const char* filename) {
             free(line);
             return code_error_alloc;
         }
-        printf("line: %s\n", line);
+        //printf("line: %s\n", line);
         st_act = process_line(line, st);
         if (st_act != code_success) {
             free(line);

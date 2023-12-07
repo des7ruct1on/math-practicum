@@ -40,26 +40,24 @@ status_code create_table(Hash_table** new, int _size) {
     return code_success;
 }
 
-bool is_prime(int number) {
-    if (number == 1 || number == 0) {
-        return false;
+bool is_prime(const int num) {
+    if (!num || num == 1) return false;
+    if (num == 2) return true;
+    if (!(num & 1)) return false;
+    for (int i = 3; i * i <= num; i += 2) 
+    {
+        if (!(num % i)) return false;
     }
-    for (int i = 1; i < (int)sqrt(number) + 1; i++) {
-        if (number % i == 0) {
-            return true;
-        }
-    }
-    return false;
+    return true;
 }
 
-int get_next_prime(int number) {
-    if (number % 2 == 0) {
-        number++;
-    }
+int get_next_prime(int num) {
+    if (!num || num == 1) return 2;
+    if (!(num & 1)) return ++num;
     do {
-        number += 2;
-    } while (!is_prime(number));
-    return number;
+        num += 2;
+    } while (!is_prime(num));
+    return num;
 }
 
 int size_list(Cell* list) {
@@ -112,6 +110,7 @@ status_code add_cell(Cell** head, Cell* item) {
 }
 
 status_code is_exist(bool *res, Cell* list, Cell* new) {
+    //printf("    %s stroka\n", new->define);
     if (!new) return code_invalid_parameter;
     if (!list) {
         *res = false;
@@ -120,20 +119,23 @@ status_code is_exist(bool *res, Cell* list, Cell* new) {
     Cell* cur = list;
     char* cur_key = cur->define;
     char* cur_value = cur->value;
+    //printf("%d\n", size_list(cur));
     while (cur != NULL) {
         cur_key = cur->define;
+        //printf("str %s %s %d\n", cur_key, new->define, strcmp(cur_key, new->define));
         if (!strcmp(cur_key, new->define)) {
-            free(cur->define);
-            cur->define = NULL;
-            cur->define = strdup(new->define);
-            if (!cur->define) return code_error_alloc;
+            free(cur->value);
+            cur->value = NULL;
+            cur->value = strdup(new->value);
+            if (!cur->value) return code_error_alloc;
             *res = true;
+            //printf("\t%s\n", cur->value);
+            return code_success;
         }
         cur = cur->next;
 
     }
     *res = false;
-    printf("%d wwwwwwwwwwww\n", *res);
     return code_success;
 }
 
@@ -151,6 +153,7 @@ void free_cell(Cell* del) {
         cur = NULL;
         cur = to_del;
     }
+
 }
 
 bool check_table_rebuild(Hash_table* table) {
@@ -158,7 +161,7 @@ bool check_table_rebuild(Hash_table* table) {
     int max = -1;
     int tmp_size = 0;
     for (int i = 0; i < table->size; i++) {
-        print_list(table->cells[i]);
+        //print_list(table->cells[i]);
         if (table->cells[i] != NULL) {
             tmp_size = size_list(table->cells[i]);
             if (tmp_size> max) {
@@ -174,11 +177,7 @@ bool check_table_rebuild(Hash_table* table) {
 }
 
 
-status_code insert_table(Hash_table* table, char* key, char* value) {
-    printf("--!!!!!!!!!!----\n");
-    print_table(table);
-    printf("-!!!!!!!!!!-\n");
-    printf("    key: %s value: %s\n", key, value);
+status_code insert_table(Hash_table** table, char* key, char* value) {
     Cell* to_add = NULL;
     status_code st_act;
     st_act = create_cell(&to_add, key, value);
@@ -186,64 +185,34 @@ status_code insert_table(Hash_table* table, char* key, char* value) {
         free(to_add);
         return st_act;
     }
-    printf("kkk %d\n", table->size);
-    unsigned long long int index = hash(key) % table->size;
-    printf("\thash %ld--\n", index);
+    unsigned long long int index = hash(key) % (*table)->size;
     bool exist;
-    st_act = is_exist(&exist, table->cells[index], to_add);
+    st_act = is_exist(&exist, (*table)->cells[index], to_add);
     if (st_act != code_success) {
         free_cell(to_add);
         return st_act;
     }
     to_add->key = index;
-    printf("------\n");
-    printf("found = %d\n", exist);
     if (!exist) {
-        //if (!table->cells[index]) table->size++;
-        printf("hueta %s %s\n", to_add->define, to_add->value);
-        st_act = add_cell(&table->cells[index], to_add);
+        st_act = add_cell(&(*table)->cells[index], to_add);
         if (st_act != code_success) {
-            //printf("kek\n");
             free_cell(to_add);
-            //table->size--;
             return st_act;
         }
-        printf("size list: %d\n", size_list(table->cells[index]));
-        printf("--fdsfdsdf----\n");
         free(key);
         key = NULL;
         free(value);
         value = NULL;
-        printf("--zzzz----\n");
-        printf("razmer %d\n", table->size);
-        //print_list(table->cells[index]);
-        //print_table(table);
-        //printf("size: %d\n", size_list(table->cells[index]));
-        //printf("%d<><><>\n", table->cells[index] == NULL);
-        //printf("here\n");
-        if (check_table_rebuild(table)) {
-            printf("wow\n");
-            printf("before\n");
-            print_table(table);
-            printf("-before\n");
-            Hash_table* new_table = NULL;
-            st_act = resize_table(table, &new_table);
+        free_cell(to_add);
+        if (check_table_rebuild(*table)) {
+            st_act = resize_table(table);
             if (st_act != code_success) {
                 free_cell(to_add);
                 return st_act;
             }
-            free_table(table);
-            table = new_table;
-            printf("after\n");
-            print_table(table);
-            printf("-after\n");
-            printf("%d---cur_size\n", table->size);
         }
     }
-    printf("after\n");
-    print_table(table);
-    printf("-after\n");
-    printf("%d---cur_size\n", table->size);
+
     return code_success;
 }
 
@@ -263,37 +232,42 @@ void print_table(Hash_table* table) {
         Cell* cur = table->cells[i];
         if (table->cells[i]) {
             printf("hash: %d\n", i);
+            printf("%d--\n", size_list(table->cells[i]));
             print_list(table->cells[i]);
         }
 
     }
 }
 
-status_code resize_table(Hash_table* old, Hash_table** new) {
-    int new_size = get_next_prime(old->size);
-    printf("next number: %d\n", new_size);
+status_code resize_table(Hash_table** old) {
+    int new_size = get_next_prime((*old)->size);
+    //printf("next number: %d\n", new_size);
     status_code st_act;
-    st_act = create_table(new, new_size);
+    Hash_table* new = NULL;
+    st_act = create_table(&new, new_size);
     if (st_act != code_success) return st_act;
 
-    for (int i = 0; i < old->size; i++) {
-        if (old->cells[i]) {
-            while (old->cells[i]) {
-                char* _define = strdup(old->cells[i]->define);
-                char* _value = strdup(old->cells[i]->value);
-                st_act = insert_table((*new), _define, _value);
+    for (int i = 0; i < (*old)->size; i++) {
+        if ((*old)->cells[i]) {
+            while ((*old)->cells[i]) {
+                char* _define = strdup((*old)->cells[i]->define);
+                char* _value = strdup((*old)->cells[i]->value);
+                st_act = insert_table(&new, _define, _value);
                 if (st_act != code_success) {
-                    free_table(*new);
+                    free_table(new);
                     free(_define);
                     free(_value);
                 }
-                old->cells[i] = old->cells[i]->next;
+                (*old)->cells[i] = (*old)->cells[i]->next;
             }
         }
     }
-    printf("======================================\n");
-    print_table(*new);
-    printf("======================================\n");
+   // printf("======================================\n");
+    //print_table(new);
+    //printf("======================================\n");
+    free_table(*old);
+    *old = NULL;
+    *old = new;
     return code_success;
 }
 
