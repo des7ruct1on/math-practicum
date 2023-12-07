@@ -1,5 +1,5 @@
-#ifndef lab_h
-#define lab_h
+#ifndef hashtable_h
+#define hashtable_h
 
 #include <stdio.h>
 #include <stdarg.h>
