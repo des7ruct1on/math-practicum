@@ -243,13 +243,14 @@ status_code read_from_file(const char* filename) {
             fclose(in);
             return code_error_alloc;
         }
+        //printf("%s\n", line);
         if (!strcmp(line, "\n") || !strcmp(line, "\r\n")) {
             //printf("111\n");
             free(line);
             line = NULL;
             continue;
         }
-       // printf("%s\n", line);
+        //printf("%s\n", line);
         index = 0;
         symbol = line[index];
         while (isspace(symbol)) {
@@ -262,7 +263,9 @@ status_code read_from_file(const char* filename) {
             index = 0;
             continue;
         }
+        //printf("%s\n", line);
         if (symbol == '[' || is_long_comment) {
+            //printf("\t1\n");
             is_long_comment = true;
             while (is_long_comment) {
                 symbol = line[index];
@@ -279,6 +282,7 @@ status_code read_from_file(const char* filename) {
                 }
             }
         }
+        //printf("%s\n", line);
         if (is_long_comment) {
             free(line);
             line = NULL;
@@ -286,10 +290,12 @@ status_code read_from_file(const char* filename) {
             index = 0;
             continue;
         }
+        //printf("%s\n", line);
         while (isspace(symbol)) {
             symbol = line[index];
             if (isspace(symbol)) index++;
         }
+        //printf("%s\n", line);
         int index_cmd = 0;
         while(isalpha(symbol)) {
             symbol = line[index];
@@ -304,6 +310,7 @@ status_code read_from_file(const char* filename) {
         //printf("    cmd: %s\n", cmd);
         //printf("    cmd: %s\n", cmd);
         //printf("    cmd: %s\n", cmd);
+        //printf("%s\n", line);
         if (cmd[0] == '\0' && symbol == '%') {
             //printf("yes\n");
             free(line);
@@ -317,9 +324,11 @@ status_code read_from_file(const char* filename) {
             }
             continue;
         }
+        //printf("%s\n", line);
         //printf("<<%d??\n", is_long_comment);
         index_cmd = 0;
         char* expr_bracket = (char*)malloc(sizeof(char) * 256);
+        //printf("9988888\n");
         if (!expr_bracket) {
             free(line);
             free(cmd);
@@ -328,7 +337,9 @@ status_code read_from_file(const char* filename) {
             fclose(in);
             return code_invalid_parameter;
         }
+        //printf("9\n");
         if (symbol != '(') {
+            //printf("\t1\n");
             if (symbol == '%') {
                 free(line);
                 free(cmd);
@@ -340,6 +351,7 @@ status_code read_from_file(const char* filename) {
                 return code_invalid_parameter;
             }
             if (symbol == '[') {
+                //printf("\t1\n");
                 is_long_comment = true;
                 while (is_long_comment) {
                     symbol = line[index];
@@ -358,8 +370,9 @@ status_code read_from_file(const char* filename) {
         if (symbol == '(') {
             while (true) {
                 symbol = line[index];
+                //printf("symbol suka %c %d\n", symbol, toascii(symbol));
                 index++;
-                if (symbol == '\n' || isspace(symbol) || symbol == '%') {
+                if (symbol == '\n' || isspace(symbol) || symbol == '%' || symbol == '\0') {
                     expr_bracket[index_cmd] = '\0';
                     break;
                 }
@@ -394,6 +407,7 @@ status_code read_from_file(const char* filename) {
         Polynom* second = NULL;
         double point;
         double res_val;
+        //printf("8fsdfsdfsd\n");
         if (strcmp(cmd, "Eval")) {
             //printf("8\n");
             //printf("kek\n");
@@ -412,6 +426,7 @@ status_code read_from_file(const char* filename) {
                 break;
             }
         } else {
+            //printf("%s woowowo\n", expr_bracket);
             if (sscanf(expr_bracket, "(%lf)", &point) != 1) {
                 free(cmd);
                 cmd = NULL;
@@ -491,10 +506,12 @@ status_code create_polynomial(Polynom** first, Polynom** second, char* expressio
     //printf("%s %d\n", expression, size);
     //printf("8.1\n");
     //printf("%c - %c\n", expression[0], expression[size - 1]);
-    if (expression[0] != '(' || expression[size - 2] != ')' || expression[size - 1] != ';') {
+    if (expression[0] != '(' || expression[size - 2] != ')') {
         return code_invalid_parameter;
     }
     //printf("8.2\n");
+    char* check_end = strchr(expression, ';');
+    if (!check_end) return code_invalid_parameter;
     char symbol;
     bool is_read_coef = false;
     bool is_read_letter = false;
@@ -510,6 +527,9 @@ status_code create_polynomial(Polynom** first, Polynom** second, char* expressio
     int tmp_index = 0;
     for (int i = 1; i < size - 2; i++) {
         symbol = expression[i];
+        if (isspace(symbol)) {
+            continue;
+        }
         //printf("    symbol: %c\n", symbol);
         if (symbol == ',') {
             is_second_pol = true;
