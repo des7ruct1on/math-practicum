@@ -6,7 +6,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <limits.h>
-#include "headers/tree.h"
+#include "headers/lab.h"
 
 void print_menu() {
     printf("\n");
@@ -25,8 +25,66 @@ void print_menu() {
     printf("\n");
 }
 
-int main(int argc, char* argv[]) {
+status_code get_line(char** arg) {
+    int index = 0;
+    (*arg) = (char*)malloc(sizeof(char) * STR_SIZE);
+    if (!(*arg)) return code_error_alloc;
+    char symbol = getchar();
+    //printf("%d--", toascii(symbol));
+    while (symbol != '\n') {
+        (*arg)[index++] = symbol;
+        symbol = getchar();
+        //printf("%d--", toascii(symbol));
+    }
+    (*arg)[index] = '\0';
+    return code_success;
+}
 
-    
+void print_storage(Array** st, int capacity) {
+    for (int i = 0; i < capacity; i++) {
+        printf("%c\n", st[i]->name);
+        print(st[i], st[i]->name, "all");
+    }
+}
+
+int main(int argc, char* argv[]) {
+    status_cmd st_cmd;
+    status_code st_act;
+    Array** storage = NULL;
+    storage = (Array**)malloc(sizeof(Array) * 32);
+    int capacity = 0;
+    while (true) {
+        print_menu();
+        char* choose = NULL;
+        st_act = get_line(&choose);
+        if (st_act == code_error_alloc) {
+            printf("Error alloc detected!!!\n");
+            break;
+        }
+        printf("%s0---\n", choose);
+        st_cmd = command(choose, storage, &capacity);
+        //print_storage(storage, capacity);
+        switch (st_cmd) {
+            case cmd_error_alloc:
+                printf("Error alloc detected!!!\n");
+                break;
+            case cmd_error_oppening:
+                printf("Can`t open file!!!\n");
+                break;
+            case cmd_exit:
+                break;
+            case cmd_invalid_parameter:
+                printf("Invalid parameter detected!!!\n");
+                break;
+            default:
+                break;
+        }
+        free(choose);
+        choose = NULL;
+        if (st_cmd != cmd_success && st_cmd != cmd_invalid_parameter) {
+            break;
+        }
+    }    
+    free_storage(storage, capacity);
     return 0;
 }

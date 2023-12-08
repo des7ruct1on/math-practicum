@@ -11,6 +11,8 @@ status_code create_array(Array** ar, char c) {
         free(*ar);
         return code_error_alloc;
     }
+    //printf("zdesssssaaaqqq\n");
+    return code_success;
 }
 
 status_code add_to_array(Array** arr, char c, int number) {
@@ -37,20 +39,26 @@ status_code add_to_array(Array** arr, char c, int number) {
 
 status_code remove_from_array(Array* arr, int index, int count) {
     if (count <= 0 || index > arr->size) return code_invalid_parameter;
-
+    int size = arr->size;
     int count_deleted = 0;
-    int _index = index;
-    while (_index + count < arr->size) {
-        arr->data[_index] = arr->data[_index + count];
-        _index++;
-        count_deleted++;
+    for (int i = index; i < size; i++) {
+        if (i + count < size) {
+            //printf("here\n");
+            arr->data[i] = arr->data[i + count];
+        }
     }
-    int* tmp = realloc(arr->data, sizeof(int) * _index);
+    int* tmp = NULL;
+    if (count < size) {
+        tmp = realloc(arr->data, sizeof(int) * (size - count));
+        arr->size -= count;
+    } else {
+        tmp = realloc(arr->data, sizeof(int) * index);
+        arr->size = index;
+    }
     if (!tmp) {
         return code_error_alloc;
     } else {
         arr->data = tmp;
-        arr->size -= count_deleted;
     }
     return code_success;
 }
@@ -64,6 +72,7 @@ status_code save_array(Array* arr, const char* filename) {
     for (int i = 0; i < arr->size; i++) {
         fprintf(file, "%d ", arr->data[i]);
     }
+    fclose(file);
     return code_success;
 }
 
@@ -76,6 +85,7 @@ void free_array(Array* arr) {
 status_code load_array(Array** arr, char name, const char* filename) {
     status_code st_act;
     if (!(*arr)) {
+        //printf("blyaha muha\n");
         st_act = create_array(arr, name);
         if (st_act != code_success) return st_act;
     }
@@ -83,15 +93,17 @@ status_code load_array(Array** arr, char name, const char* filename) {
     if (!file) {
         return code_error_oppening;
     }
-    
+    //printf("otkril\n");
     int number;
-    while (fscanf(file, "%d", &number)) {
-        st_act = add_to_array(*arr, name, number);
+    while (fscanf(file, "%d", &number) == 1) {
+        //printf("%d>>>\n", number);
+        st_act = add_to_array(arr, name, number);
         if (st_act != code_success) {
             free_array(*arr);
             return st_act;
         }
     }
+    fclose(file);
     return code_success;
 }
 
@@ -100,7 +112,7 @@ status_code concat_arrays(Array* a, Array* b) {
     int size = b->size;
     status_code st_act;
     for (int i = 0; i < size; i++) {
-        st_act = add_to_array(a, a->name, b->data[i]);
+        st_act = add_to_array(&a, a->name, b->data[i]);
         if (st_act != code_success) {
             free_array(a);
             free_array(b);
@@ -114,6 +126,7 @@ void stats_array(Array* a) {
     if (!a) return;
     printf("Array %c\n", a->name);
     printf("Size: %d\n", a->size);
+    if (a->size == 0) return;
     int size = a->size;
     int max_count = 0;
     int most_common = a->data[0];
@@ -163,37 +176,37 @@ void stats_array(Array* a) {
     printf("\n");
 }
 
-Array* find_array(Array* storage, int size, char name) {
+Array* find_array(Array** storage, int size, char name) {
     if (!storage) return NULL;
     int left = 0;
     int right = size - 1;
     while (left <= right) {
         int middle = (left + right) / 2;
-        char cur = storage[middle].name; 
+        char cur = storage[middle]->name; 
         if (cur < name) {
             left = middle + 1;
         } else if (cur > name) {
             right = middle - 1;
         } else {
-            return &storage[middle];
+            return storage[middle];
         }
     }
     return NULL;
 }
 
-status_code Free(Array** arr) {
-    if (!(*arr)) return code_success;
-    char _name = (*arr)->name;
-    free_array(*arr);
-    status_code st_act;
-    st_act = create_array(arr, _name);
-    if (st_act != code_success) return st_act;
+status_code Free(Array* arr) {
+    if (!arr) return code_success;
+    free(arr->data);
+    arr->data = (int*)malloc(sizeof(int) * 256);
+    if (!arr->data) return code_error_alloc;
+    arr->size = 0;
     return code_success;
 }
 
-void print(Array* arr, char* mode) {
+void print(Array* arr, char name, char* mode) {
     if (!arr) return;
     if (!strcmp(mode, "all")) {
+        //printf("pechataem vse\n");
         for (int i = 0; i < arr->size; i++) {
             printf("%d ", arr->data[i]);
         }
@@ -203,12 +216,14 @@ void print(Array* arr, char* mode) {
         int read = sscanf(mode, "%d %d", &left, &right);
         if (read != 2) {
             int read = sscanf(mode, "%d", &left);
+            //printf("chisla: %d\n", left);
             if (read != 1) return;
             printf("%d ", arr->data[left]);
         } else {
-            if (left < right || left > arr->size || right > arr->size) {
+            if (left > right || left > arr->size || right > arr->size) {
                 return;
             }
+            //printf("chisla: %d %d\n", left, right);
             for (int i = left; i <= right; i++) {
                 printf("%d ", arr->data[i]);
             }
@@ -218,14 +233,15 @@ void print(Array* arr, char* mode) {
 }
 
 status_code copy_arrays(Array* a, Array** b, int start, int end) {
-    if (*b) return code_invalid_parameter;
+    status_code st_act;
+    if (!(*b)) return code_invalid_parameter;
     if (start > a->size) return code_invalid_parameter;
     int upper_bound = fmin(end, a->size);
-    status_code st_act;
-    for (int i = 0; i < upper_bound; i++) {
+    for (int i = start; i < upper_bound; i++) {
         st_act = add_to_array(b, (*b)->name, a->data[i]);
         if (st_act != code_success) return st_act;
     }
+    return code_success;
 }
 
 int compare_ascending(const void* a, const void* b) {
@@ -268,12 +284,13 @@ status_code rand_fill_array(Array** arr, char name, char* arg) {
     return code_success;
 }
 
-void free_storage(Array* st, int size) {
+void free_storage(Array** st, int size) {
     if (!st) return;
 
     for (int i = 0; i < size; i++) {
-        free_array(&st[i]);
+        free_array(st[i]);
     }
+    free(st);
 }
 
 void sort(Array* a, char mode) {
@@ -310,18 +327,15 @@ void add_to_storage(Array** st, Array* a, int* capacity) {
     }
 }
 
-
-void free_storage(Array** st, int* capacity) {
-    for (int i = 0; i < *capacity; i++) {
-        free_array(st[i]);
-    }
-    free(*st);
-}
-
-status_cmd command(char* input, Array* storage, int* size_storage) {
+status_cmd command(char* input, Array** storage, int* size_storage) {
     if (!input || !strcmp(input, "\0")) return cmd_invalid_parameter;
-
+    char* check = strchr(input, ';');
+    if (check == NULL) {
+        return code_invalid_parameter;
+    }
+    //printf("size storage: %d\n", *size_storage);
     int size = strlen(input);
+    //printf("\t%s, size = %d\n", input, size);
     int index = 0;
     char* cmd = (char*)malloc(sizeof(char) * size);
     if (!cmd) return cmd_error_alloc;
@@ -334,6 +348,7 @@ status_cmd command(char* input, Array* storage, int* size_storage) {
     bool is_read_cmd = false;
     for (int i = 0; i < size; i++) {
         char symb = input[i];
+        //printf("dymb %c %d %d\n", symb, is_read_cmd, index);
         if (!isspace(symb)) {
             if (symb == ',' || symb == ';') continue;
             if (!is_read_cmd) {
@@ -345,14 +360,14 @@ status_cmd command(char* input, Array* storage, int* size_storage) {
             }
         }
         if (isspace(symb)) {
+            if (is_read_cmd) {
+                arg[index] = symb;
+                index++;
+            }
             if (index != 0 && !is_read_cmd) {
                 cmd[index] = '\0';
                 index = 0;
                 is_read_cmd = true;
-            }
-            if (is_read_cmd) {
-                arg[index] = symb;
-                index++;
             }
         }
     }
@@ -368,6 +383,7 @@ status_cmd command(char* input, Array* storage, int* size_storage) {
     int size_arg = strlen(arg);
     Array* tmp = NULL;
     bool need_to_add = false;
+    //printf("%s\n %s\n", cmd, arg);
     if (!strcmp(cmd, "Load")) 
     {
         char* filename = (char*)malloc(sizeof(char) * size);
@@ -376,25 +392,35 @@ status_cmd command(char* input, Array* storage, int* size_storage) {
             free(arg);
             return cmd_error_alloc;
         }
+        //printf("zdes\n");
         name_array_first = arg[0];
         for (int i = 2; i < size_arg; i++) {
             filename[index] = arg[i];
             index++;
         }
         filename[index] = '\0';
+        //printf("%s file\n", filename);
         index = 0;
         tmp = find_array(storage, *size_storage, name_array_first);
         if (tmp == NULL) need_to_add = true;
+        //printf("zdesfdsasdf\n");
         st_act = load_array(&tmp, name_array_first, filename);
         if (st_act != code_success) {
+            //printf("su4ara\n");
             free(filename);
             free(cmd);
             free(arg);
-            return cmd_invalid_parameter;
+            if (st_act == code_error_oppening) {
+                return cmd_error_oppening;
+            } else {
+                return cmd_invalid_parameter;
+            }
         }
         free(filename);
+        //printf("zaebis dobavlenie\n");
+        //stats_array(tmp);
         if (need_to_add) {
-            add_to_storage(&storage, tmp, *size_storage);
+            add_to_storage(storage, tmp, size_storage);
         }
     } 
     else if (!strcmp(cmd, "Save")) 
@@ -413,12 +439,16 @@ status_cmd command(char* input, Array* storage, int* size_storage) {
         filename[index] = '\0';
         index = 0;
         tmp = find_array(storage, *size_storage, name_array_first);
-        st_act = save_array(&tmp, name_array_first, filename);
+        st_act = save_array(tmp, filename);
         if (st_act != code_success) {
             free(filename);
             free(cmd);
             free(arg);
-            return cmd_invalid_parameter;
+            if (st_act == code_error_oppening) {
+                return cmd_error_oppening;
+            } else {
+                return cmd_invalid_parameter;
+            }
         }
         free(filename);
     } 
@@ -439,7 +469,7 @@ status_cmd command(char* input, Array* storage, int* size_storage) {
         index = 0;
         tmp = find_array(storage, *size_storage, name_array_first);
         if (tmp == NULL) need_to_add = true;
-        st_act = rand_fill_array(tmp, name_array_first, arg_two);
+        st_act = rand_fill_array(&tmp, name_array_first, arg_two);
         if (st_act != code_success) {
             free(arg_two);
             free(cmd);
@@ -448,12 +478,12 @@ status_cmd command(char* input, Array* storage, int* size_storage) {
         }
         free(arg_two);
         if (need_to_add) {
-            add_to_storage(&storage, tmp, *size_storage);
+            add_to_storage(storage, tmp, size_storage);
         }
     } 
     else if (!strcmp(cmd, "Concat")) 
     {
-        int read = sscanf(arg, "%c %c", name_array_first, name_array_second);
+        int read = sscanf(arg, "%c %c", &name_array_first, &name_array_second);
         if (read != 2) {
             free(cmd);
             free(arg);
@@ -469,12 +499,14 @@ status_cmd command(char* input, Array* storage, int* size_storage) {
             return cmd_invalid_parameter;
         }
     } 
-    else if (!strcmp(cmd, "Free")) 
+    else if (!strncmp(cmd, "Free", 4)) 
     {
         int size_cmd = strlen(cmd);
-        name_array_first = cmd[-2];
+        printf("----%s\n", cmd);
+        name_array_first = cmd[5];
+        printf("bukva %c\n", name_array_first);
         tmp = find_array(storage, *size_storage, name_array_first);
-        st_act = Free(&tmp);
+        st_act = Free(tmp);
         if (st_act != code_success) {
             free(cmd);
             free(arg);
@@ -530,13 +562,15 @@ status_cmd command(char* input, Array* storage, int* size_storage) {
         arg_two[index] = '\0';
         index = 0;
         int index_rem_st, index_rem_end;
-        int read = sscanf(arg_two, "%d %d %c", &index_rem_st, &index_rem_end, name_array_second);
-        if (read != 2) {
+        printf("doshel\n");
+        int read = sscanf(arg_two, "%d %d %c", &index_rem_st, &index_rem_end, &name_array_second);
+        if (read != 3) {
             free(cmd);
             free(arg);
             free(arg_two);
             return cmd_invalid_parameter;
         }
+        printf("doshel2\n");
         tmp = find_array(storage, *size_storage, name_array_first);
         Array* tmp2 = NULL;
         tmp2 = find_array(storage, *size_storage, name_array_second);
@@ -550,7 +584,7 @@ status_cmd command(char* input, Array* storage, int* size_storage) {
         }
         free(arg_two);
         if (need_to_add) {
-            add_to_storage(&storage, tmp2, *size_storage);
+            add_to_storage(storage, tmp2, size_storage);
         }
     } 
     else if (!strcmp(cmd, "Sort")) 
@@ -573,9 +607,22 @@ status_cmd command(char* input, Array* storage, int* size_storage) {
     } 
     else if (!strcmp(cmd, "Print")) 
     {
+        
         name_array_first = arg[0];
         tmp = find_array(storage, *size_storage, name_array_first);
-        print(tmp, arg);
+        char* arg_two = (char*)malloc(sizeof(char) * size);
+        if (!arg_two) {
+            free(cmd);
+            free(arg);
+            return cmd_error_alloc;
+        }
+        for (int i = 2; i < size_arg; i++) {
+            arg_two[index] = arg[i];
+            index++;
+        }
+        arg_two[index] = '\0';
+        print(tmp, name_array_first, arg_two);
+        free(arg_two);
     } 
     else if (!strcmp(cmd, "Exit")) 
     {
@@ -585,5 +632,5 @@ status_cmd command(char* input, Array* storage, int* size_storage) {
     } 
     free(cmd);
     free(arg);
-    return cmd_invalid_parameter;
+    return cmd_success;
 }
