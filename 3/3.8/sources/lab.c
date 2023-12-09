@@ -621,20 +621,7 @@ status_code create_polynomial(Polynom** first, Polynom** second, char* expressio
             is_read_coef = false;
             is_read_letter = false;
         }
-        /*
-        printf("+++++++++++++++first+++++++++++++++++\n");
-        print_polynom(*first);
-        printf("+++++++++++++++++++++++++++++++++++++\n");
-        printf("+++++++++++++++second++++++++++++++++\n");
-        print_polynom(*second);
-        printf("+++++++++++++++++++++++++++++++++++++\n");
-        */
-        
-        
     }
-    //print_polynom(*first);
-    //print_polynom(*second);
-    //printf("woow\n");
     return code_success;
 }
 

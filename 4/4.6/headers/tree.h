@@ -26,31 +26,31 @@ typedef struct Tree {
     struct Tree* right;
 } Tree;
 
-typedef struct stack_node_char {
-    char data;
-    struct stack_node_char* next;
-} stack_node_char;
+typedef struct stack_node {
+    void* data;
+    struct stack_node* next;
+} stack_node;
 
-typedef struct Stack_char {
-    stack_node_char* top;
+typedef struct Stack {
+    stack_node* top;
     int size;
-} Stack_char;
+} Stack;
 
 
 status_code create_tree(Tree** tree, char value);
 status_code insert_tree(Tree** tree, char value);
 void free_tree(Tree* tree);
-status_code create_stack(Stack_char** stack);
-bool is_empty_stack(Stack_char* st);
-int size_stack(Stack_char* st);
-char top_stack(Stack_char* st);
-char pop_stack(Stack_char* st);
-status_code push_stack(Stack_char* st, char _data);
-void free_stack(Stack_char* st);
 bool is_operator(char c);
 int get_priority(char c);
 int op_assoc(char op);
 status_code to_pol_expression(char* expression, char** pol_expression);
 double binary_pow(double base, int power);
+status_code create_stack(Stack** stack);
+bool is_empty_stack(Stack* st);
+int size_stack(Stack* st);
+void* top_stack(Stack* st);
+void* pop_stack(Stack* st);
+status_code push_stack(Stack* st, void* _data);
+void free_stack(Stack* st);
 status_code compute(char* postfix, long long* res);
 #endif
