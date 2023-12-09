@@ -27,7 +27,7 @@ typedef struct Tree {
 } Tree;
 
 typedef struct stack_node {
-    void* data;
+    char data;
     struct stack_node* next;
 } stack_node;
 
@@ -35,6 +35,16 @@ typedef struct Stack {
     stack_node* top;
     int size;
 } Stack;
+
+typedef struct stack_node_tree {
+    Tree* data;
+    struct stack_node_tree* next;
+} stack_node_tree;
+
+typedef struct Stack_tree {
+    stack_node_tree* top;
+    int size;
+} Stack_tree;
 
 
 status_code create_tree(Tree** tree, char value);
@@ -48,9 +58,20 @@ double binary_pow(double base, int power);
 status_code create_stack(Stack** stack);
 bool is_empty_stack(Stack* st);
 int size_stack(Stack* st);
-void* top_stack(Stack* st);
-void* pop_stack(Stack* st);
-status_code push_stack(Stack* st, void* _data);
+char top_stack(Stack* st);
+char pop_stack(Stack* st);
+status_code push_stack(Stack* st, char _data);
 void free_stack(Stack* st);
+status_code create_stack_tree(Stack_tree** stack);
+bool is_empty_stack_tree(Stack_tree* st);
+int size_stack_tree(Stack_tree* st);
+Tree* top_stack_tree(Stack_tree* st);
+Tree* pop_stack_tree(Stack_tree* st);
+status_code push_stack_tree(Stack_tree* st, Tree* _data);
+void free_stack_tree(Stack_tree* st);
+status_code create_arifmh_tree(Tree** tree, char* postfix);
 status_code compute(char* postfix, long long* res);
+void print_tree(Tree* root, int level);
+void print_error(status_code st);
+status_code truth_table(const char *filename);
 #endif
