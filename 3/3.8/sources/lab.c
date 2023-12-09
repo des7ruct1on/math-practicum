@@ -5,7 +5,7 @@ int compare_monoms(Polynom* a, Polynom* b) {
 }
 
 status_code push_monom(Polynom** equation, int _degree, int _coef) {
-    if (_degree == 0 && _coef == 0) return code_invalid_parameter;
+    if (_degree == 0 && _coef == 0) return code_success;
     Polynom* new = (Polynom*)malloc(sizeof(Polynom));
     if (!new) return code_error_alloc;
     new->coef = _coef;
@@ -566,7 +566,7 @@ status_code create_polynomial(Polynom** first, Polynom** second, char* expressio
                         coef *= -1;
                         is_negative = false;
                     }
-                    //printf("-----%d\n", coef);
+                    printf("-----%d\n", coef);
                     coef_str[0] = '\0';
                     tmp_index = 0;
                     is_read_coef = true;
@@ -878,6 +878,7 @@ status_code cmps(Polynom* F, Polynom* G, Polynom** res) {
             destroy_polynomial(second_G);
             second_G = tmp_res;
             //print_polynom(second_G);
+            //printf("kaif\n");
         }
         //printf("kaif\n");
         //print_polynom(tmp_res);
@@ -905,7 +906,10 @@ status_code cmps(Polynom* F, Polynom* G, Polynom** res) {
             //printf("122211\n");
         } else {
             if (f_degree == 1) {
+                //printf("yes\n");
+                print_polynom(second_G);
                 tmp_res = second_G;
+                tmp_res->coef *= cur_left->coef;
                 //printf("yes\n");
                 //print_polynom(tmp_res);
                 //printf("..yes\n");
