@@ -36,6 +36,16 @@ typedef struct Stack_char {
     int size;
 } Stack_char;
 
+typedef struct stack_node_num {
+    char data;
+    struct stack_node_num* next;
+} stack_node_num;
+
+typedef struct Stack_num {
+    stack_node_num* top;
+    int size;
+} Stack_num;
+
 
 status_code create_tree(Tree** tree, char value);
 status_code insert_tree(Tree** tree, char value);
@@ -53,4 +63,11 @@ int op_assoc(char op);
 status_code to_pol_expression(char* expression, char** pol_expression);
 double binary_pow(double base, int power);
 status_code compute(char* postfix, long long* res);
+status_code create_stack_num(Stack_num** stack);
+bool is_empty_stack_num(Stack_num* st);
+int size_stack_num(Stack_num* st);
+long long top_stack_num(Stack_num* st);
+long long pop_stack_num(Stack_num* st);
+status_code push_stack_num(Stack_num* st, long long _data);
+void free_stack_num(Stack_num* st);
 #endif

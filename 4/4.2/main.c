@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
             printf("Error alloc detected!!!\n");
             break;
         }
-        printf("%s0---\n", choose);
+        //printf("%s0---\n", choose);
         st_cmd = command(choose, storage, &capacity);
         //print_storage(storage, capacity);
         switch (st_cmd) {

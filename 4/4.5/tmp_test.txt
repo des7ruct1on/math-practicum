@@ -1,0 +1,23 @@
+Invalid parameter detected!!!
+0 (1-1)^(2-2)
+
+Invalid parameter detected!!!
+3 2*(2^(3+(2*(1/0))))
+
+Invalid parameter detected!!!
+4 0^0
+
+You missed right bracket!!!
+6 2*(2^(3+(2*(1/0)))
+Invalid parameter detected!!!
+0 (1-1)^(2-2)
+
+Invalid parameter detected!!!
+3 2*(2^(3+(2*(1/0))))
+
+Invalid parameter detected!!!
+4 0^0
+
+You missed right bracket!!!
+6 2*(2^(3+(2*(1/0)))
+

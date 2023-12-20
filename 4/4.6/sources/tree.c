@@ -151,7 +151,7 @@ Tree* top_stack_tree(Stack_tree* st) {
 }
 
 Tree* pop_stack_tree(Stack_tree* st) {
-    if (!st) return '\0';
+    if (!st) return NULL;
     stack_node_tree* tmp = st->top;
     Tree* top_symb = tmp->data;
     st->top = st->top->next;
@@ -193,11 +193,11 @@ status_code to_pol_expression(char* expression, char** pol_expression) {
         return code_error_alloc;
     }
     int index = 0;
-    printf("doshel\n");
+    //printf("doshel\n");
     for (int i = 0; i < size_expression; i++) {
-        print_stack(stack);
+        //print_stack(stack);
         char c = expression[i];
-        printf("symbol %c\n", c);
+        //printf("symbol %c\n", c);
         if (isspace(c)) {
             continue;
         }
@@ -208,7 +208,7 @@ status_code to_pol_expression(char* expression, char** pol_expression) {
                     free_stack(stack);
                     free(*pol_expression);
                     *pol_expression = NULL;
-                    printf("here ban1\n");
+                    //printf("here ban1\n");
                     return code_invalid_parameter;
                 }
             }
@@ -217,7 +217,7 @@ status_code to_pol_expression(char* expression, char** pol_expression) {
                     free_stack(stack);
                     free(*pol_expression);
                     *pol_expression = NULL;
-                    printf("here ban2\n");
+                    //printf("here ban2\n");
                     return code_invalid_parameter;
                 }
                 continue;
@@ -255,7 +255,7 @@ status_code to_pol_expression(char* expression, char** pol_expression) {
             (*pol_expression)[index] = c;
             index++;
         } else if (c == ')') {
-            print_stack(stack);
+           // print_stack(stack);
             while(!is_empty_stack(stack) && top_stack(stack) != '(') {
                 //printf("%c---dsadas\n", top_stack(stack));
                 (*pol_expression)[index] = pop_stack(stack);
@@ -468,9 +468,9 @@ int compute_tree(Tree* root, char* vars, int* values, int count_vars) {
         case '~':
             return !left;
         case '-':
-            return left <= right;
+            return left < right;
         case '+':
-            return left > right;
+            return left >= right;
         case '<':
             return left != right;
         case '=':
@@ -480,6 +480,7 @@ int compute_tree(Tree* root, char* vars, int* values, int count_vars) {
         case '?':
             return !(left | right);
     }
+    return 0;
 }
 
 void get_rand_filename(char *filename) {
@@ -532,7 +533,9 @@ status_code truth_table(const char *filename) {
         return code_invalid_parameter;
     }
     fclose(input);
+#ifdef DEBUG
     printf("jere\n");
+#endif
     Tree *root = NULL;
     char* pol_expression = NULL;
     st_act = to_pol_expression(line, &pol_expression);
@@ -541,14 +544,14 @@ status_code truth_table(const char *filename) {
         pol_expression = NULL;
         return st_act;
     }
-    printf("%s--\n", pol_expression);
+    //printf("%s--\n", pol_expression);
     st_act = create_arifmh_tree(&root, pol_expression);
     if (st_act != code_success) {
         free_tree(root);
         free(line);
         return st_act;
     }
-    printf("ushze\n");
+    //printf("ushze\n");
     char out_filename[128];
     get_rand_filename(out_filename);
     FILE *out = fopen(out_filename, "w");
@@ -573,7 +576,7 @@ status_code truth_table(const char *filename) {
             vars_values[j] = (i >> j) & 1;
         }
         int comp_res = compute_tree(root, vars, vars_values, count_vars);
-        printf("this %d\n", comp_res);
+        //printf("this %d\n", comp_res);
         print_table(out, vars_values, count_vars, comp_res);
     }
     free(line);

@@ -566,7 +566,7 @@ status_code create_polynomial(Polynom** first, Polynom** second, char* expressio
                         coef *= -1;
                         is_negative = false;
                     }
-                    printf("-----%d\n", coef);
+                    //printf("-----%d\n", coef);
                     coef_str[0] = '\0';
                     tmp_index = 0;
                     is_read_coef = true;

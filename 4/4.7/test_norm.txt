@@ -1,10 +1,10 @@
-myvar=15;
+myvar=3;
 bg=25;
 ccc=bg+11;
 print ccc;
 myvar=ccc;
 bg=ccc*myvar;
 print;
-bg=bg/1;
-zxc=2^5;
+bg=bg/bg;
+zxc=ccc%1;
 print;

@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <time.h>
-#define TABLE_SIZE 2
+#define TABLE_SIZE 128
 
 typedef enum status_code {
     code_error_oppening,

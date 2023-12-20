@@ -8,7 +8,10 @@
 #include <limits.h>
 #include "headers/hashtable.h"
 
+#define macro 1      + 2
+
 status_code process_file(const char* filename) {
+    //printf("%d\n", macro);
     if (!filename) return code_error_oppening;
     FILE* file = fopen(filename, "r");
     if (!file) {
@@ -42,6 +45,7 @@ status_code process_file(const char* filename) {
             free(line);
             return code_error_alloc;
         }
+        //printf("%s line\n", line);
         int size_line = strlen(line);
         char* key = (char*)malloc(sizeof(char) * size_line);
         if (!key) {
@@ -58,7 +62,10 @@ status_code process_file(const char* filename) {
             free(value);
             return code_error_alloc;
         }
-        if (sscanf(line, "#define %s %s ", key, value) != 2) {
+        int ch = sscanf(line, "#define %s %[^\n]", key, value);
+        //printf("%d\n", ch);
+        if (ch != 2) {
+            
             if (!strcmp(line, "\0") || !strcmp(line, "\n") || !strcmp(line, "\r\n")) {
                 fprintf(file_tmp, "%s", line);
             }
@@ -101,15 +108,21 @@ status_code process_file(const char* filename) {
         return code_error_alloc;
     }
     bool word_scanned = false;
+    //printf("`~~~~~~NOWWW\n");
+
+    //printf("symb %c\n", c);
     while (c != EOF) {
+        //printf("symb %c\n", c);
         if (!isspace(c) && c != EOF) {
             word[index] = c;
+            //printf("symb %c\n", c);
             index++;
             word_scanned = true;
         } else {
             if (word_scanned) {
                 word[index] = '\0';
                 index = 0;
+                //printf("%s word\n", word);
                 char* to_replace = find_element(table, word);
                 //printf("%s--------\n", to_replace);
                 if (!to_replace) {

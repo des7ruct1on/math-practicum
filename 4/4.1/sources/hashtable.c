@@ -178,6 +178,7 @@ bool check_table_rebuild(Hash_table* table) {
 
 
 status_code insert_table(Hash_table** table, char* key, char* value) {
+   // printf("%s---\n", value);
     Cell* to_add = NULL;
     status_code st_act;
     st_act = create_cell(&to_add, key, value);
@@ -194,6 +195,7 @@ status_code insert_table(Hash_table** table, char* key, char* value) {
     }
     to_add->key = index;
     if (!exist) {
+        //printf("zdws\n");
         st_act = add_cell(&(*table)->cells[index], to_add);
         if (st_act != code_success) {
             free_cell(to_add);
@@ -211,6 +213,7 @@ status_code insert_table(Hash_table** table, char* key, char* value) {
                 return st_act;
             }
         }
+       // print_table(*table);
     }
 
     return code_success;

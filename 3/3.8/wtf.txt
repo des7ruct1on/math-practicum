@@ -1,1 +1,2 @@
-Cmps(x^2-2x,x^2);
+Add(x+1);
+Cmps(x^3);

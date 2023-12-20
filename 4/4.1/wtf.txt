@@ -1,0 +1,8 @@
+#define 1 one
+#define 2 two
+#define 3 three
+#define 4 four
+#define lol #defide fewfr gffdgdf g
+
+#define kek chiselki weqw
+ weddings fds svadbafsd fsd

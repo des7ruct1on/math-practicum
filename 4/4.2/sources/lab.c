@@ -331,7 +331,7 @@ status_cmd command(char* input, Array** storage, int* size_storage) {
     if (!input || !strcmp(input, "\0")) return cmd_invalid_parameter;
     char* check = strchr(input, ';');
     if (check == NULL) {
-        return code_invalid_parameter;
+        return cmd_invalid_parameter;
     }
     //printf("size storage: %d\n", *size_storage);
     int size = strlen(input);
