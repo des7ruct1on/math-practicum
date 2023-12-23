@@ -18,7 +18,9 @@
         "unordered_map": "c",
         "vector": "c",
         "locale": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "ios": "c",
+        "__locale": "c"
     },
     "editor.inlineSuggest.showToolbar": "onHover"
 }

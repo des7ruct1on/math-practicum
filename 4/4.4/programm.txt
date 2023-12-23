@@ -1,0 +1,12 @@
+read(A, 10);
+write(A, 2);
+read(B, 10);
+write(B, 2);
+read(Z, 10);
+write(Z, 2);
+A := A <> B <> Z & A;
+B :=\ A;
+write(A, 2);
+write(B, 2);
+Z :=  \B;
+write(Z, 2);

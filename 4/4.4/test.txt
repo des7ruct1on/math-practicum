@@ -1,0 +1,8 @@
+{kekekeke}read(A, 10); {wow meow ne hocji}
+write(A, 2); % kkkkkkeee
+read(B, 10); {fsddfsdfsd
+fsd fdsf sd
+ fsdf dsfsdfsdf}
+write(B, 2);
+read(Z, 10);
+write(Z, 2);

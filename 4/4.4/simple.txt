@@ -1,0 +1,3 @@
+read(A, 2); % kkkkkkeee
+B :=        \ A;
+write(B, 2);
