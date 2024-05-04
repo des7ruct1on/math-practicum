@@ -17,11 +17,11 @@ typedef struct Skew_heap {
 } Skew_heap;
 
 status_code create_skew_heap(Skew_heap** heap, Request req);
-Skew_heap* skew_merge(Skew_heap* A, Skew_heap* B);
-status_code get_max_skew(Skew_heap** heap, Request* find);
-status_code insert_skew(Skew_heap** heap, Request req);
+Skew_heap* skew_merge(Logger* logger, Skew_heap* A, Skew_heap* B);
+status_code get_max_skew(Logger* logger, Skew_heap** heap, Request* find);
+status_code insert_skew(Logger* logger, Skew_heap** heap, Request req);
 void free_skew(Skew_heap* heap);
-Skew_heap* skew_merge_destroy(Skew_heap* A, Skew_heap* B);
+Skew_heap* skew_merge_destroy(Logger* logger, Skew_heap* A, Skew_heap* B);
 int skew_heap_size(Skew_heap* heap);
 #endif
 

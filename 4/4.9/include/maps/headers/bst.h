@@ -18,9 +18,9 @@ typedef struct Tree {
 } Tree;
 
 status_code create_tree(Tree** tree, char* key, Post* office);
-status_code insert_tree(Tree** tree, char* key, Post* office);
+status_code insert_tree(Logger* logger, Tree** tree, char* key, Post* office);
 void free_tree(Tree* root, void(*free_storage)(void*));
 Post* search_bst(Tree* root, char* key);
 int tree_size(Tree* root);
-
+char* find_post_tree(Tree* root, Post* find);
 #endif

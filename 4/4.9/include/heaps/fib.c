@@ -1,4 +1,5 @@
 #include "headers/fib.h"
+#include <math.h>
 
 status_code create_fib_node(fib_node** node, Request _req) {
     (*node) = (fib_node*)malloc(sizeof(fib_node));
@@ -20,11 +21,15 @@ status_code create_fib_heap(Fibbonacci_heap** heap) {
     return code_success;
 }
 
-status_code insert_fib(Fibbonacci_heap** heap, Request _req) {
+status_code insert_fib(Logger* logger, Fibbonacci_heap** heap, Request _req) {
     status_code st_act;
     fib_node* tmp = NULL;
     st_act = create_fib_node(&tmp, _req);
-    if (st_act  != code_success) return code_success;
+    if (st_act != code_success) {
+        create_log(&logger, "error creating node, check logs\n", get_sev_from_status(st_act), NULL, NULL, 0, get_time_now());
+        write_log(logger);
+        return st_act;
+    }
     if (!(*heap)->root) {
         (*heap)->root = tmp;
     } else {
@@ -63,7 +68,9 @@ void free_fib_heap(Fibbonacci_heap* heap) {
     free(heap);
 }
 
-void fib_merge(Fibbonacci_heap* A, Fibbonacci_heap* B) {
+void fib_merge(Logger* logger, Fibbonacci_heap* A, Fibbonacci_heap* B) {
+    create_log(&logger, "started merging heaps\n", INFO, NULL, NULL, 0, get_time_now());
+    write_log(logger);
     if (!A->root) {
         A->root = B->root;
     } 
@@ -81,13 +88,20 @@ void fib_merge(Fibbonacci_heap* A, Fibbonacci_heap* B) {
     }
     A->count_nodes += B->count_nodes;
     B->count_nodes = 0;
+    create_log(&logger, "finished merging heaps\n", INFO, NULL, NULL, 0, get_time_now());
+    write_log(logger);
 }
 
-Fibbonacci_heap* fib_merge_destr(Fibbonacci_heap* A, Fibbonacci_heap* B) {
+Fibbonacci_heap* fib_merge_destr(Logger* logger, Fibbonacci_heap* A, Fibbonacci_heap* B) {
+    create_log(&logger, "started merging heaps\n", INFO, NULL, NULL, 0, get_time_now());
+    write_log(logger);
     status_code st_act;
     Fibbonacci_heap* _new = NULL;
     st_act = create_fib_heap(&_new);
-    if (st_act != code_success) return;
+    if (st_act != code_success) {
+        free_fib_heap(_new);
+        return NULL;
+    }
     if (!A->root) {
         A->root = B->root;
     } 
@@ -109,6 +123,8 @@ Fibbonacci_heap* fib_merge_destr(Fibbonacci_heap* A, Fibbonacci_heap* B) {
     free(B);
     A = NULL;
     B = NULL;
+    create_log(&logger, "finished merging heaps\n", INFO, NULL, NULL, 0, get_time_now());
+    write_log(logger);
     return _new;
 }
 
@@ -125,11 +141,13 @@ void union_list(fib_node* first, fib_node* second) {
 }
 
 status_code collect_nodes(Fibbonacci_heap* heap) {
-    if (!heap || !heap->root) return;
+    if (!heap || !heap->root) return code_invalid_parameter;
 
     int max_degree_fib = log2(heap->count_nodes);
     fib_node** collection = (fib_node**)malloc(sizeof(fib_node*));
-    if (!collection) return code_error_alloc;
+    if (!collection) {
+        return code_error_alloc;
+    }
     for (int i = 0; i < max_degree_fib; i++) collection[i] = NULL;
 
     fib_node* max = heap->root;
@@ -162,6 +180,7 @@ status_code collect_nodes(Fibbonacci_heap* heap) {
     }
     heap->root = max;
     free(collection);
+    return code_success;
 }
 
 void find_max_fib(Fibbonacci_heap* heap, Request* res) {

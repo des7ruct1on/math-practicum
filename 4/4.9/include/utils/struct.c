@@ -13,9 +13,9 @@
 status_code request_copy(Request a, Request** b) {
     (*b) = (Request*)malloc(sizeof(Request));
     if (!(*b)) return code_error_alloc;
-    (*b)->id = a.id;
+    (*b)->index = strdup(a.index);
     (*b)->id = strdup(a.id);
-    (*b)->priority = a.id;
+    (*b)->priority = a.priority;
     (*b)->sending_time.day = a.sending_time.day;
     (*b)->sending_time.month = a.sending_time.month;
     (*b)->sending_time.minute = a.sending_time.minute;
@@ -26,8 +26,8 @@ status_code request_copy(Request a, Request** b) {
     return code_success;
 }
 
-void swap_request(Request** a, Request** b) {
-    Request* tmp = *a;
+void swap_request(Request* a, Request* b) {
+    Request tmp = *a;
     *a = *b;
     *b = tmp;
 }
@@ -65,12 +65,17 @@ int compare_time(my_time *time1, my_time *time2) {
 status_code get_iso_time(char* str, my_time* _time) {
     if (!str || !_time) return code_invalid_parameter;
 
-    if (sscanf(str, "%d-%d-%dT%d:%d:%d", &(_time->year), &(_time->month), &(_time->day), &(_time->hour), &(_time->minute), &(_time->second)) != 6) {
+    // Удалить символ новой строки, если он есть
+    str[strcspn(str, "\n")] = '\0';
+    printf("            VREMYA: %s\n", str);
+
+    if (sscanf(str, "%04d-%02d-%02dT%02d:%02d:%02d", &((*_time).year), &((*_time).month), &((*_time).day), &((*_time).hour), &((*_time).minute), &((*_time).second)) != 6) {
         return code_invalid_parameter; 
     }
-
+    printf("        >>> %04d-%02d-%02dT%02d:%02d:%02d", (*_time).year, (*_time).month, (*_time).day, (*_time).hour, (*_time).minute, (*_time).second);
     return code_success;
 }
+
 
 status_code create_model(Model** model, Heap h, Storage s, void* _map) {
     if (!_map)  return code_invalid_parameter;
@@ -86,7 +91,7 @@ void get_unique_id(char* operator_name) {
     const char alphabet[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Алфавит
     int alphabet_length = strlen(alphabet);
 
-    srand(time(NULL)); // Инициализация генератора псевдослучайных чисел
+   
     for (int i = 0; i < 32; i++) {
         operator_name[i] = alphabet[rand() % 32]; 
     }
@@ -94,30 +99,57 @@ void get_unique_id(char* operator_name) {
 }
 
 status_code create_request(Request* req, char* line) {
+    printf("\n\n%s\n", line);
     if (!line) return code_invalid_parameter;
     status_code st_act;
     char* token = NULL;
     //char input_string[] = "2024-04-04T12:34:57 3 129337 \"поменяй\"";
     token = strtok(line, " "); // Получаем первое слово
+    printf("    TIME: %s\n", token);
     st_act = get_iso_time(token, &req->sending_time);
     if (st_act != code_success) return st_act;
     token = strtok(NULL, " ");
     int prior;
     sscanf(token, "%d", &prior);
     req->priority = prior;
+    printf("    prior: %d\n", prior);
     token = strtok(NULL, " ");
     req->index = strdup(token);
+    printf("    index: %s\n", token);
     token = strtok(NULL, " ");
     req->text = strdup(token);
+    printf("    text: %s\n", token);
     char tmp[256];
     get_unique_id(tmp);
     req->id = strdup(tmp);
+    printf("    id: %s\n", req->id );
     return code_success;
 
 }
 
 void add_minute(my_time *time) {
     time->minute += 1;
+    if (time->minute >= 60) {
+        time->minute = 0;
+        time->hour += 1;
+        if (time->hour >= 24) {
+            time->hour = 0;
+            time->day += 1;
+            if (time->day >= 31) {
+                time->day = 1;
+                time->month += 1;
+
+                if (time->month >= 13) {
+                    time->month = 1;
+                    time->year += 1;
+                }
+            }
+        }
+    }
+}
+
+void add_minutes(my_time *time, int val) {
+    time->minute += val;
     if (time->minute >= 60) {
         time->minute = 0;
         time->hour += 1;
@@ -148,4 +180,11 @@ my_time get_time_now() {
     cur_time.minute = now->tm_min;
     cur_time.second = now->tm_sec;
     return cur_time;
+}
+
+int time_difference_minutes(my_time start_time, my_time end_time) {
+    int start_minutes = start_time.day * 24 * 60 + start_time.hour * 60 + start_time.minute;
+    int end_minutes = end_time.day * 24 * 60 + end_time.hour * 60 + end_time.minute;
+    int difference_minutes = end_minutes - start_minutes;
+    return difference_minutes;
 }

@@ -1,0 +1,45 @@
+     [2024:05:05 02:28:08] [INFO] get_all_info function has finished
+
+     [2024:05:05 02:28:08] [INFO] read_request finished
+
+     [2024:05:05 02:28:08] [INFO] read_request started
+
+     [2024:05:05 02:28:08] [INFO] get_full_model finished
+
+     [2024:05:05 02:28:08] [INFO] create_map finished
+
+     [2024:05:05 02:28:08] [INFO] create_map started
+
+     [2024:05:05 02:28:08] [INFO] creating post finished
+
+
+     [2024:05:05 02:28:08] [INFO] creating post
+
+     [2024:05:05 02:28:08] [INFO] creating post finished
+
+
+     [2024:05:05 02:28:08] [INFO] creating post
+
+     [2024:05:05 02:28:08] [INFO] creating post finished
+
+
+     [2024:05:05 02:28:08] [INFO] creating post
+
+     [2024:05:05 02:28:08] [INFO] creating post finished
+
+
+     [2024:05:05 02:28:08] [INFO] creating post
+
+     [2024:05:05 02:28:08] [INFO] creating post finished
+
+
+     [2024:05:05 02:28:08] [INFO] creating post
+
+     [2024:05:05 02:28:08] [INFO] get_full_model started
+
+     [2024:05:05 02:28:08] [INFO] params will be written from file
+
+     [2024:05:05 02:28:08] [INFO] get_all_info function started
+
+[2024:05:05 02:28:07] [START] started main program
+

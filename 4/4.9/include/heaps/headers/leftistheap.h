@@ -19,10 +19,10 @@ typedef struct Leftist_heap {
 
 void free_leftist(Leftist_heap* heap);
 status_code create_heap_lh(Leftist_heap** heap, Request key);
-Leftist_heap* copy_lh(Leftist_heap *src);
+Leftist_heap* copy_lh(Logger* logger, Leftist_heap *src);
 void swap_lh(Leftist_heap** a, Leftist_heap** b);
 Leftist_heap* merge_lh(Leftist_heap* x, Leftist_heap* y);
-status_code insert_lh(Leftist_heap** heap, Request key);
+status_code insert_lh(Logger* logger, Leftist_heap** heap, Request key);
 Request* pop_lh(Leftist_heap** heap);
 int leftist_heap_size(Leftist_heap* heap);
 #endif

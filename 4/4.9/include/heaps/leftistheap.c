@@ -1,4 +1,6 @@
 #include "headers/leftistheap.h"
+#include <math.h>
+
 void free_leftist(Leftist_heap* heap) {
     if (!heap) return;
     free_request(&heap->key);
@@ -16,17 +18,23 @@ status_code create_heap_lh(Leftist_heap** heap, Request key) {
     return code_success;
 }
 
-Leftist_heap* copy_lh(Leftist_heap *src) {
+Leftist_heap* copy_lh(Logger* logger, Leftist_heap *src) {
     if (!src) {
         return NULL;
     }
     Leftist_heap* res = NULL;
     status_code st_act;
-    st_act = create_heap(&res, src->key);
-    if (st_act != code_success) return NULL;
+    st_act = create_heap_lh(&res, src->key);
+    if (st_act != code_success) {
+        create_log(&logger, "error after creating heap, check logs\n", get_sev_from_status(st_act), NULL, NULL, 0, get_time_now());
+        write_log(logger);
+        free_leftist(res);
+
+        return NULL;
+    }
     res->dist = src->dist;
-    res->left = copy_lh(src->left);
-    res->right = copy_lh(src->right);
+    res->left = copy_lh(logger, src->left);
+    res->right = copy_lh(logger, src->right);
     return res;
 }
 
@@ -57,11 +65,15 @@ Leftist_heap* merge_lh(Leftist_heap* x, Leftist_heap* y) {
     return x;
 }
 
-status_code insert_lh(Leftist_heap** heap, Request key) {
+status_code insert_lh(Logger* logger, Leftist_heap** heap, Request key) {
     Leftist_heap* node = NULL;
     status_code st_act;
     st_act = create_heap_lh(&node, key);
-    if (st_act != code_success) return st_act;
+    if (st_act != code_success) {
+        create_log(&logger, "error after creating heap, check logs\n", get_sev_from_status(st_act), NULL, NULL, 0, get_time_now());
+        write_log(logger);
+        return st_act;
+    }
     *heap = merge_lh(*heap, node);
     return code_success;
 }

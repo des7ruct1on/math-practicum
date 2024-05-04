@@ -1,36 +1,48 @@
 #include "headers/treap.h"
+#include <math.h>
 
-Treap* merge_treap(Treap* a, Treap* b) {
+Treap* merge_treap(Logger* logger, Treap* a, Treap* b) {
     if (!a) return b;
     if (!b) return a;
     if (a->data.priority > b->data.priority) {
-        a->right = merge_treap(a->right, b);
+        a->right = merge_treap(logger, a->right, b);
         return a;
     } else {
-        b->left = merge_treap(a, b->left);
+        b->left = merge_treap(logger, a, b->left);
         return b;
     }
 }
 
-status_code treap_copy(Treap** copy, Treap* add) {
+status_code treap_copy(Logger* logger, Treap** copy, Treap* add) {
     if (!add) {
         *copy = NULL;
         return code_success;
     }
     *copy = (Treap*)malloc(sizeof(Treap));
-    if (!*copy) return code_error_alloc;
-
+    if (!*copy) {
+        return code_error_alloc;
+    }
+    
     status_code st_act;
-    st_act = request_copy(add->data, &(*copy)->data);
+    Request* tmp = NULL;
+    st_act = request_copy(add->data, &tmp);
     if (st_act != code_success) {
+        create_log(&logger, "error after copying request, check logs\n", get_sev_from_status(st_act), NULL, NULL, 0, get_time_now());
+        write_log(logger);
+        free_treap(*copy);
+    } else {
+        (*copy)->data = *tmp;
+    }
+    st_act = treap_copy(logger, &(*copy)->left, add->left);
+    if (st_act != code_success) {
+        create_log(&logger, "error after copying left node, check logs\n", get_sev_from_status(st_act), NULL, NULL, 0, get_time_now());
+        write_log(logger);
         free_treap(*copy);
     }
-    st_act = treap_copy(&(*copy)->left, add->left);
+    st_act = treap_copy(logger, &(*copy)->right, add->right);
     if (st_act != code_success) {
-        free_treap(*copy);
-    }
-    st_act = treap_copy(&(*copy)->right, add->right);
-    if (st_act != code_success) {
+        create_log(&logger, "error after copying right node, check logs\n", get_sev_from_status(st_act), NULL, NULL, 0, get_time_now());
+        write_log(logger);
         free_treap(*copy);
     }
     return code_success;
@@ -44,21 +56,25 @@ void free_treap(Treap* tree) {
     free(tree);
 }
 
-Treap* merge_treap_copy(Treap* a, Treap* b) {
+Treap* merge_treap_copy(Logger* logger, Treap* a, Treap* b) {
     if (!a && !b) return NULL;
     Treap* lc = NULL;
     Treap* rc = NULL;
     status_code st_act;
-    st_act = treap_copy(&lc, a);
+    st_act = treap_copy(logger, &lc, a);
     if (st_act != code_success) {
+        create_log(&logger, "error after copying left node, check logs\n", get_sev_from_status(st_act), NULL, NULL, 0, get_time_now());
+        write_log(logger);
         return NULL;
     }
-    st_act = treap_copy(&rc, b);
+    st_act = treap_copy(logger, &rc, b);
     if (st_act != code_success) {
+        create_log(&logger, "error after copying right node, check logs\n", get_sev_from_status(st_act), NULL, NULL, 0, get_time_now());
+        write_log(logger);
         free_treap(a);
         return NULL;
     }
-    return merge_treap(lc, rc);
+    return merge_treap(logger, lc, rc);
 }
 
 void split_treap(Treap* root, Request* key, Treap** a, Treap** b) {
@@ -67,11 +83,11 @@ void split_treap(Treap* root, Request* key, Treap** a, Treap** b) {
         return;
     }
     if (strcmp(root->data.id, key->id) < 0) {
-        split_treap(root->right, key->id, &root->right, b);
+        split_treap(root->right, key, &root->right, b);
         *a = root;
         return;
     } else {
-        split_treap(root->left, key->id, a, &root->left);
+        split_treap(root->left, key, a, &root->left);
         *b = root;
         return;
     }
@@ -84,44 +100,52 @@ Treap* create_node_treap(Request tmp) {
     return node;
 }
 
-void insert_treap(Treap** root, Request tmp) {
+void insert_treap(Logger* logger, Treap** root, Request tmp) {
     Treap* less, *greater;
-    split_treap(*root, (*root)->data.id, &less, &greater);
+    split_treap(*root, &(*root)->data, &less, &greater);
     Treap* add = create_node_treap(tmp);
-    *root = merge_treap(merge_treap(less, add), greater);
+    *root = merge_treap(logger, merge_treap(logger, less, add), greater);
 }
 
-Treap* search_treap(Treap* root, Request* tmp) {
+Treap* search_treap(Logger* logger, Treap* root, Request* tmp) {
+    status_code st_act;
     Treap* less, *equal, *greater;
-    split_treap(root, tmp->id, &less, &greater);
-    split_treap(greater, tmp->id + 1, &equal, &greater);
-    root = merge_treap(merge_treap(less, equal), greater);
+    split_treap(root, tmp, &less, &greater);
+    Request* t = NULL;
+    st_act = request_copy(*tmp, &t);
+    if (st_act != code_success) {
+        free_request(t);
+        root = merge_treap(logger, less, greater);
+        return NULL;
+    }
+    strcat(t->id, "z");
+    split_treap(greater, t, &equal, &greater);
+    root = merge_treap(logger, merge_treap(logger, less, equal), greater);
+    free_request(t);
     return equal;
 }
 
-void erase_treap(Treap** root, Request* tmp) {
+void erase_treap(Logger* logger, Treap** root, Request* tmp) {
+    status_code st_act;
     Treap* less, *equal, *greater;
-    split_treap(*root, tmp->id, &less, &greater);
-    split_treap(greater, tmp->id + 1, &equal, &greater);
-    *root = merge_treap(less, greater);
-}
-
-void print_treap(Treap* root, int n) {
-    if (root == NULL) {
+    split_treap(*root, tmp, &less, &greater);
+    Request* t = NULL;
+    st_act = request_copy(*tmp, &t);
+    if (st_act != code_success) {
+        free_request(t);
+        *root = merge_treap(logger, less, greater);
         return;
     }
-    print_treap(root->right, n + 1);
-    for (int i = 0; i < n; i++) {
-        printf("\t");
-    }
-    printf("<%d, %d>\n", root->data.id, root->data.priority);
-    print_treap(root->left, n + 1);
+    strcat(t->id, "z");
+    split_treap(greater, t, &equal, &greater);
+    *root = merge_treap(logger, less, greater);
+    free_request(t);
 }
 
 int treap_size(Treap* root) {
     if (!root) {
         return 0;
     } 
-    return 1 + tree_size(root->left) + tree_size(root->right);
+    return 1 + treap_size(root->left) + treap_size(root->right);
 }
 

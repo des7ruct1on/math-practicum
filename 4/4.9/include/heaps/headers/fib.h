@@ -27,11 +27,11 @@ typedef struct Fibbonacci_heap {
 
 status_code create_fib_node(fib_node** node, Request _req);
 status_code create_fib_heap(Fibbonacci_heap** heap);
-status_code insert_fib(Fibbonacci_heap** heap, Request _req);
+status_code insert_fib(Logger* logger, Fibbonacci_heap** heap, Request _req);
 void free_fib_node(fib_node* node);
 void free_fib_heap(Fibbonacci_heap* heap);
-void fib_merge(Fibbonacci_heap* A, Fibbonacci_heap* B);
-Fibbonacci_heap* fib_merge_destr(Fibbonacci_heap* A, Fibbonacci_heap* B);
+void fib_merge(Logger* logger, Fibbonacci_heap* A, Fibbonacci_heap* B);
+Fibbonacci_heap* fib_merge_destr(Logger* logger, Fibbonacci_heap* A, Fibbonacci_heap* B);
 void union_list(fib_node* first, fib_node* second);
 status_code collect_nodes(Fibbonacci_heap* heap);
 void find_max_fib(Fibbonacci_heap* heap, Request* res);

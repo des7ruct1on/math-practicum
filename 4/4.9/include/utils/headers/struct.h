@@ -46,7 +46,6 @@ typedef struct Post {
     void* storage;
     int size_operators;
     int free_requests;
-    int left_requests;
     bool is_overload;
     Operator* ops;
 } Post;
@@ -80,13 +79,15 @@ typedef struct Model {
 } Model;
 
 void free_request(Request* a);
-status_code request_copy(Request a, Request* b);
-void swap_request(Request** a, Request** b);
-int compare_time(const my_time *time1, const my_time *time2);
+status_code request_copy(Request a, Request** b);
+void swap_request(Request* a, Request* b);
+int compare_time(my_time *time1, my_time *time2);
 status_code get_iso_time(char* str, my_time* _time);
-status_code create_model(Model** model, Heap h, Storage s, void* _map, Post* _post);
+status_code create_model(Model** model, Heap h, Storage s, void* _map);
 status_code create_request(Request* req, char* line);
 void add_minute(my_time *time);
 void get_unique_id(char* operator_name);
 my_time get_time_now();
+void add_minutes(my_time *time, int val);
+int time_difference_minutes(my_time start_time, my_time end_time);
 #endif

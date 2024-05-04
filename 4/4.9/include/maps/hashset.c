@@ -1,5 +1,17 @@
 #include "headers/hashset.h"
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "../../include/heaps/headers/binaryheap.h"
+#include "../../include/heaps/headers/binomial.h"
+#include "../../include/heaps/headers/fib.h"
+#include "../../include/heaps/headers/leftistheap.h"
+#include "../../include/heaps/headers/skew.h"
+#include "../../include/heaps/headers/treap.h"
+#include "../../include/maps/headers/array.h"
+#include "../../include/maps/headers/bst.h"
+#include "../../include/maps/headers/hashset.h"
+//#include "../../include/maps/headers/trie.h"
 
 unsigned long long int hash(const char* key) {
     if (!key) return 0;
@@ -62,7 +74,7 @@ int size_list(Cell* list) {
     return size;
 }
 
-status_code create_cell(Cell** new, const char* key, const Post* value) {
+status_code create_cell(Cell** new, char* key, Post* value) {
     if (!key || !value) return code_invalid_parameter;
     (*new) = (Cell*)malloc(sizeof(Cell));
     if (!(*new)) {
@@ -103,7 +115,7 @@ status_code is_exist(bool *res, Cell* list, Cell* new) {
     }
     Cell* cur = list;
     char* cur_key = cur->define;
-    Post* cur_value = cur->value;
+    //Post* cur_value = cur->value;
     //printf("%d\n", size_list(cur));
     while (cur != NULL) {
         cur_key = cur->define;
@@ -124,14 +136,33 @@ status_code is_exist(bool *res, Cell* list, Cell* new) {
 }
 
 
-void free_cell(Cell* del, void(*free_storage)(void*)) {
+void free_cell(Cell* del, Heap type) {
     if (!del) return;
     Cell* cur = del;
     while (cur != NULL) {
         Cell* to_del = cur->next;
         free(cur->define);
         cur->define = NULL;
-        free_storage(cur->value->storage);
+        switch(type) {
+            case binary:
+                free_binary((Binary_heap*)cur->value->storage);
+                break;
+            case binomial:
+                free_binom_heap((Binomial_heap*)cur->value->storage);
+                break;
+            case fibonacci:
+                free_fib_heap((Fibbonacci_heap*)cur->value->storage);
+                break;
+            case skew:
+                free_skew((Skew_heap*)cur->value->storage);
+                break;
+            case leftist:
+                free_leftist((Leftist_heap*)cur->value->storage);
+                break;
+            case treap:
+                free_treap((Treap*)cur->value->storage);
+                break;
+        }
         free(cur->value->ops);
         free(cur);
         cur->value = NULL;
@@ -163,12 +194,14 @@ bool check_table_rebuild(Hash_table* table) {
 }
 
 
-status_code insert_table(Hash_table** table, char* key, Post* value, void(*free_storage)(void*)) {
+status_code insert_table(Model* model, Logger* logger, Hash_table** table, char* key, Post* value) {
    // printf("%s---\n", value);
     Cell* to_add = NULL;
     status_code st_act;
     st_act = create_cell(&to_add, key, value);
     if (st_act != code_success) {
+        create_log(&logger, "error after creating cell, check logs\n", get_sev_from_status(st_act), NULL, NULL, 0, get_time_now());
+        write_log(logger);
         free(to_add);
         return st_act;
     }
@@ -176,7 +209,9 @@ status_code insert_table(Hash_table** table, char* key, Post* value, void(*free_
     bool exist;
     st_act = is_exist(&exist, (*table)->cells[index], to_add);
     if (st_act != code_success) {
-        free_cell(to_add, free_storage);
+        create_log(&logger, "error after checking is existing, check logs\n", get_sev_from_status(st_act), NULL, NULL, 0, get_time_now());
+        write_log(logger);
+        free_cell(to_add, model->heap_type);
         return st_act;
     }
     to_add->key = index;
@@ -184,18 +219,22 @@ status_code insert_table(Hash_table** table, char* key, Post* value, void(*free_
         //printf("zdws\n");
         st_act = add_cell(&(*table)->cells[index], to_add);
         if (st_act != code_success) {
-            free_cell(to_add, free_storage);
+            create_log(&logger, "error after adding cell, check logs\n", get_sev_from_status(st_act), NULL, NULL, 0, get_time_now());
+            write_log(logger);
+            free_cell(to_add, model->heap_type);
             return st_act;
         }
         free(key);
         key = NULL;
         free(value);
         value = NULL;
-        free_cell(to_add, free_storage);
+        free_cell(to_add, model->heap_type);
         if (check_table_rebuild(*table)) {
-            st_act = resize_table(table, free_storage);
+            st_act = resize_table(model, logger, table, model->heap_type);
             if (st_act != code_success) {
-                free_cell(to_add, free_storage);
+                create_log(&logger, "error after resizing cell, check logs\n", get_sev_from_status(st_act), NULL, NULL, 0, get_time_now());
+                write_log(logger);
+                free_cell(to_add, model->heap_type);
                 return st_act;
             }
         }
@@ -205,10 +244,10 @@ status_code insert_table(Hash_table** table, char* key, Post* value, void(*free_
     return code_success;
 }
 
-void free_table(Hash_table* table, void(*free_storage)(void*)) {
+void free_table(Hash_table* table, Heap type) {
     if (!table) return;
     for (int i = 0; i < table->size; i++) {
-        free_cell(table->cells[i], free_storage);
+        free_cell(table->cells[i], type);
         table->cells[i] = NULL;
     }
     free(table->cells);
@@ -216,7 +255,7 @@ void free_table(Hash_table* table, void(*free_storage)(void*)) {
     table = NULL;
 }
 
-status_code resize_table(Hash_table** old, void(*free_storage)(void*)) {
+status_code resize_table(Model* model, Logger* logger, Hash_table** old, Heap type) {
     int new_size = get_next_prime((*old)->size);
     //printf("next number: %d\n", new_size);
     status_code st_act;
@@ -229,9 +268,9 @@ status_code resize_table(Hash_table** old, void(*free_storage)(void*)) {
             while ((*old)->cells[i]) {
                 char* _define = strdup((*old)->cells[i]->define);
                 Post* _value = (*old)->cells[i]->value;
-                st_act = insert_table(&new, _define, _value, free_storage);
+                st_act = insert_table(model, logger, &new, _define, _value);
                 if (st_act != code_success) {
-                    free_table(new, free_storage);
+                    free_table(new, model->heap_type);
                     free(_define);
                     free(_value);
                 }
@@ -242,7 +281,7 @@ status_code resize_table(Hash_table** old, void(*free_storage)(void*)) {
    // printf("======================================\n");
     //print_table(new);
     //printf("======================================\n");
-    free_table(*old, free_storage);
+    free_table(*old, model->heap_type);
     *old = NULL;
     *old = new;
     return code_success;
@@ -273,4 +312,22 @@ int table_size(Hash_table* table) {
         total_size += size_list(table->cells[i]);
     }
     return total_size;
+}
+
+char* find_post_hashset(Hash_table* table, Post* find) {
+    if (table == NULL || table->cells == NULL) {
+        return NULL; 
+    }
+
+    for (int i = 0; i < table->size; i++) {
+        Cell* current_cell = table->cells[i]; 
+        while (current_cell != NULL) {
+            if (current_cell->value == find) {
+                return current_cell->define; 
+            }
+            current_cell = current_cell->next; 
+        }
+    }
+
+    return NULL; 
 }
