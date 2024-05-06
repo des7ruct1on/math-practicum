@@ -11,7 +11,7 @@
 #include "../../include/maps/headers/array.h"
 #include "../../include/maps/headers/bst.h"
 #include "../../include/maps/headers/hashset.h"
-//#include "../../include/maps/headers/trie.h"
+#include "../../include/maps/headers/trie.h"
 
 unsigned long long int hash(const char* key) {
     if (!key) return 0;

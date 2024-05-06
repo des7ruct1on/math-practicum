@@ -14,6 +14,7 @@ void print_reqs(Request* reqs, int size) {
 }
 
 int main(int argc, char* argv[]) {
+    srand(time(NULL));
     printf("%d--\n", argc);
     Logger* logger = NULL;
     status_code st_act;
@@ -50,8 +51,10 @@ int main(int argc, char* argv[]) {
     print_reqs(reqs, count_reqs);
     for (my_time start = model->start_time; compare_time(&start, &end) <= 0; add_minute(&start)) {
         Request to_process = reqs[request_index];
+        printf("Current request: %s\n", to_process.id);
         printf("zdes\n");
         if (compare_time(&to_process.sending_time, &start) == 0) {
+            printf("zdes2222\n");
             request_index++;
             st_act = insert_map(logger, model, to_process, posts, count_posts, &post_tmp_index, start);
             if (st_act != code_success) {

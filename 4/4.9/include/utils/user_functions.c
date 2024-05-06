@@ -1041,32 +1041,46 @@ void print_choose() {
 }
 
 void process_requests(Logger* logger, Model* model, Post** posts, my_time _time) {
+    printf("zashel\n");
     for (int i = 0; i < model->count_post; i++) {
         Post* tmp = posts[i];
         Request _check;
         status_code st_act;
+        int count_request = 0;
         switch(model->heap_type) {
             case binary:
                 _check = ((Binary_heap*)tmp->storage)->data[0];
+                count_request = binary_heap_size((Binary_heap*)tmp->storage);
                 break;
             case binomial:
                 _check = ((Binomial_heap*)tmp->storage)->root->data;
+                count_request = size_binom_heap((Binomial_heap*)tmp->storage);
                 break;
             case fibonacci:
                 _check = ((Fibbonacci_heap*)tmp->storage)->root->req;
+                count_request = size_fib_heap((Fibbonacci_heap*)tmp->storage);
                 break;
             case skew:
                 _check = ((Skew_heap*)tmp->storage)->data;
+                count_request = skew_heap_size((Skew_heap*)tmp->storage);
                 break;
             case treap:
                 _check = ((Treap*)tmp->storage)->data;
+                count_request = treap_size((Treap*)tmp->storage);
                 break;
             case leftist:
                 _check = ((Leftist_heap*)tmp->storage)->key;
+                count_request = leftist_heap_size((Leftist_heap*)tmp->storage);
                 break;
         }
+        if (count_request == 0) {
+            continue;
+        }
+        printf("after switch\n");
         char* op_replacer = NULL;
         for (int k = 0; k < tmp->size_operators; k++) {
+            printf("str1: %s\n", _check.id);
+            printf("str2: %s\n", tmp->ops[k].current_request->id);
             if (strcmp(_check.id, tmp->ops[k].current_request->id)) {
                 continue;
             }

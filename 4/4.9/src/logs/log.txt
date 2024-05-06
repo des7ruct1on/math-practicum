@@ -1,45 +1,57 @@
-     [2024:05:05 02:28:08] [INFO] get_all_info function has finished
+     [2014:10:22 12:19:54] [INFO] insert_map function has finished
 
-     [2024:05:05 02:28:08] [INFO] read_request finished
+[2014:10:22 12:19:54] [REQUEST_HANDLING_STARTED] request handling started lDhsAuajxikhtjeCzFwxprbysqvpdjzo, gzgemkmfqihiesbjaguzmyyBeuwyacmg
+[2014:10:22 12:19:54] [REQUEST_HANDLING_STARTED] request handling started lDhsAuajxikhtjeCzFwxprbysqvpdjzo, aBosEteiygBcyClyfnflzgeFomCBullu
+[2014:10:22 12:19:54] [REQUEST_HANDLING_STARTED] request handling started lDhsAuajxikhtjeCzFwxprbysqvpdjzo, dylEsdfskfbtjsajajcnglazgihCnipq
+[2014:10:22 12:19:54] [REQUEST_HANDLING_STARTED] request handling started lDhsAuajxikhtjeCzFwxprbysqvpdjzo, DExyBAxhahapjeqnaoiymDjttBioweat
+[2014:10:22 12:19:54] [REQUEST_HANDLING_STARTED] request handling started lDhsAuajxikhtjeCzFwxprbysqvpdjzo, yccfBCcFmgpzocdbdCEByEurhwruABCs
+[2014:10:22 12:19:54] [REQUEST_HANDLING_STARTED] request handling started lDhsAuajxikhtjeCzFwxprbysqvpdjzo, AuyAnzADdpeqnitktbyCyCazyjcaneji
+[2014:10:22 12:19:54] [REQUEST_HANDLING_STARTED] request handling started lDhsAuajxikhtjeCzFwxprbysqvpdjzo, bwspFzbaqkvgnEecCloojxedbCjjiecj
+[2014:10:22 12:19:54] [NEW_REQUEST] new request id and post index: lDhsAuajxikhtjeCzFwxprbysqvpdjzo, zcinAAacykEdBvkEEsCEFinfqEcCsfyl
+     [2014:10:22 12:19:54] [INFO] insert_map function has started
 
-     [2024:05:05 02:28:08] [INFO] read_request started
+     [2024:05:06 04:42:54] [INFO] get_all_info function has finished
 
-     [2024:05:05 02:28:08] [INFO] get_full_model finished
+     [2024:05:06 04:42:54] [INFO] read_request finished
 
-     [2024:05:05 02:28:08] [INFO] create_map finished
+     [2024:05:06 04:42:54] [INFO] read_request started
 
-     [2024:05:05 02:28:08] [INFO] create_map started
+     [2024:05:06 04:42:54] [INFO] get_full_model finished
 
-     [2024:05:05 02:28:08] [INFO] creating post finished
+     [2024:05:06 04:42:54] [INFO] create_map finished
 
+     [2024:05:06 04:42:54] [INFO] create_map started
 
-     [2024:05:05 02:28:08] [INFO] creating post
-
-     [2024:05:05 02:28:08] [INFO] creating post finished
-
-
-     [2024:05:05 02:28:08] [INFO] creating post
-
-     [2024:05:05 02:28:08] [INFO] creating post finished
-
-
-     [2024:05:05 02:28:08] [INFO] creating post
-
-     [2024:05:05 02:28:08] [INFO] creating post finished
+     [2024:05:06 04:42:54] [INFO] creating post finished
 
 
-     [2024:05:05 02:28:08] [INFO] creating post
+     [2024:05:06 04:42:54] [INFO] creating post
 
-     [2024:05:05 02:28:08] [INFO] creating post finished
+     [2024:05:06 04:42:54] [INFO] creating post finished
 
 
-     [2024:05:05 02:28:08] [INFO] creating post
+     [2024:05:06 04:42:54] [INFO] creating post
 
-     [2024:05:05 02:28:08] [INFO] get_full_model started
+     [2024:05:06 04:42:54] [INFO] creating post finished
 
-     [2024:05:05 02:28:08] [INFO] params will be written from file
 
-     [2024:05:05 02:28:08] [INFO] get_all_info function started
+     [2024:05:06 04:42:54] [INFO] creating post
 
-[2024:05:05 02:28:07] [START] started main program
+     [2024:05:06 04:42:54] [INFO] creating post finished
+
+
+     [2024:05:06 04:42:54] [INFO] creating post
+
+     [2024:05:06 04:42:54] [INFO] creating post finished
+
+
+     [2024:05:06 04:42:54] [INFO] creating post
+
+     [2024:05:06 04:42:54] [INFO] get_full_model started
+
+     [2024:05:06 04:42:54] [INFO] params will be written from file
+
+     [2024:05:06 04:42:54] [INFO] get_all_info function started
+
+[2024:05:06 04:42:52] [START] started main program
 
