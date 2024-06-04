@@ -25,7 +25,7 @@
 
 void print_info(Post** posts, int size, Model* model);
 void free_post(Post* post, Heap type_heap);
-status_code create_post(Logger* logger, Post** post, Heap type_heap, int _size_op);
+status_code create_post(Logger* logger, Post** post, Heap type_heap, int _size_op, Model* model);
 Heap get_type_heap(char* str);
 Storage get_type_map(char* str);
 status_code get_full_model(Logger* logger, Model** model, const char* filename, Post*** posts_nodes, int* size_posts);
@@ -38,4 +38,5 @@ Post* find_less_load(Post** posts, int size);
 void print_choose();
 void process_requests(Logger* logger, Model* model, Post** posts, my_time _time);
 char* int_to_string(int number);
+void print_time(my_time a);
 #endif

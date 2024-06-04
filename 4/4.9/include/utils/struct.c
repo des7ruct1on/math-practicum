@@ -56,9 +56,6 @@ int compare_time(my_time *time1, my_time *time2) {
     if (time1->minute != time2->minute) {
         return time1->minute < time2->minute ? -1 : 1;
     }
-    if (time1->second != time2->second) {
-        return time1->second < time2->second ? -1 : 1;
-    }
     return 0;
 }
 
@@ -107,6 +104,8 @@ status_code create_request(Request* req, char* line) {
     token = strtok(line, " "); // Получаем первое слово
     printf("    TIME: %s\n", token);
     st_act = get_iso_time(token, &req->sending_time);
+    printf("\n\n\n\n%s\n\n\n\n", token);
+    printf("%d %d %d - %d %d %d \n", req->sending_time.year, req->sending_time.month, req->sending_time.day, req->sending_time.hour, req->sending_time.minute, req->sending_time.second);
     if (st_act != code_success) return st_act;
     token = strtok(NULL, " ");
     int prior;
@@ -183,8 +182,9 @@ my_time get_time_now() {
 }
 
 int time_difference_minutes(my_time start_time, my_time end_time) {
-    int start_minutes = start_time.day * 24 * 60 + start_time.hour * 60 + start_time.minute;
-    int end_minutes = end_time.day * 24 * 60 + end_time.hour * 60 + end_time.minute;
+    unsigned int start_minutes = start_time.day * 24 * 60 + start_time.hour * 60 + start_time.minute;
+    unsigned int end_minutes = end_time.day * 24 * 60 + end_time.hour * 60 + end_time.minute;
+    printf("%u ---- %u\n", start_minutes, end_minutes);
     int difference_minutes = end_minutes - start_minutes;
     return difference_minutes;
 }

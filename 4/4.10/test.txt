@@ -1,0 +1,13 @@
+a = 3;
+b = 4;
+
+# hahaahha
+
+wtf = mult(a, a);
+zxc = mult(b, b);
+c = add(wtf, zxc);
+
+#BREAKPOINT
+
+
+output(c);

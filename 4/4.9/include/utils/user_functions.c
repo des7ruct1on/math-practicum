@@ -88,7 +88,7 @@ void free_post(Post* post, Heap type_heap) {
     }
 }
 
-status_code create_post(Logger* logger, Post** post, Heap type_heap, int _size_op) {
+status_code create_post(Logger* logger, Post** post, Heap type_heap, int _size_op, Model* model) {
     if (_size_op < 0)  return code_invalid_parameter;
     *post = (Post*)malloc(sizeof(Post));
     create_log(&logger, "creating post\n", INFO, NULL, NULL, 0, get_time_now());
@@ -162,7 +162,7 @@ status_code create_post(Logger* logger, Post** post, Heap type_heap, int _size_o
     }
     for (int i = 0; i < _size_op; i++) {
         (*post)->ops[i].current_request = NULL;
-        (*post)->ops[i].time_process = 0;
+        (*post)->ops[i].time_process = rand() % model->max_process_time + model->min_process_time;
         get_unique_id((*post)->ops[i].name);
 
     }
@@ -225,6 +225,7 @@ status_code get_full_model(Logger* logger, Model** model, const char* filename, 
         write_log(logger);
         return code_invalid_parameter;
     }
+    printf("\n\n11111\n\n");
     status_code st_act;
     char* line = NULL;
     int read;
@@ -245,6 +246,8 @@ status_code get_full_model(Logger* logger, Model** model, const char* filename, 
     }
     printf("heap  <%s\n", line);
     (*model)->heap_type = get_type_heap(line);
+    (*model)->heap_type = binary;
+    printf("\n\n2222222\n\n");
     free(line);
     line = NULL;
     read = getline(&line, &(size_t){0}, file);
@@ -257,6 +260,8 @@ status_code get_full_model(Logger* logger, Model** model, const char* filename, 
     }
     printf("map  <%s\n", line);
     (*model)->storage_type = get_type_map(line);
+    (*model)->storage_type = bst;
+    printf("\n\n333333\n\n");
     free(line);
     line = NULL;
     read = getline(&line, &(size_t){0}, file);
@@ -273,6 +278,7 @@ status_code get_full_model(Logger* logger, Model** model, const char* filename, 
         write_log(logger);
         return st_act;
     }
+    printf("\n\n444444\n\n");
     free(line);
     line = NULL;
     read = getline(&line, &(size_t){0}, file);
@@ -284,6 +290,7 @@ status_code get_full_model(Logger* logger, Model** model, const char* filename, 
         return code_error_alloc;
     }
     printf("TIME: %s\n", line);
+    printf("\n\n55555\n\n");
     st_act = get_iso_time(line, &(*model)->end_time);
     if (st_act != code_success) {
         create_log(&logger, "ERORR check log status\n", get_sev_from_status(st_act), NULL, NULL, 0, get_time_now());
@@ -304,6 +311,7 @@ status_code get_full_model(Logger* logger, Model** model, const char* filename, 
     free(line);
     line = NULL;
     read = getline(&line, &(size_t){0}, file);
+    printf("\n\n666666\n\n");
     if (read == -1) {
         create_log(&logger, "didnt allocate on line\n", BAD_ALLOC, NULL, NULL, 0, get_time_now());
         write_log(logger);
@@ -322,6 +330,7 @@ status_code get_full_model(Logger* logger, Model** model, const char* filename, 
         fclose(file);
         return code_error_alloc;
     }
+    printf("\n\n777777\n\n");
     sscanf(line, "%d", &(*model)->count_post);
     free(line);
     line = NULL;
@@ -333,6 +342,7 @@ status_code get_full_model(Logger* logger, Model** model, const char* filename, 
         fclose(file);
         return code_error_alloc;
     }
+    printf("\n\n88888\n\n");
     *size_posts = 0;
     int num;
     int check;
@@ -352,7 +362,7 @@ status_code get_full_model(Logger* logger, Model** model, const char* filename, 
         if (sscanf(token, "%d", &num) == 1) {
             Post* tmp = NULL;
             printf("NUMBER = %d\n", num);
-            st_act = create_post(logger, &tmp, (*model)->heap_type, num);
+            st_act = create_post(logger, &tmp, (*model)->heap_type, num, *model);
             if (st_act != code_success) {
                 printf("wfd\n");
                 create_log(&logger, "ERORR check log status\n", get_sev_from_status(st_act), NULL, NULL, 0, get_time_now());
@@ -364,13 +374,7 @@ status_code get_full_model(Logger* logger, Model** model, const char* filename, 
             (*posts_nodes)[_ind] = tmp;
             _ind++;
             
-        } else {
-            create_log(&logger, "invalid num\n", INVALID_PARAMETER, NULL, NULL, 0, get_time_now());
-            write_log(logger);
-            free(line);
-            fclose(file);
-            return code_invalid_parameter;
-        }
+        } 
         token = strtok(NULL, " "); // Получаем следующий токен
     }
     free(line);
@@ -513,7 +517,7 @@ status_code get_full_model_from_user(Logger* logger, Model** model, Post*** post
         if (sscanf(token, "%d", &num) == 1) {
             Post* tmp = NULL;
             printf("NUMBER = %d\n", num);
-            st_act = create_post(logger, &tmp, (*model)->heap_type, num);
+            st_act = create_post(logger, &tmp, (*model)->heap_type, num, *model);
             if (st_act != code_success) {
                 printf("wfd\n");
                 create_log(&logger, "ERORR check log status\n", get_sev_from_status(st_act), NULL, NULL, 0, get_time_now());
@@ -601,6 +605,29 @@ status_code create_map(Logger* logger, Storage type_storage, Model* model) {
     return code_success;
 }
 
+int compare_time_(const void* a, const void* b) {
+    Request* req1 = (Request*)a;
+    Request* req2 = (Request*)b;
+
+    if (req1->sending_time.year != req2->sending_time.year) {
+        return req1->sending_time.year - req2->sending_time.year;
+    }
+    if (req1->sending_time.month != req2->sending_time.month) {
+        return req1->sending_time.month - req2->sending_time.month;
+    }
+    if (req1->sending_time.day != req2->sending_time.day) {
+        return req1->sending_time.day - req2->sending_time.day;
+    }
+    if (req1->sending_time.hour != req2->sending_time.hour) {
+        return req1->sending_time.hour - req2->sending_time.hour;
+    }
+    if (req1->sending_time.minute != req2->sending_time.minute) {
+        return req1->sending_time.minute - req2->sending_time.minute;
+    }
+    return req1->sending_time.second - req2->sending_time.second;
+}
+
+
 status_code read_request(Logger* logger, int count_files, char* filenames[], Request** reqs, int* total_reqs, int choose) {
     create_log(&logger, "read_request started\n", INFO, NULL, NULL, 0, get_time_now());
     write_log(logger);
@@ -628,8 +655,10 @@ status_code read_request(Logger* logger, int count_files, char* filenames[], Req
         FILE* tmp;
         if (choose == 1) {
             tmp = fopen(filenames[i + 2], "r");
+            printf("FILE: %s\n", filenames[i + 2]);
         } else {
             tmp = fopen(filenames[i + 3], "r");
+            printf("FILE: %s\n", filenames[i + 3]);
         }
         //printf("    %s tuttt6\n", filenames[i + 3]);
         if (!tmp) {
@@ -704,8 +733,10 @@ status_code read_request(Logger* logger, int count_files, char* filenames[], Req
         if (line) free(line);
         if (line) line = NULL;
         fclose(tmp);
+        
 
     }
+    qsort(*reqs, *total_reqs, sizeof(Request), compare_time_);
 
     create_log(&logger, "read_request finished\n", INFO, NULL, NULL, 0, get_time_now());
     write_log(logger);
@@ -733,6 +764,11 @@ status_code get_all_info(Logger* logger, int choose, int argc, char* argv[], Mod
         return code_invalid_parameter;
     }
     int max_prior;
+    if (argc < 2) {
+        create_log(&logger, "you should type priority in 1st arg\n", INVALID_PARAMETER, NULL, NULL, 0, get_time_now());
+        write_log(logger);
+        return code_invalid_parameter;
+    }
     sscanf(argv[1], "%d", &max_prior);
     printf("    prior = %d\n", max_prior);
     create_log(&logger, "get_all_info function started\n", INFO, NULL, NULL, 0, get_time_now());
@@ -745,6 +781,12 @@ status_code get_all_info(Logger* logger, int choose, int argc, char* argv[], Mod
     } else {
         create_log(&logger, "params will be written from file\n", INFO, NULL, NULL, 0, get_time_now());
         write_log(logger);
+        if (argc < 3) {
+            create_log(&logger, "not enough args\n", INVALID_PARAMETER, NULL, NULL, 0, get_time_now());
+            write_log(logger);
+            return code_invalid_parameter;
+        }
+        printf("FILE GETTING\n");
         st_act = get_full_model(logger, model, argv[2], posts_nodes, size_posts);
     }
     if (st_act != code_success) {
@@ -752,7 +794,7 @@ status_code get_all_info(Logger* logger, int choose, int argc, char* argv[], Mod
         write_log(logger);
         return st_act;
     }
-
+    printf("ZAKONCHGIL:\n");
     int new_count = argc - 2;
     print_info(*posts_nodes, (*model)->count_post, *model);
     st_act = read_request(logger, new_count, argv, reqs, count_reqs, choose);
@@ -764,6 +806,7 @@ status_code get_all_info(Logger* logger, int choose, int argc, char* argv[], Mod
     printf("doshel\n");
     create_log(&logger, "get_all_info function has finished\n", INFO, NULL, NULL, 0, get_time_now());
     write_log(logger);
+
     return code_success;
 }
 
@@ -775,6 +818,7 @@ status_code insert_map(Logger* logger, Model* model, Request to_add, Post** post
         write_log(logger);
         return code_invalid_parameter;
     }
+    int _index_post = 0;
     bool is_exist = false;
     Post* tmp = NULL;
     status_code st_act;
@@ -792,9 +836,11 @@ status_code insert_map(Logger* logger, Model* model, Request to_add, Post** post
             tmp = find_element((Hash_table*)model->map, to_add.index);
             break;
     }
-    if (!tmp) {
-        tmp = posts[*index_post];
-        *index_post++;
+    if (!tmp) { 
+        tmp = posts[_index_post];
+        _index_post++;
+        *index_post = _index_post;
+        printf("    getting post, because there is no post with this index\n");
         switch(model->storage_type) {
             case array:
                 st_act = insert_array(logger, (Array*)model->map, to_add.index, tmp);
@@ -822,6 +868,7 @@ status_code insert_map(Logger* logger, Model* model, Request to_add, Post** post
                 }
                 break;
             case hashset:
+                printf("VASYAAA\n");
                 st_act = insert_table(model, logger, (Hash_table**)&model->map, to_add.index, tmp);
                 if (st_act != code_success) {
                     create_log(&logger, "error catched while trying inserting in map, check logs\n", get_sev_from_status(st_act), NULL, NULL, 0, _time);
@@ -831,6 +878,7 @@ status_code insert_map(Logger* logger, Model* model, Request to_add, Post** post
                 break;
         }
     } 
+    printf("added, index_post = %d\n", _index_post);
     switch(model->heap_type) {
         case binary:
             st_act = insert_bh(logger, (Binary_heap*)tmp->storage, to_add);
@@ -876,6 +924,7 @@ status_code insert_map(Logger* logger, Model* model, Request to_add, Post** post
             }
             break;
     }
+    printf("added request to heap\n");
     int size_storage;
     switch(model->heap_type) {
         case binary:
@@ -897,22 +946,41 @@ status_code insert_map(Logger* logger, Model* model, Request to_add, Post** post
             size_storage = leftist_heap_size((Leftist_heap*)tmp->storage);
             break;
     }
+    printf("SIZE: %d\n", size_storage);
     double coeff_over = size_storage / tmp->size_operators;
+    printf("coeff = %lf\n", coeff_over);
     tmp->free_requests = tmp->size_operators - size_storage;
     char* information = concatenate_strings("new request id and post index: ", to_add.id, ", ", to_add.index);
     create_log(&logger, information, NEW_REQUEST, NULL, NULL, 0, _time);
     write_log(logger);
-    if (fabs(coeff_over - model->coeff_overload) < 1e-8) {
+    Request* _add_req = NULL;
+    st_act = request_copy(to_add, &_add_req);
+    printf("KEK: %s %s\n", _add_req->id, to_add.id);
+    if (fabs(coeff_over - model->coeff_overload) < 1e-8 && size_storage != 0) {
+        printf("overload\n");
         tmp->is_overload = true;
+        bool is_alone = false;
         Post* exchange = find_less_load(posts, count_posts);
-        if (!exchange) return code_success;
+        if (!exchange) {
+            exchange = tmp;
+            is_alone = true;
+        }
+        printf("Coming to merge1\n");
         tmp->free_requests = tmp->size_operators;
         char* id_post = get_id_post(model, exchange);
-        char* inform = concatenate_strings("post overloaded, ", to_add.id, "delivered to ", id_post);
-        create_log(&logger, inform, DEPARTMENT_OVERLOADED, NULL, id_post, 0, _time);
+        printf("id_post %s\n", id_post);
+        printf("Coming to merge2\n");
+        char* inform = NULL;
+        printf("%s -- %s\n", to_add.id, id_post);
+        inform = concatenate_strings("post overloaded, ", to_add.id, "delivered to ", id_post);
+        printf("%s --\n", inform);
+        create_log(&logger, inform, DEPARTMENT_OVERLOADED, NULL, NULL, 0, _time);
         write_log(logger);
+        printf("----------%s\n", inform);
+        printf("Coming to merge3\n");
         switch(model->heap_type) {
             case binary:
+                
                 st_act = merge_destruction_bh(logger, (Binary_heap*)exchange->storage, tmp->storage);
                 if (st_act != code_success) {
                     create_log(&logger, "error catched while trying to merge in heap, check logs\n", get_sev_from_status(st_act), NULL, NULL, 0, get_time_now());
@@ -987,8 +1055,8 @@ status_code insert_map(Logger* logger, Model* model, Request to_add, Post** post
         if (exchange->free_requests != 0) {
             for (int k = 0; k < exchange->size_operators; k++) {
                 if (check_operator_free(exchange->ops[k])) {
-                    exchange->ops[k].current_request = &to_add;
-                    exchange->ops[k].start = to_add.sending_time;
+                    exchange->ops[k].current_request = _add_req;
+                    exchange->ops[k].start = _add_req->sending_time;
                     exchange->ops[k].time_process = get_random_process_time(model);
                     information = concatenate_strings("request handling started ", to_add.id, ", ", tmp->ops[k].name);
                     create_log(&logger, information, REQUEST_HANDLING_STARTED, exchange->ops[k].name, to_add.index, 0, _time);
@@ -996,15 +1064,20 @@ status_code insert_map(Logger* logger, Model* model, Request to_add, Post** post
                     exchange->free_requests--;
                     free(information);
                     information = NULL;
+                    break;
                 }
             }
         }
+        printf("    finished\n");
     } else {
+        printf("FREE_REQUESTS: %d\n", tmp->free_requests);
         if (tmp->free_requests != 0) {
             for (int k = 0; k < tmp->size_operators; k++) {
                 if (check_operator_free(tmp->ops[k])) {
-                    tmp->ops[k].current_request = &to_add;
-                    tmp->ops[k].start = to_add.sending_time;
+                    printf("free operator: %s\n", tmp->ops[k].name);
+                    tmp->ops[k].current_request = _add_req;
+                    printf("    < < < < <%s\n", tmp->ops[k].current_request->id);
+                    tmp->ops[k].start = _add_req->sending_time;
                     tmp->ops[k].time_process = get_random_process_time(model);
                     information = concatenate_strings("request handling started ", to_add.id, ", ", tmp->ops[k].name);
                     create_log(&logger, information, REQUEST_HANDLING_STARTED, tmp->ops[k].name, to_add.index, 0, _time);
@@ -1012,6 +1085,8 @@ status_code insert_map(Logger* logger, Model* model, Request to_add, Post** post
                     tmp->free_requests--;
                     free(information);
                     information = NULL;
+                    printf("DOBAVIL %s to %s, operator = %s\n", tmp->ops[k].current_request->id, tmp->ops[k].current_request->index, tmp->ops[k].name);
+                    break;
                 }
             }
         }
@@ -1023,9 +1098,12 @@ status_code insert_map(Logger* logger, Model* model, Request to_add, Post** post
 }
 
 Post* find_less_load(Post** posts, int size) {
-    if (!posts) return NULL;
+    if (!posts) {
+        return NULL;
+    }
     int minimum = posts[0]->free_requests;
     Post* tmp = posts[0];
+    printf("size %d\n", size);
     for (int i = 1; i < size; i++) {
         if (posts[i]->free_requests < minimum && !posts[i]->is_overload) {
             minimum = posts[i]->free_requests;
@@ -1040,56 +1118,83 @@ void print_choose() {
     printf("Enter 2 to upload params of model from file\n");
 }
 
+void print_time(my_time a) {
+    printf("TIME CUR: %04d-%02d-%02dT%02d:%02d:%02d\n", a.year, a.month, a.day, a.hour, a.minute, a.second);
+}
+
 void process_requests(Logger* logger, Model* model, Post** posts, my_time _time) {
-    printf("zashel\n");
     for (int i = 0; i < model->count_post; i++) {
         Post* tmp = posts[i];
         Request _check;
         status_code st_act;
         int count_request = 0;
+
         switch(model->heap_type) {
             case binary:
-                _check = ((Binary_heap*)tmp->storage)->data[0];
                 count_request = binary_heap_size((Binary_heap*)tmp->storage);
+                if (count_request != 0) {   
+                    _check = ((Binary_heap*)tmp->storage)->data[0];
+                }
                 break;
             case binomial:
-                _check = ((Binomial_heap*)tmp->storage)->root->data;
                 count_request = size_binom_heap((Binomial_heap*)tmp->storage);
+                //printf("%d--\n", count_request);
+                if (count_request != 0) {  
+                    if (((Binomial_heap*)tmp->storage)->root == NULL) {
+                        printf("WWWWW\n");
+                    }
+                    _check = ((Binomial_heap*)tmp->storage)->root->data;
+                }
                 break;
             case fibonacci:
-                _check = ((Fibbonacci_heap*)tmp->storage)->root->req;
                 count_request = size_fib_heap((Fibbonacci_heap*)tmp->storage);
+                if (count_request != 0) {
+                    _check = ((Fibbonacci_heap*)tmp->storage)->root->req;
+                }
                 break;
             case skew:
-                _check = ((Skew_heap*)tmp->storage)->data;
                 count_request = skew_heap_size((Skew_heap*)tmp->storage);
+                if (count_request != 0)  {
+                    _check = ((Skew_heap*)tmp->storage)->data;
+                }
                 break;
             case treap:
-                _check = ((Treap*)tmp->storage)->data;
                 count_request = treap_size((Treap*)tmp->storage);
+                if (count_request != 0)  {
+                    _check = ((Treap*)tmp->storage)->data;
+                }
                 break;
             case leftist:
-                _check = ((Leftist_heap*)tmp->storage)->key;
                 count_request = leftist_heap_size((Leftist_heap*)tmp->storage);
+                if (count_request != 0) {
+                    _check = ((Leftist_heap*)tmp->storage)->key;
+                }
                 break;
         }
         if (count_request == 0) {
             continue;
         }
-        printf("after switch\n");
         char* op_replacer = NULL;
         for (int k = 0; k < tmp->size_operators; k++) {
             printf("str1: %s\n", _check.id);
+            if (tmp->ops[k].current_request == NULL) {
+                break;
+            } else {
+                printf("Operator with request %s\n", tmp->ops[k].name);
+                printf("REQUEST %s\n", tmp->ops[k].current_request->id);
+            }
             printf("str2: %s\n", tmp->ops[k].current_request->id);
             if (strcmp(_check.id, tmp->ops[k].current_request->id)) {
                 continue;
             }
+            printf("nashel\n");
             my_time check = _time;
             add_minutes(&check, tmp->ops[k].time_process);
-            
+            //print_time(check);
             if (compare_time(&_time, &_check.sending_time) >= 0) {
                 char* str_op = strdup(tmp->ops[k].name);
                 str_op = strcat(str_op, " ");
+
                 int diff_t = time_difference_minutes(_time, _check.sending_time);
                 char* diff_t_str = int_to_string(diff_t);
                 str_op = strcat(str_op, diff_t_str);
@@ -1130,7 +1235,7 @@ void process_requests(Logger* logger, Model* model, Post** posts, my_time _time)
                         to_del = pop_lh((Leftist_heap**)&tmp->storage);
                         break;
                 }
-                free(to_del);
+                //free(to_del);
                 to_del = NULL;
             }
             break;

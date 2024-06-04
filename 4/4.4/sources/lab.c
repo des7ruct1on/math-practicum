@@ -16,6 +16,36 @@ status_code create_vector(Vector** ar, char c) {
     return code_success;
 }
 
+void print_info_file(FILE* file, condition status, Vector* var) {
+    switch (status) {
+        case cond_error_reading:
+            fprintf(file, "Error reading file\n");
+            break;
+        case cond_error_writing:
+            fprintf(file, "Error writing file\n");
+            break;
+        case cond_met_comment:
+            fprintf(file, "Met comment\n");
+            break;
+        case cond_unknown_var:
+            fprintf(file, "Unknown var!\n");
+            break;
+        case cond_value:
+            fprintf(file, "Var: %c\n", var->name);
+            for (int i = 0; i < var->size; i++) {
+                fprintf(file, "%c ", var->data[i]);
+            }
+            fprintf(file, "\n");
+            break;
+        case cond_invalid_parameter:
+            fprintf(file, "Invalid parameter detected!!!\n");
+            break;
+        default:
+            break;
+    }
+}
+
+
 status_code add_to_vector(Vector** arr, char c, char number) {
     status_code st_act;
     if (!(*arr)) {
@@ -135,18 +165,22 @@ status_code operation(Vector** a, Vector* b, char operator[]) {
         }
     }
     else if (!strcmp(operator, "->")) {
+        //printf("zashel\n");
+        //printf("%d---\n", b->size);
         for (int i = 0; i < b->size; i++) {
-            (*a)->data[i] = ~((*a)->data[i] - '0') | (b->data[i] - '0') + '0';
+            (*a)->data[i] = (((*a)->data[i] - '0') <= (b->data[i] - '0')) + '0';
+            //printf("%d-----\n", (*a)->data[i]);
         }
+        //printf("str %s\n", (*a)->data);
     }
     else if (!strcmp(operator, "<-")) {
         for (int i = 0; i < b->size; i++) {
-            (*a)->data[i] = ((*a)->data[i] - '0') | !(b->data[i] - '0') + '0';
+            (*a)->data[i] = (((*a)->data[i] - '0') >= (b->data[i] - '0')) + '0';
         }
     }
     else if (!strcmp(operator, "~")) {
         for (int i = 0; i < b->size; i++) {
-            (*a)->data[i] = !(((*a)->data[i] - '0') ^ (b->data[i] - '0')) + '0';
+            (*a)->data[i] = (((*a)->data[i] - '0') == (b->data[i] - '0')) + '0';
         }
     }
     else if (!strcmp(operator, "<>")) {
@@ -156,7 +190,7 @@ status_code operation(Vector** a, Vector* b, char operator[]) {
     }
     else if (!strcmp(operator, "+>")) {
         for (int i = 0; i < b->size; i++) {
-            (*a)->data[i] = ((*a)->data[i] - '0') >= (b->data[i] - '0') + '0';
+            (*a)->data[i] = !(((*a)->data[i] - '0') <= (b->data[i] - '0')) + '0';
         }
     }
     else if (!strcmp(operator, "?")) {
@@ -193,7 +227,7 @@ status_code operation(Vector** a, Vector* b, char operator[]) {
 }
 
 bool is_operator(char c) {
-    return (c == '\\' || c == '+' || c == '&' || c == '|' || c == '~' || c == '<' || c == '>' || c == '?' || c == '!' || c == ':' || c == '=');
+    return (c == '\\' || c == '+' || c == '&' || c == '|' || c == '~' || c == '-' || c == '<' || c == '>' || c == '?' || c == '!' || c == ':' || c == '=');
 }
 
 
@@ -248,8 +282,13 @@ status_code convert_to_decimal(char* number_str, int base, int * dec_number) {
     unsigned int decimal_number = 0;
     int power = strlen(number_str) - 1;  
     bool start = true;
-    for (int i = 0; i < strlen(number_str); i++) {
+    //printf("here1 %s\n", number_str);
+    int size = strlen(number_str);
+    //printf("SIZE %d\n", size);
+    for (int i = 0; i < size; i++) {
         char digit = number_str[i];
+        //printf("%c\n", digit);
+        //printf("hzzz\n");
         if (digit == '-' && start) {
             if (start) {
                 power--;
@@ -270,9 +309,11 @@ status_code convert_to_decimal(char* number_str, int base, int * dec_number) {
         power--;
         start = false;
     }
+    //printf("here2\n");
     if (decimal_number > INT_MAX) {
         return code_invalid_parameter;
     }
+    //printf("here3\n");
     *dec_number = decimal_number;
     return code_success;
 }
@@ -342,15 +383,18 @@ status_code print_vector(Vector* a, int base, const char* filename) {
     }
     int dec_num;
     status_code st_act;
+    //printf("0000\n");
     st_act = convert_to_decimal(a->data, 2, &dec_num);
     if (st_act != code_success) {
         return st_act;
     }
+    //printf("1111\n");
     char* new_num = NULL;
     st_act = convert_from_decimal(dec_num, base, &new_num);
     if (st_act != code_success) {
         return st_act;
     }
+    //printf("2222\n");
     if (!filename) {
         printf("Number in %d base: %s\n", base, new_num);
     } else {
@@ -367,37 +411,8 @@ status_code print_vector(Vector* a, int base, const char* filename) {
 
 }
 
-void print_info_file(FILE* file, condition status, Vector* var) {
-    switch (status) {
-        case cond_error_reading:
-            fprintf(file, "Error reading file\n");
-            break;
-        case cond_error_writing:
-            fprintf(file, "Error writing file\n");
-            break;
-        case cond_met_comment:
-            fprintf(file, "Met comment\n");
-            break;
-        case cond_unknown_var:
-            fprintf(file, "Unknown var!\n");
-            break;
-        case cond_value:
-            fprintf(file, "Var: %c\n", var->name);
-            for (int i = 0; i < var->size; i++) {
-                fprintf(file, "%c ", var->data[i]);
-            }
-            fprintf(file, "\n");
-            break;
-        case cond_invalid_parameter:
-            fprintf(file, "Invalid parameter detected!!!\n");
-            break;
-        default:
-            break;
-    }
-}
-
 status_code process(const char* filename, Vector** storage, int* size_storage, bool is_trace, const char* output) {
-    printf("%s %s\n", filename, output);
+    //printf("%s %s\n", filename, output);
     FILE* file = fopen(filename, "r");
     if (!file) return code_error_oppening;
 
@@ -568,11 +583,16 @@ status_code process(const char* filename, Vector** storage, int* size_storage, b
                 if (sscanf(cmd, "(%c, %d)", &c, &base)!= 2) {
                     free(line);
                     line = NULL;
+                    //printf("neee\n");
                     print_info_file(file_out, cond_error_reading, NULL);
                     continue;
                         // ne prochitalo
                 }
                 vet_st = find_vector(storage, *size_storage, c);
+                //printf("%c>>>\n", vet_st->name);
+                if (!vet_st) {
+                    printf("pustoy\n");
+                }
                 if (!vet_st) {
                     print_info_file(file_out, cond_unknown_var, NULL);
                     free(line);
@@ -583,7 +603,9 @@ status_code process(const char* filename, Vector** storage, int* size_storage, b
                 }
                     //printf("ndasdasdo\n");
                 st_act = print_vector(vet_st, base, output);
+                //print_info_file(stdout, cond_value, vet_st);
                 if (st_act != code_success) {
+                    //printf("tttuuut\n");
                     print_info_file(file_out, cond_error_writing, NULL);
                     free(line);
                     line = NULL;
@@ -630,6 +652,7 @@ status_code process(const char* filename, Vector** storage, int* size_storage, b
                     return st_act;
                 }
                 add_to_storage(storage, vet_st, size_storage);
+                printf("DOBAVIL\n");
             }
         }
         c = line[i];
@@ -711,9 +734,11 @@ status_code process(const char* filename, Vector** storage, int* size_storage, b
                     print_info_file(file_out, cond_invalid_parameter, NULL);
                     break;
                 }
+                //printf("%d size\n", summator->size);
+                //print_vector(summator, 2, NULL);
                 print_info_file(file_out, cond_value, summator);
                 //printf("fsdfsdfsd\n");
-                //print_vector(vet_end, 2, NULL);
+                //print_vector(summator, 2, NULL);
                 //printf("    fsdfsdfsd\n");
                 //printf("SUMMMATOR\n");
                 //print_vector(summator, 2, NULL);

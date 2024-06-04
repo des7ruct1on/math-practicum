@@ -6,3 +6,5 @@ fsd fdsf sd
 write(B, 2);
 read(Z, 10);
 write(Z, 2);
+F := B -> Z;
+write(F, 2);

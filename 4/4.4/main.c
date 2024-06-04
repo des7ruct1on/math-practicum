@@ -30,6 +30,7 @@ int main(int argc, char* argv[]) {
         printf("Invalid parameter detected!!!\n");
         exit(1);
     }
+    //printf("zashel]\n");
     status_code st_act;
     Vector** storage = NULL;
     storage = (Vector**)malloc(sizeof(Vector) * 32);
@@ -39,7 +40,7 @@ int main(int argc, char* argv[]) {
     }
     int capacity = 0;
     bool is_trace = false;
-    printf("%d %s\n", !strcmp("/trace", argv[2]), argv[2]);
+    //printf("%d %s\n", !strcmp("/trace", argv[2]), argv[2]);
     if (argc == 4 && !strcmp("/trace", argv[2])) {
         is_trace = true;
         st_act = process(argv[1], storage, &capacity, is_trace, argv[3]);

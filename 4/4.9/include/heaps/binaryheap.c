@@ -76,22 +76,27 @@ Request* pop_bh(Binary_heap* q) {
     if (!q) return NULL;
     Request* value = &q->data[0];
     swap_request(&(q->data[0]), &(q->data[q->size - 1]));
+    printf("sdelal swap\n");
     q->size--;
     heapify_down_bh(q);
-    
+    printf("ushel\n");
     return value;
 }
 
 status_code merge_destruction_bh(Logger * logger, Binary_heap* a, Binary_heap* b) {
     if (!b) return code_success;
     status_code st_act;
-    while (b->size) {
-        st_act = insert_bh(logger, a, *pop_bh(b));
+    while (b->size > 0) {
+        Request* t = pop_bh(b);
+        int _size = b->size;
+        //printf("%d\n", _size);
+        st_act = insert_bh(logger, a, *t);
         if (st_act != code_success) {
             create_log(&logger, "error after insert, check logs\n", get_sev_from_status(st_act), NULL, NULL, 0, get_time_now());
             write_log(logger);
             return st_act;
         }
+        if (_size == 0) break;
     }
     return code_success;
 }

@@ -43,7 +43,7 @@ status_code insert_array(Logger* logger, Array* arr, char* key, Post* office) {
     if (arr->size == arr->capacity - 1) {
         arr->capacity *= 2;
         arr->keys = (char**)malloc(arr->capacity * sizeof(char*));
-        if (arr->keys) {
+        if (!arr->keys) {
             arr->capacity /= 2;
             free(arr);
             return code_error_alloc;

@@ -10,3 +10,4 @@ write(A, 2);
 write(B, 2);
 Z :=  \B;
 write(Z, 2);
+write(A, 2);

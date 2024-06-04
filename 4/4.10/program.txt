@@ -1,0 +1,22 @@
+var_1 -> 500;
+
+#var_2 = mult(2,5);
+
+Var3 -> (div(10,5), %(var_1,2))sum;
+
+#var_2 = (2,5)mult;
+#Var3 = ((var_2,5)div, (var_1,2)rem)add;
+
+#var_2 = 2 mult 5;
+#Var3 = (var_2 div 5) add (var_1 rem 2);
+
+in(var_1);
+
+print(26);
+#BREAKPOINT
+
+var_4 -> pow(2, 2);
+print(var_4);
+
+in(var_4);
+print(var_4);

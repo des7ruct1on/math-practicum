@@ -14,7 +14,7 @@ void get_random_dates(my_time* start, my_time* end) {
         start->second = rand() % 60; 
     }
     if (end) {
-        end->year = rand() % (2024 - start->year + 1) + start->year; 
+        end->year = rand() % (2024 - start->year) + start->year; // Год окончания не позднее года начала
         end->month = rand() % 12 + 1; 
         end->day = rand() % 31 + 1; 
         end->hour = rand() % 24; 
@@ -25,7 +25,7 @@ void get_random_dates(my_time* start, my_time* end) {
 
 void get_random_date_diap(my_time A, my_time B, my_time* res) {
 
-    res->year = rand() % (B.year - A.year) + A.year;
+    res->year = A.year;//rand() % (B.year - A.year) + A.year;
     res->month = rand() % 12 + 1;
     res->day = rand() % 30 + 1;
     res->hour = rand() % 24;
@@ -143,6 +143,12 @@ int main(int argc, char* argv[]) {
     write_requests(logger, "src/file1.txt", st, end, prior);
     write_requests(logger, "src/file2.txt", st, end, prior);
     write_requests(logger, "src/file3.txt", st, end, prior);
+    write_requests(logger, "src/file4.txt", st, end, prior);
+    write_requests(logger, "src/file5.txt", st, end, prior);
+    write_requests(logger, "src/file6.txt", st, end, prior);
+    write_requests(logger, "src/file7.txt", st, end, prior);
+    write_requests(logger, "src/file8.txt", st, end, prior);
+    write_requests(logger, "src/file9.txt", st, end, prior);
     //printf("here15\n");
     return 0;
 }

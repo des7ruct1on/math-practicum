@@ -1,0 +1,27 @@
+left=
+not not
+not()
+input in
+input()
+output print
+output()
+add sum
+()add
+mult mult
+mult()
+sub sub
+sub()
+pow pow
+pow()
+div div
+div()
+rem %
+rem()
+xor ><
+xor()
+and and
+and()
+or or
+or()
+= ->
+=()
